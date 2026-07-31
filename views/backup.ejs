@@ -1,0 +1,148 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<div class="mb-6">
+  <a href="<%= pages.prompts %>" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to prompts</a>
+</div>
+
+<div class="max-w-2xl space-y-6">
+  <% if (importError) { %>
+    <div class="notice notice-error">
+      <%- include('partials/icon', { name: 'fa-solid fa-circle-exclamation' }) %>
+      <span><%= importError %></span>
+    </div>
+  <% } %>
+
+  <% if (importResult) { %>
+    <div class="notice notice-ok">
+      <%- include('partials/icon', { name: 'fa-solid fa-circle-check' }) %>
+      <span>
+        Imported <%= importResult.imported %> ·
+        Skipped <%= importResult.skipped.length %> ·
+        Ignored <%= importResult.ignored %>
+        <% if (importResult.created.length) { %>
+          · Created <%= importResult.created.length %> categories: <%= importResult.created.join(", ") %>
+        <% } %>
+        <% if (importResult.skipped.length) { %>
+          <details class="mt-1">
+            <summary class="cursor-pointer text-xs">Which were skipped</summary>
+            <p class="mt-1 text-xs"><%= importResult.skipped.join(", ") %></p>
+          </details>
+        <% } %>
+      </span>
+    </div>
+  <% } %>
+
+  <section class="card">
+    <div class="card-head">
+      <%- include('partials/icon', { name: 'fa-solid fa-box-archive' }) %>
+      <h2>Full backup</h2>
+      <span class="ml-auto">
+        <form action="<%= pages.backups %>" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button type="submit" class="btn btn-primary btn-sm">
+            <%- include('partials/icon', { name: 'fa-solid fa-plus' }) %> Create backup
+          </button>
+        </form>
+      </span>
+    </div>
+    <div class="card-body">
+      <p class="help mt-0 mb-3.5">
+        Everything in one zip: the database, every image file, and a readable
+        copy of your prompts. It holds no <code>.env</code> and no API key, so
+        it is safe to keep somewhere else.
+      </p>
+
+      <% if (!backups.length) { %>
+        <p class="card-empty">No backups yet.</p>
+      <% } else { %>
+        <ul class="divide-y divide-slate-200 border-t border-slate-200">
+          <% backups.forEach(function (backup) { %>
+            <li class="flex flex-wrap items-center gap-3 py-3">
+              <%- include('partials/icon', { name: 'fa-solid fa-file-zipper', extra: 'text-slate-400' }) %>
+              <span class="min-w-0 flex-1 truncate font-mono text-sm text-slate-800"><%= backup.name %></span>
+              <span class="text-xs text-slate-500">
+                <%= backup.size %> · <%= backup.createdAt.slice(0, 16).replace("T", " ") %>
+              </span>
+              <a href="<%= pages.backups %>/<%= encodeURIComponent(backup.name) %>" class="btn btn-quiet btn-sm"
+                aria-label="Download <%= backup.name %>">
+                <%- include('partials/icon', { name: 'fa-solid fa-download' }) %>
+              </a>
+              <form action="<%= pages.backups %>/<%= encodeURIComponent(backup.name) %>/delete" method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button type="submit" class="btn btn-quiet btn-sm text-red-600 hover:text-red-700"
+                  aria-label="Delete <%= backup.name %>">
+                  <%- include('partials/icon', { name: 'fa-regular fa-trash-can' }) %>
+                </button>
+              </form>
+            </li>
+          <% }); %>
+        </ul>
+      <% } %>
+
+      <div class="notice notice-info mt-4 mb-0">
+        <%- include('partials/icon', { name: 'fa-solid fa-terminal' }) %>
+        <span>
+          Putting one back is a command line job, with the app stopped, because it
+          replaces your whole library at once:
+          <code>node scripts/restore.js data/backups/&lt;file&gt;.zip</code>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <%- include('partials/icon', { name: 'fa-solid fa-file-export' }) %>
+      <h2>Export prompts</h2>
+    </div>
+    <div class="card-body">
+      <p class="help mt-0 mb-3.5">
+        Every saved prompt as one JSON file, with its category, rating, and preferred
+        size and model. Always all of them, never the filter you last used &mdash; a
+        backup holding some of your prompts would be worse than none.
+      </p>
+      <a href="<%= pages.prompts %>/export" class="btn btn-primary">
+        <%- include('partials/icon', { name: 'fa-solid fa-download' }) %> Export all prompts
+      </a>
+    </div>
+  </section>
+
+  <section class="card" data-widget="import-prompts">
+    <div class="card-head">
+      <%- include('partials/icon', { name: 'fa-solid fa-file-import' }) %>
+      <h2>Import prompts</h2>
+    </div>
+    <div class="card-body">
+      <p class="help mt-0 mb-3.5">
+        Load prompts from a file this page exported, or one written by hand.
+        A name you already have is skipped rather than overwritten, so importing
+        the same file twice is harmless and nothing saved can be lost.
+      </p>
+      <form action="<%= pages.prompts %>/import" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <label for="import-file" class="field-label">JSON file</label>
+        <input id="import-file" name="file" type="file" accept="application/json,.json" required
+          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium focus:border-brand-500 focus:outline-none" />
+        <p class="help">
+          A category named in the file is created if you do not have it. An entry
+          with no name or no prompt text is counted as ignored rather than stopping
+          the rest.
+        </p>
+
+        <div class="mt-3.5">
+          <button type="submit" class="btn btn-primary">
+            <%- include('partials/icon', { name: 'fa-solid fa-file-import' }) %> Import
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <p class="text-xs text-slate-500">
+    Export and import cover prompts only. For your images and their files, take
+    a full backup.
+  </p>
+</div>
+
+<%- include('partials/chrome-foot') %>

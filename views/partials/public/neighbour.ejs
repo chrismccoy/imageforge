@@ -1,0 +1,9 @@
+<%
+  
+  const isPrev = dir === "prev";
+  const tag = id ? "a" : "span";
+  const arrow = isPrev ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right";
+%>
+<<%= tag %><% if (id) { %> href="<%= prefix %>/<%= token %>/i/<%= id %>"<% } %>
+  data-neighbour-<%= dir %> class="btn btn-quiet btn-sm<%= id ? "" : " btn-disabled" %>"
+  ><% if (isPrev) { %><%- include('../icon', { name: arrow }) %> Previous<% } else { %>Next <%- include('../icon', { name: arrow }) %><% } %></<%= tag %>>

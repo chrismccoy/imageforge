@@ -1,0 +1,27 @@
+<div class="filter-bar" data-list-head<% if (fav) { %> data-favourites-view<% } %>>
+  <p class="text-sm text-slate-500" data-list-count>
+    <% if (q || fav || collection || prompt) { %><%= total %> of <%= totalAll %> saved<% } else { %><%= total %> saved<% } %>
+  </p>
+  <%- include('../search-form', { action: pages.generations, q: q }) %>
+  <form method="get" action="<%= pages.generations %>" class="flex items-center gap-2">
+        <%- include('../carried-filters', {
+          filters: { ...filters, collection: '' },
+        }) %>
+    <select name="collection"
+      class="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none">
+      <option value="">All collections</option>
+      <option value="none" <%= collection === 'none' ? 'selected' : '' %>>Not in any</option>
+      <% collectionList.forEach(function (c) { %>
+        <option value="<%= c.id %>" <%= String(collection) === String(c.id) ? 'selected' : '' %>><%= c.name %></option>
+      <% }); %>
+    </select>
+    <button type="submit" class="btn btn-quiet btn-sm">Filter</button>
+  </form>
+  <a href="<%= favUrl %>" class="btn btn-sm <%= fav ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-50' : 'btn-quiet' %>">
+    <%- include('../icon', { name: 'fa-solid fa-star' }) %> Favourites
+  </a>
+  <span class="flex-1"></span>
+  <%- include('../bulk-idle') %>
+</div>
+
+<%- include('../bulk-bar') %>

@@ -1,0 +1,118 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<div class="max-w-6xl space-y-6">
+  <% if (error) { %>
+    <div class="notice notice-error mb-0 max-w-2xl">
+      <%- include('partials/icon', { name: 'fa-solid fa-circle-exclamation' }) %>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <form action="<%= pages.collections %>" method="post" class="card max-w-2xl">
+    <div class="card-body flex items-end gap-3">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div class="flex-1">
+        <label for="name" class="field-label">New collection</label>
+        <input id="name" name="name" type="text" required placeholder="Acme rebrand"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none" />
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <%- include('partials/icon', { name: 'fa-solid fa-plus' }) %> Add
+      </button>
+    </div>
+  </form>
+
+  <div class="card">
+    <% if (collections.length === 0) { %>
+      <p class="card-empty">No collections yet.</p>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="text-center">Images</th>
+              <th>Sharing</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% collections.forEach(function (collection) { %>
+              <tr>
+                <td>
+                  <form action="<%= pages.collections %>/<%= collection.id %>" method="post" class="flex items-center gap-2">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <input name="name" type="text" value="<%= collection.name %>" required
+                      class="w-56 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none" />
+                    <button type="submit" class="btn btn-quiet btn-sm">
+                      <%- include('partials/icon', { name: 'fa-solid fa-pen' }) %> Rename
+                    </button>
+                  </form>
+                </td>
+                <td class="text-center">
+                  <a href="<%= pages.generations %>?collection=<%= collection.id %>"
+                    title="See the images in <%= collection.name %>"
+                    class="pill hover:bg-brand-100 hover:text-brand-700"><%= collection.images %></a>
+                </td>
+                <td>
+                  <% if (collection.share_token) { %>
+                    <% const shareUrl = collectionPrefix + '/' + collection.share_token; %>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="pill pill-green">
+                        <%- include('partials/icon', { name: 'fa-solid fa-circle-check' }) %> Shared
+                      </span>
+                      <a href="<%= shareUrl %>" class="font-mono text-xs text-brand-600 hover:underline"><%= shareUrl %></a>
+                      <button type="button" data-copy="<%= shareUrl %>" aria-label="Copy the link"
+                        class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+                        <%- include('partials/icon', { name: 'fa-regular fa-copy' }) %>
+                      </button>
+                    </div>
+                    <p class="help">Shown as &ldquo;<%= collection.public_title %>&rdquo;</p>
+                  <% } else { %>
+                    <form action="<%= pages.collections %>/<%= collection.id %>/share" method="post" class="flex items-center gap-2">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <input name="title" type="text" required
+                        placeholder="Public title" value="<%= collection.public_title || '' %>"
+                        class="w-44 rounded-md border border-slate-300 px-2 py-1 text-xs focus:border-brand-500 focus:outline-none" />
+                      <button type="submit" class="btn btn-quiet btn-sm">
+                        <%- include('partials/icon', { name: 'fa-solid fa-share-nodes' }) %> Share
+                      </button>
+                    </form>
+                  <% } %>
+                </td>
+                <td class="text-right">
+                  <div class="flex flex-wrap items-center justify-end gap-2" data-confirm>
+                    <% if (collection.share_token) { %>
+                      <form action="<%= pages.collections %>/<%= collection.id %>/unshare" method="post" data-confirm-hide>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                        <button type="submit" class="btn btn-quiet btn-sm">
+                          <%- include('partials/icon', { name: 'fa-solid fa-link-slash' }) %> Un-share
+                        </button>
+                      </form>
+                    <% } %>
+                    <button type="button" data-confirm-open class="btn btn-danger btn-sm">
+                      <%- include('partials/icon', { name: 'fa-regular fa-trash-can' }) %> Delete
+                    </button>
+                    <%- include('partials/confirm-panel', {
+                          action: `${pages.collections}/${collection.id}/delete`,
+                          label: collection.images > 0 ? 'Delete? Images are kept' : 'Delete?'
+                        }) %>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <p class="help">
+    A shared collection shows its public title, never its own name. Un-sharing kills every link under it at once.
+  </p>
+</div>
+
+<%- include('partials/page-scripts', { scripts: ['ui', 'copy-link'] }) %>
+<%- include('partials/inline-confirm') %>
+<%- include('partials/chrome-foot') %>

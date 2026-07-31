@@ -1,0 +1,9 @@
+<%- include('../prompt-modal') %>
+<%- include('../page-scripts', {
+      scripts: ['ui', 'api', 'prompt-modal', 'favorite', 'bulk', 'collections'],
+    }) %>
+
+<% if (sharing) { %>
+  <%- include('../share-dialog') %>
+  <%- include('../page-scripts', { scripts: ['share'] }) %>
+<% } %>

@@ -1,0 +1,15 @@
+<%- include('partials/head') %>
+<%- include('partials/public/header') %>
+  <% const pageUrl = `${prefix}/${token}`; %>
+  <div class="pub-narrow">
+    <%- include('partials/image-card', {
+          downloadUrl: imageUrl,
+          downloadAttr: true,
+          pageUrl: pageUrl,
+        }) %>
+  </div>
+<%- include('partials/page-scripts', {
+      scripts: ['ui', 'copy-link', 'share-page'],
+    }) %>
+<%- include('partials/public/foot') %>
+<%- include('partials/foot') %>

@@ -1,0 +1,26 @@
+<section data-widget="<%= widget %>" class="card">
+  <div class="card-head">
+    <h2><%= title %></h2>
+    <a href="<%= allUrl %>" class="ml-auto text-xs text-brand-600 hover:underline">All</a>
+  </div>
+  <div class="card-body">
+    <% if (rows.length) { %>
+      <ul class="space-y-2 text-sm">
+        <% rows.forEach(function (prompt) { %>
+          <li class="flex items-center justify-between gap-3">
+            <a href="<%= pages.prompts %>/<%= prompt.id %>/edit" class="truncate text-slate-700 hover:text-brand-600"><%= prompt.name %></a>
+            <% if (badge === "rating") { %>
+              <span class="shrink-0 text-xs">
+                <%- include('../stars', { rating: prompt.rating }) %>
+              </span>
+            <% } else { %>
+              <span class="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600"><%= prompt.uses %></span>
+            <% } %>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <p class="card-empty"><%= empty %></p>
+    <% } %>
+  </div>
+</section>

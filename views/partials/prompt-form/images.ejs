@@ -1,0 +1,22 @@
+<section data-widget="prompt-images" class="card">
+  <div class="card-head">
+    <%- include('../icon', { name: 'fa-regular fa-images' }) %><h2>Made from this</h2>
+    <% if (madeFromTotal > 0) { %>
+      <a href="<%= pages.generations %>?prompt=<%= prompt.id %>" class="ml-auto text-xs text-brand-600 hover:underline">All <%= madeFromTotal %></a>
+    <% } %>
+  </div>
+  <div class="card-body">
+    <% if (!madeFrom.length) { %>
+      <p class="help mt-0">Nothing has been generated from this prompt yet.</p>
+    <% } else { %>
+      <div class="grid grid-cols-4 gap-1.5">
+        <% madeFrom.forEach(function (gen) { %>
+          <a href="<%= pages.generations %>?prompt=<%= prompt.id %>"
+            class="block aspect-square overflow-hidden rounded-md border border-slate-200 bg-slate-50 hover:border-brand-500">
+            <img src="<%= uploadPrefix %>/<%= gen.filename %>" alt="<%= gen.prompt || prompt.name %>" loading="lazy" class="h-full w-full object-cover" />
+          </a>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</section>

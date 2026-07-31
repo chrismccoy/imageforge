@@ -1,0 +1,138 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<%
+  const saved = results.filter(function (result) { return result.ok; }).length;
+  const refused = results.length - saved;
+%>
+
+<div class="max-w-2xl">
+  <% if (error) { %>
+    <div class="notice notice-error">
+      <%- include('partials/icon', { name: 'fa-solid fa-circle-exclamation' }) %>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <% if (results.length > 1) { %>
+    <section data-widget="upload-results" class="card mb-6">
+      <div class="card-head">
+        <%- include('partials/icon', { name: 'fa-solid fa-list-check' }) %>
+        <h2>Last upload</h2>
+        <span class="ml-auto flex items-center gap-2">
+          <% if (saved) { %><span class="pill pill-green"><%= saved %> saved</span><% } %>
+          <% if (refused) { %><span class="pill pill-amber"><%= refused %> refused</span><% } %>
+        </span>
+      </div>
+      <div>
+        <% results.forEach(function (result) { %>
+          <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-2.5 text-sm last:border-b-0">
+            <%- include('partials/icon', { name: 'fa-regular fa-image', extra: 'text-slate-400' }) %>
+            <span class="min-w-0 flex-1 truncate text-slate-700"><%= result.name %></span>
+            <% if (result.ok) { %>
+              <span class="pill pill-green">Saved</span>
+            <% } else { %>
+              <span class="pill text-red-600"><%= result.error %></span>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+      <% if (saved) { %>
+        <div class="card-body border-t border-slate-200">
+          <a href="<%= pages.generations %>" class="btn btn-quiet btn-sm">
+            <%- include('partials/icon', { name: 'fa-regular fa-images' }) %> See what was saved
+          </a>
+        </div>
+      <% } %>
+    </section>
+  <% } %>
+
+  <form action="<%= pages.upload %>" method="post" enctype="multipart/form-data" class="card">
+    <div class="card-head">
+      <%- include('partials/icon', { name: 'fa-solid fa-arrow-up-from-bracket' }) %>
+      <h2>Choose files</h2>
+    </div>
+    <div class="card-body space-y-5">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+      <div data-drop-field data-max-bytes="<%= maxBytes %>" data-max-files="<%= maxFiles %>">
+        <label for="image" class="field-label">Image files</label>
+
+        <div data-drop-plain>
+          <input id="image" name="image" type="file" accept="<%= acceptedMime.join(',') %>" multiple required
+            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium focus:border-brand-500 focus:outline-none" />
+          <p class="help">PNG, JPEG, or WebP, up to <%= maxLabel %> each. Up to <%= maxFiles %> at a time.</p>
+        </div>
+
+        <button type="button" data-drop-zone hidden
+          class="w-full rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center hover:border-brand-500 hover:bg-slate-100 focus:border-brand-500 focus:outline-none">
+          <%- include('partials/icon', { name: 'fa-solid fa-cloud-arrow-up', extra: 'mb-2.5 block text-2xl text-slate-400' }) %>
+          <span class="block text-sm font-medium text-slate-700">Drag images here</span>
+          <span class="help">or click to choose them</span>
+          <span class="mt-1 block text-xs text-slate-400">PNG, JPEG, or WebP, up to <%= maxLabel %> each, <%= maxFiles %> at a time</span>
+        </button>
+
+        <div data-drop-preview hidden class="card mt-3">
+          <ul data-drop-list class="divide-y divide-slate-100"></ul>
+        </div>
+
+        <p data-drop-error hidden class="help mt-2 text-red-600"></p>
+      </div>
+
+      <div>
+        <label for="prompt_id" class="field-label">Assign to a saved prompt</label>
+        <select id="prompt_id" name="prompt_id"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+          <option value="">None, use the prompt I type below</option>
+          <% prompts.forEach(function (prompt) { %>
+            <option value="<%= prompt.id %>" <%= selectedPromptId === String(prompt.id) ? 'selected' : '' %>><%= prompt.name %></option>
+          <% }); %>
+        </select>
+        <p class="help">Pick a prompt to link the image to it and show its text.</p>
+      </div>
+
+      <div>
+        <label for="prompt" class="field-label">Or the prompt used</label>
+        <textarea id="prompt" name="prompt" rows="4" placeholder="The prompt this image came from."
+          class="w-full resize-y rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"><%= promptText %></textarea>
+        <p class="help">Used only when no saved prompt is picked above. Shows up under Show Prompt.</p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <label for="model" class="field-label">Model</label>
+          <select id="model" name="model"
+            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+            <% models.forEach(function (token) { %>
+              <option value="<%= token %>" <%= token === selectedModel ? 'selected' : '' %>><%= modelIds[token] %></option>
+            <% }); %>
+          </select>
+          <p class="help">Recorded with the picture, the same as a generated one.</p>
+        </div>
+
+        <div>
+          <label for="size" class="field-label">Resolution</label>
+          <select id="size" name="size"
+            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+            <% sizes.forEach(function (size) { %>
+              <option value="<%= size %>" <%= size === selectedSize ? 'selected' : '' %>><%= size %></option>
+            <% }); %>
+          </select>
+          <p class="help">Recorded with the image and shown on its card.</p>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button type="submit" class="btn btn-primary">
+          <%- include('partials/icon', { name: 'fa-solid fa-arrow-up-from-bracket' }) %> Upload
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/page-scripts', {
+      scripts: ['ui', 'upload-sort', 'upload-drop'],
+    }) %>
+
+<%- include('partials/chrome-foot') %>

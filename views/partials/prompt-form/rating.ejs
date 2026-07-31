@@ -1,0 +1,9 @@
+<section data-widget="prompt-rating" class="card">
+  <div class="card-head"><%- include('../icon', { name: 'fa-solid fa-star' }) %><h2>Rating</h2></div>
+  <div class="card-body">
+    <span data-rating-group data-prompt-id="<%= prompt.id %>" data-rating="<%= prompt.rating || '' %>" class="inline-flex gap-1">
+      <%- include('../stars', { rating: prompt.rating, size: 'text-lg', button: true }) %>
+    </span>
+    <p class="help">Rated on the list as well — this is the same value.</p>
+  </div>
+</section>

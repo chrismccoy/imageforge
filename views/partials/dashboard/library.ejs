@@ -1,0 +1,26 @@
+<section data-widget="library" class="card">
+  <div class="card-head"><h2>Library</h2></div>
+  <div class="card-body">
+    <dl class="space-y-3 text-sm">
+      <div class="flex items-center justify-between">
+        <dt class="text-slate-500">Prompts</dt>
+        <dd data-widget="prompts"><a href="<%= pages.prompts %>" class="font-medium text-slate-900 hover:text-brand-600"><%= promptCount %></a></dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt class="text-slate-500">Collections</dt>
+        <dd><a href="<%= pages.collections %>" class="font-medium text-slate-900 hover:text-brand-600"><%= collectionCount %></a></dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt class="text-slate-500">Categories</dt>
+        <dd><a href="<%= pages.categories %>" class="font-medium text-slate-900 hover:text-brand-600"><%= categoryCount %></a></dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt class="text-slate-500">In trash</dt>
+        <dd data-widget="trash"><a href="<%= pages.trash %>" class="font-medium text-slate-900 hover:text-brand-600"><%= chrome.counts.trash %></a></dd>
+      </div>
+    </dl>
+    <a href="<%= pages.generate %>" class="btn btn-primary mt-5 w-full">
+      <%- include('../icon', { name: 'fa-solid fa-plus' }) %> New generation
+    </a>
+  </div>
+</section>

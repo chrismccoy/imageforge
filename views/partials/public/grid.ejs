@@ -1,0 +1,14 @@
+<% if (!tiles.length) { %>
+  <%- include('empty', { icon: emptyIcon, text: emptyText }) %>
+<% } else { %>
+  <div class="pub-grid">
+    <% tiles.forEach(function (tile) { %>
+      <a href="<%= tile.href %>" class="pub-tile">
+        <img src="<%= tile.src %>" alt="Shared image" loading="lazy"
+          class="aspect-square w-full object-cover" />
+      </a>
+    <% }); %>
+  </div>
+
+  <%- include('../pager') %>
+<% } %>

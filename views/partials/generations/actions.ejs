@@ -1,0 +1,20 @@
+<div class="flex flex-wrap items-center gap-2" data-list-head>
+  <form method="post" action="<%= pages.generations %>/view">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <input type="hidden" name="view" value="<%= otherView %>" />
+    <%- include('../carried-filters') %>
+    <input type="hidden" name="page" value="<%= page %>" />
+    <button type="submit" class="btn btn-quiet">
+      <%- include('../icon', { name: otherView === 'list' ? 'fa-solid fa-list' : 'fa-solid fa-table-cells-large' }) %>
+      <%= otherView === 'list' ? 'List view' : 'Grid view' %>
+    </button>
+  </form>
+  <a href="<%= pages.generations %>/download-all" class="btn btn-quiet">
+    <%- include('../icon', { name: 'fa-solid fa-file-zipper' }) %> Download all
+  </a>
+  <% if (!fav) { %>
+    <a href="<%= pages.generate %>" class="btn btn-primary">
+      <%- include('../icon', { name: 'fa-solid fa-plus' }) %> New generation
+    </a>
+  <% } %>
+</div>

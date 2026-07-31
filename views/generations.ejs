@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+<% if (total > 0) { %>
+  <%- include('partials/generations/actions') %>
+<% } %>
+<%- include('partials/page-head-end') %>
+
+<% if (total > 0) { %>
+  <%- include('partials/generations/filters') %>
+<% } %>
+
+<% if (total === 0) { %>
+  <%- include('partials/empty-state', {
+        live: true,
+        icon: fav ? 'fa-solid fa-star' : 'fa-regular fa-image',
+        text: headline + '.',
+        note: note,
+        link: filtered
+          ? { href: pages.generations, label: 'Show everything' }
+          : { href: pages.generate, label: 'Generate your first image' },
+      }) %>
+<% } else { %>
+  <% if (fav) { %><%- include('partials/generations/empty-favourites') %><% } %>
+  <div data-list-grid class="<%= view === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-5 sm:grid-cols-2 3xl:grid-cols-3' %>">
+    <% generations.forEach(function (gen) { %>
+      <%- include('partials/generation-card', { gen: gen, view: view }) %>
+    <% }); %>
+  </div>
+
+  <%- include('partials/pager') %>
+  <%- include('partials/generations/scripts') %>
+<% } %>
+
+<%- include('partials/inline-confirm') %>
+<%- include('partials/chrome-foot') %>

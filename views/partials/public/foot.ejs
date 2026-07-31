@@ -1,0 +1,7 @@
+</main>
+<% if ((locals.mark ?? true) && brand.mark) { %>
+  <footer class="pub-foot">
+    <%- include('../icon', { name: brand.icon }) %>
+    <span>Made with <%= brand.name %></span>
+  </footer>
+<% } %>

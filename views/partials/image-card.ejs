@@ -1,0 +1,31 @@
+<article class="shot-frame">
+  <img src="<%= imageUrl %>" alt="<%= prompt %>" class="w-full bg-slate-50 object-contain" />
+  <div class="shot-body">
+    <% if (prompt) { %>
+      <p class="prompt-label">Prompt</p>
+      <p class="prompt-text"><%= prompt %></p>
+    <% } %>
+
+    <div class="meta-row">
+      <% if (model) { %><span class="chip"><%- include('icon', { name: 'fa-solid fa-microchip' }) %> <%= model %></span><% } %>
+      <% if (size) { %><span class="chip"><%- include('icon', { name: 'fa-regular fa-square' }) %> <%= size %></span><% } %>
+      <% if (createdAt) { %><span class="chip"><%- include('icon', { name: 'fa-regular fa-calendar' }) %> <%= createdAt.slice(0, 10) %></span><% } %>
+      <% if (tokens) { %><span class="chip"><%- include('icon', { name: 'fa-solid fa-coins' }) %> <%= tokens %> tokens</span><% } %>
+      <% if (cost) { %><span class="chip"><%- include('icon', { name: 'fa-solid fa-dollar-sign' }) %> <%= cost %></span><% } %>
+    </div>
+
+    <div class="act-row">
+      <a href="<%= downloadUrl %>" <% if (downloadAttr) { %>download<% } %> class="btn btn-primary">
+        <%- include('icon', { name: 'fa-solid fa-download' }) %> Download
+      </a>
+      <% if (prompt) { %>
+        <button type="button" data-copy-prompt data-prompt="<%= prompt %>" class="btn btn-quiet">
+          <%- include('icon', { name: 'fa-regular fa-copy' }) %> Copy prompt
+        </button>
+      <% } %>
+      <button type="button" data-copy="<%= pageUrl %>" class="btn btn-quiet">
+        <%- include('icon', { name: 'fa-solid fa-link' }) %> Copy link
+      </button>
+    </div>
+  </div>
+</article>

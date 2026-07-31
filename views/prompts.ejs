@@ -1,0 +1,152 @@
+<%- include('partials/header') %>
+<div class="flex items-center gap-2">
+  <a href="<%= pages.promptsBackup %>" class="btn btn-quiet">
+    <%- include('partials/icon', { name: 'fa-solid fa-right-left' }) %> Import / Export
+  </a>
+  <a href="<%= pages.prompts %>/new" class="btn btn-primary">
+    <%- include('partials/icon', { name: 'fa-solid fa-plus' }) %> Add prompt
+  </a>
+</div>
+<%- include('partials/page-head-end') %>
+
+<div class="filter-bar">
+  <p class="text-sm text-slate-500">
+    <% if (q || category) { %><%= total %> of <%= totalAll %> saved<% } else { %><%= total %> saved<% } %>
+  </p>
+  <%- include('partials/search-form', { action: pages.prompts, q: q }) %>
+  <form method="get" action="<%= pages.prompts %>" class="flex items-center gap-2">
+    <% if (q) { %><input type="hidden" name="q" value="<%= q %>" /><% } %>
+    <select name="category"
+      class="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none">
+      <option value="">All categories</option>
+      <option value="none" <%= category === 'none' ? 'selected' : '' %>>Uncategorised</option>
+      <% categories.forEach(function (c) { %>
+        <option value="<%= c.id %>" <%= String(category) === String(c.id) ? 'selected' : '' %>><%= c.name %></option>
+      <% }); %>
+    </select>
+    <button type="submit" class="btn btn-quiet btn-sm">Filter</button>
+  </form>
+  <span class="flex-1"></span>
+  <% if (total > 0) { %>
+    <span data-bulk-idle hidden>
+      <button type="button" data-bulk-start class="btn btn-quiet btn-sm">
+        <%- include('partials/icon', { name: 'fa-regular fa-square-check' }) %> Select
+      </button>
+    </span>
+  <% } %>
+</div>
+
+<% if (total > 0) { %>
+  <form id="bulk-prompts" method="post" hidden class="filter-bar" data-bulk="bulk-prompts">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <label class="flex items-center gap-2 text-sm text-slate-600">
+      <input type="checkbox" data-bulk-all /> Select all on this page
+    </label>
+    <span data-bulk-count class="text-sm text-slate-500">None selected</span>
+    <span class="flex-1"></span>
+    <button type="submit" data-bulk-action formaction="<%= pages.prompts %>/bulk-delete" class="btn btn-danger btn-sm">
+      <%- include('partials/icon', { name: 'fa-regular fa-trash-can' }) %> Delete selected
+    </button>
+    <button type="button" data-bulk-cancel class="btn btn-quiet btn-sm">Cancel</button>
+  </form>
+<% } %>
+
+<div class="card">
+  <% if (total === 0) { %>
+    <div class="card-empty">
+      <% if (q) { %>
+        <p>No prompts match &ldquo;<%= q %>&rdquo;.</p>
+        <a href="<%= pages.prompts %>" class="mt-2 inline-block text-brand-600 hover:underline">Clear the search</a>
+      <% } else { %>
+        <p>No prompts yet. Click <span class="font-medium">Add prompt</span> to create one.</p>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th data-bulk-cell hidden class="w-10"></th>
+            <th>
+              <a href="<%= nameSortUrl %>" class="<%= sort === 'rating' ? 'text-slate-500 hover:text-slate-700' : 'text-slate-900' %>">Title</a>
+            </th>
+            <th class="w-full">Prompt Text</th>
+            <th>Category</th>
+            <th>
+              <a href="<%= ratingSortUrl %>" class="<%= sort === 'rating' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700' %>">Rating</a>
+            </th>
+            <th class="text-center">Generations</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody data-prompt-rows>
+          <% prompts.forEach(function (prompt) { %>
+            <tr data-prompt-row data-sort-key="<%= prompt.sortKey %>">
+              <td data-bulk-cell hidden>
+                <input type="checkbox" name="ids" value="<%= prompt.id %>" form="bulk-prompts"
+                  aria-label="Select this prompt" />
+              </td>
+              <td class="whitespace-nowrap font-medium text-slate-900">
+                <button type="button" data-pin data-prompt-id="<%= prompt.id %>"
+                  aria-pressed="<%= prompt.pinned ? 'true' : 'false' %>"
+                  aria-label="Pin <%= prompt.name %> to the top"
+                  title="<%= prompt.pinned ? 'Pinned to the top' : 'Pin to the top' %>"
+                  class="mr-1.5 inline-flex align-middle <%= prompt.pinned ? 'text-brand-600' : 'text-slate-300' %> hover:text-brand-500"><%- include('partials/icon', { name: 'fa-solid fa-thumbtack' }) %></button><%= prompt.name %>
+              </td>
+              <td class="text-slate-500">
+                <span class="line-clamp-3 whitespace-pre-wrap break-words"><%= prompt.prompt %></span>
+                <% if (prompt.notes) { %>
+                  <span class="mt-1 line-clamp-1 block text-xs italic text-slate-400" title="<%= prompt.notes %>"><%= prompt.notes %></span>
+                <% } %>
+              </td>
+              <td class="whitespace-nowrap text-slate-500"><%= prompt.category_name || "—" %></td>
+              <td class="whitespace-nowrap">
+                <span data-rating-group data-prompt-id="<%= prompt.id %>" data-rating="<%= prompt.rating || '' %>" class="inline-flex gap-0.5">
+                  <%- include('partials/stars', { rating: prompt.rating, size: 'text-sm', button: true }) %>
+                </span>
+              </td>
+              <td class="whitespace-nowrap text-center">
+                <a href="<%= pages.generations %>?prompt=<%= prompt.id %>"
+                  title="See the images made from <%= prompt.name %>"
+                  class="pill hover:bg-brand-100 hover:text-brand-700"><%= prompt.uses %></a>
+              </td>
+              <td class="whitespace-nowrap text-right">
+                <div class="flex items-center justify-end gap-2" data-confirm>
+                  <button type="button" data-prompt-show data-prompt="<%= prompt.prompt %>" data-confirm-hide class="btn btn-quiet btn-sm">
+                    <%- include('partials/icon', { name: 'fa-regular fa-comment' }) %> Show Prompt
+                  </button>
+                  <a href="<%= pages.prompts %>/<%= prompt.id %>/edit" data-confirm-hide class="btn btn-quiet btn-sm">
+                    <%- include('partials/icon', { name: 'fa-solid fa-pen' }) %> Edit
+                  </a>
+                  <a href="<%= pages.prompts %>/<%= prompt.id %>/duplicate" data-confirm-hide class="btn btn-quiet btn-sm">
+                    <%- include('partials/icon', { name: 'fa-regular fa-copy' }) %> Duplicate
+                  </a>
+                  <button type="button" data-confirm-open aria-label="Delete" class="btn btn-danger btn-sm">
+                    <%- include('partials/icon', { name: 'fa-regular fa-trash-can' }) %>
+                  </button>
+                  <%- include('partials/confirm-panel', { action: `${pages.prompts}/${prompt.id}/delete` }) %>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/pager') %>
+
+<% if (total > 0) { %>
+  <%- include('partials/prompt-modal') %>
+  <%- include('partials/page-scripts', {
+        scripts: [
+          'ui', 'api', 'prompt-modal', 'rating',
+          'pin-order', 'pin',
+          'bulk',
+        ],
+      }) %>
+<% } %>
+
+<%- include('partials/inline-confirm') %>
+<%- include('partials/chrome-foot') %>

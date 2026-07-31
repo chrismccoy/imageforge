@@ -1,0 +1,24 @@
+<section data-widget="settings-storage" class="card">
+  <div class="card-head"><%- include('../icon', { name: 'fa-solid fa-hard-drive' }) %><h2>Storage</h2></div>
+  <div class="card-body">
+    <p class="text-2xl font-semibold text-slate-900"><%= chrome.storage.used %></p>
+    <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+      <div class="h-full w-0 rounded-full <%= chrome.storage.percent > 90 ? 'bg-red-500' : 'bg-brand-600' %>"
+        data-bar-percent="<%= chrome.storage.percent %>"></div>
+    </div>
+    <p class="help">
+      of <%= chrome.storage.quota %>
+      <% if (chrome.counts.trash) { %>
+        · <%= chrome.counts.trash %> image<%= chrome.counts.trash === 1 ? '' : 's' %> in the trash still count
+      <% } %>
+    </p>
+    <% if (chrome.counts.trash) { %>
+      <form action="<%= pages.trash %>/empty" method="post" class="mt-2.5">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <button type="submit" class="btn btn-quiet btn-sm">
+          <%- include('../icon', { name: 'fa-regular fa-trash-can' }) %> Empty the trash
+        </button>
+      </form>
+    <% } %>
+  </div>
+</section>

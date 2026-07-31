@@ -1,0 +1,196 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<% if (!hasKey) { %>
+  <div class="notice notice-warn">
+    <%- include('partials/icon', { name: 'fa-solid fa-triangle-exclamation' }) %>
+    <span>No OpenAI API key is set. Add <code class="font-mono">OPENAI_API_KEY</code> to your <code class="font-mono">.env</code> file.</span>
+  </div>
+<% } %>
+
+<div class="mb-6">
+  <a href="<%= pages.generations %>" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to generations</a>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
+
+  <section class="card">
+    <div class="card-head"><%- include('partials/icon', { name: 'fa-solid fa-paintbrush' }) %><h2>Mask</h2></div>
+    <div class="card-body space-y-4">
+      <div>
+        <label for="prompt" class="field-label">What should be there instead</label>
+        <textarea id="prompt" rows="6" placeholder="Describe what belongs in the area you brushed."
+          class="w-full resize-y rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none"></textarea>
+        <div class="mt-1 flex items-start justify-between gap-3">
+          <p class="help">
+            Describe the whole picture as it should end up, not only the patch.
+          </p>
+          <p data-char-count="prompt" class="help whitespace-nowrap text-right"></p>
+        </div>
+      </div>
+
+      <div>
+        <span class="field-label">Tool</span>
+        <div class="grid grid-cols-4 gap-1" data-tools>
+          <button type="button" data-tool="brush" aria-pressed="true" aria-label="Brush"
+            class="btn btn-quiet px-2 py-1.5 aria-pressed:border-brand-500 aria-pressed:bg-indigo-50 aria-pressed:text-brand-700">
+            <%- include('partials/icon', { name: 'fa-solid fa-paintbrush' }) %>
+          </button>
+          <button type="button" data-tool="rect" aria-pressed="false" aria-label="Box"
+            class="btn btn-quiet px-2 py-1.5 aria-pressed:border-brand-500 aria-pressed:bg-indigo-50 aria-pressed:text-brand-700">
+            <%- include('partials/icon', { name: 'fa-regular fa-square' }) %>
+          </button>
+          <button type="button" data-tool="ellipse" aria-pressed="false" aria-label="Oval"
+            class="btn btn-quiet px-2 py-1.5 aria-pressed:border-brand-500 aria-pressed:bg-indigo-50 aria-pressed:text-brand-700">
+            <%- include('partials/icon', { name: 'fa-regular fa-circle' }) %>
+          </button>
+          <button type="button" data-tool="eraser" aria-pressed="false" aria-label="Eraser"
+            class="btn btn-quiet px-2 py-1.5 aria-pressed:border-brand-500 aria-pressed:bg-indigo-50 aria-pressed:text-brand-700">
+            <%- include('partials/icon', { name: 'fa-solid fa-eraser' }) %>
+          </button>
+        </div>
+        <p id="tool-hint" class="help">
+          Paint over what should change. The brush size sets how wide the stroke is.
+        </p>
+      </div>
+
+      <div>
+        <label for="brush" class="field-label">Brush size</label>
+        <input type="range" id="brush" min="8" max="160" value="48" class="w-full" />
+        <p class="help">Used by the brush and the eraser.</p>
+      </div>
+
+      <div>
+        <button type="button" id="invert-btn" aria-pressed="false"
+          class="btn btn-quiet w-full aria-pressed:border-brand-500 aria-pressed:bg-indigo-50 aria-pressed:text-brand-700">
+          <%- include('partials/icon', { name: 'fa-solid fa-right-left' }) %> Invert selection
+        </button>
+        <p class="help">
+          Change everything except what you painted.
+        </p>
+      </div>
+
+      <div>
+        <span class="field-label">Zoom</span>
+        <div class="flex items-center gap-2">
+          <button type="button" id="zoom-out" aria-label="Zoom out"
+            class="btn btn-quiet w-10 px-2 py-1.5">
+            <%- include('partials/icon', { name: 'fa-solid fa-minus' }) %>
+          </button>
+          <span id="zoom-level" aria-live="polite"
+            class="flex-1 text-center text-sm tabular-nums text-slate-600">Fit</span>
+          <button type="button" id="zoom-in" aria-label="Zoom in"
+            class="btn btn-quiet w-10 px-2 py-1.5">
+            <%- include('partials/icon', { name: 'fa-solid fa-plus' }) %>
+          </button>
+        </div>
+        <p class="help">Scroll the picture to move around it.</p>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="button" id="undo-btn"
+          class="btn btn-quiet flex-1">
+          <%- include('partials/icon', { name: 'fa-solid fa-rotate-left' }) %> Undo
+        </button>
+        <button type="button" id="clear-btn"
+          class="btn btn-quiet flex-1">
+          <%- include('partials/icon', { name: 'fa-solid fa-xmark' }) %> Clear
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="model" class="field-label">Model</label>
+          <select id="model"
+            class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+            <% modelTokens.forEach(function (token) { %>
+              <option value="<%= token %>" <%= token === selectedModel ? 'selected' : '' %>><%= modelIds[token] %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div>
+          <label for="size" class="field-label">Size</label>
+          <select id="size"
+            class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+            <% sizes.forEach(function (size) { %>
+              <option value="<%= size %>" <%= size === defaultSize ? 'selected' : '' %>><%= size %></option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+
+      <button id="edit-btn" type="button" <%= hasKey ? '' : 'disabled' %> class="btn btn-dark w-full py-2.5">
+        <%- include('partials/spinner', { id: 'edit-spinner', size: 'h-5 w-5', hide: true }) %>
+        <span id="edit-label">Make the edit</span>
+      </button>
+
+      <p id="status" class="mt-3 min-h-5 text-sm text-slate-500"></p>
+
+      <p class="help">
+        Started from
+        <a href="<%= pages.generations %>" class="underline">#<%= image.id %></a>:
+        <%= startingPrompt || "(no prompt)" %>
+      </p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-body">
+      <div id="viewport" class="mx-auto max-h-[70vh] w-full max-w-2xl overflow-auto rounded-md">
+        <div id="stage" class="relative w-full select-none">
+          <img id="source" src="<%= uploadPrefix %>/<%= image.filename %>" alt=""
+            class="block w-full rounded-md" />
+          <canvas id="mask" data-source-id="<%= image.id %>"
+            class="absolute inset-0 h-full w-full cursor-crosshair touch-none rounded-md opacity-60"></canvas>
+          <img id="edited" alt="" hidden class="absolute inset-0 h-full w-full rounded-md" />
+
+          <div id="wipe-handle" hidden
+            class="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white/80 shadow"></div>
+        </div>
+      </div>
+
+      <div id="wipe-row" hidden class="mx-auto mt-3 w-full max-w-2xl">
+        <label for="wipe" class="field-label">Compare with the original</label>
+        <input type="range" id="wipe" min="0" max="100" value="0" step="1"
+          aria-label="How much of the original to show" class="mt-1 w-full" />
+        <div class="flex justify-between text-xs text-slate-500">
+          <span>Original</span>
+          <span>The edit</span>
+        </div>
+      </div>
+
+      <p id="brush-hint" class="help mt-3 text-center">
+        Brush over what should change. Everything you do not brush is kept.
+      </p>
+
+      <div id="result" hidden class="mt-3">
+        <div class="flex flex-wrap items-center justify-center gap-2">
+          <button type="button" id="save-btn" class="btn btn-primary">
+            Save
+          </button>
+          <button type="button" id="revert-btn"
+            class="btn btn-quiet">
+            <%- include('partials/icon', { name: 'fa-solid fa-arrow-left' }) %> Back to the brush
+          </button>
+          <a id="view-link" href="<%= pages.generations %>" hidden
+            class="btn btn-quiet">
+            <%- include('partials/icon', { name: 'fa-regular fa-images' }) %> View in generations
+          </a>
+        </div>
+        <p class="help mt-2 text-center">
+          The edit is shown in place. Save it to keep it, or go back to the brush
+          to try again — the original is untouched either way.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<%- include('partials/page-scripts', {
+      scripts: [
+        'ui', 'api', 'char-count', 'wipe',
+        'edit-geometry', 'edit-strokes', 'edit',
+      ],
+    }) %>
+
+<%- include('partials/chrome-foot') %>

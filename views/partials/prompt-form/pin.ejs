@@ -1,0 +1,18 @@
+<section data-widget="prompt-pin" class="card">
+  <div class="card-head"><%- include('../icon', { name: 'fa-solid fa-thumbtack' }) %><h2>Placement</h2></div>
+  <div class="card-body">
+    <div class="toggle-row">
+      <button type="button" data-pin data-prompt-id="<%= prompt.id %>"
+        aria-pressed="<%= prompt.pinned ? 'true' : 'false' %>"
+        aria-label="Pin <%= prompt.name %> to the top"
+        title="<%= prompt.pinned ? 'Pinned to the top' : 'Pin to the top' %>"
+        class="mt-0.5 text-lg leading-none <%= prompt.pinned ? 'text-brand-600' : 'text-slate-300' %> hover:text-brand-500">
+        <%- include('../icon', { name: 'fa-solid fa-thumbtack' }) %>
+      </button>
+      <span>
+        <span class="block text-sm font-medium text-slate-900">Pinned to the top</span>
+        <span class="block text-xs text-slate-500">Pinned prompts sort above the rest whichever order the list is in.</span>
+      </span>
+    </div>
+  </div>
+</section>

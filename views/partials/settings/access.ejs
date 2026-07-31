@@ -1,0 +1,29 @@
+<section data-widget="settings-access" class="card">
+  <div class="card-head"><%- include('../icon', { name: 'fa-solid fa-shield-halved' }) %><h2>Access</h2></div>
+  <div class="card-body">
+    <dl class="divide-y divide-slate-100 text-sm">
+      <div class="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+        <dt class="flex items-center gap-1.5 text-slate-500">
+          <%- include('../icon', { name: 'fa-solid fa-user' }) %> Signed in as
+        </dt>
+        <dd class="font-medium text-slate-900"><%= access.user %></dd>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+        <dt class="flex items-center gap-1.5 text-slate-500">
+          <%- include('../icon', { name: 'fa-solid fa-network-wired' }) %> Allow list
+        </dt>
+        <dd class="font-medium text-slate-900">
+          <%= access.allowList
+            ? access.allowList + (access.allowList === 1 ? ' address' : ' addresses')
+            : 'any address' %>
+        </dd>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+        <dt class="flex items-center gap-1.5 text-slate-500">
+          <%- include('../icon', { name: 'fa-solid fa-server' }) %> Behind a proxy
+        </dt>
+        <dd class="font-medium text-slate-900"><%= access.trustProxy ? 'yes' : 'no' %></dd>
+      </div>
+    </dl>
+  </div>
+</section>

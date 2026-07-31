@@ -1,0 +1,21 @@
+<div class="toggle-row">
+  <label class="relative mt-0.5 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center">
+    <input type="checkbox" name="<%= name %>" value="on" class="peer sr-only" aria-label="<%= title %>"
+      <%= stored === 1 || (stored === null && fallback) ? 'checked' : '' %> />
+    <span
+      class="absolute inset-0 rounded-full bg-slate-300 transition-colors peer-checked:bg-brand-600 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-2"
+    ></span>
+    <span
+      class="relative h-4 w-4 translate-x-0.5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4"
+    ></span>
+  </label>
+  <div>
+    <div class="text-sm font-medium text-slate-900"><%= title %></div>
+    <p class="mt-0.5 text-xs text-slate-500">
+      <%- help %>
+      <% if (stored === null && locals.envVar) { %>
+        Currently following the <code class="font-mono"><%= envVar %></code> environment variable.
+      <% } %>
+    </p>
+  </div>
+</div>

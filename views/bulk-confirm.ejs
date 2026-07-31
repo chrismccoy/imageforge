@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<div class="max-w-2xl">
+  <div class="card border-red-200 p-6">
+    <h2 class="text-sm font-semibold text-slate-900"><%= heading %></h2>
+    <p class="mt-2 text-sm text-slate-600"><%= detail %></p>
+
+    <ul class="mt-4 max-h-64 space-y-1 overflow-y-auto text-sm text-slate-500">
+      <% items.forEach(function (item) { %>
+        <li class="truncate">• <%= item.label %></li>
+      <% }); %>
+    </ul>
+
+    <form action="<%= action %>" method="post" class="mt-6 flex items-center gap-3">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <input type="hidden" name="confirm" value="1" />
+      <% items.forEach(function (item) { %>
+        <input type="hidden" name="ids" value="<%= item.id %>" />
+      <% }); %>
+      <button type="submit" class="btn btn-danger">
+        Yes, delete <%= items.length %>
+      </button>
+      <a href="<%= backUrl %>" class="btn btn-quiet">Cancel</a>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/chrome-foot') %>

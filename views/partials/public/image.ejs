@@ -1,0 +1,31 @@
+<%
+  
+  const pageUrl = `${prefix}/${token}/i/${id}`;
+  const picUrl = ext ? `${pageUrl}.${ext}` : `${pageUrl}/file`;
+  const near = locals.neighbours || {};
+  const hasNeighbours = Boolean(near.prev || near.next);
+%>
+<div class="pub-narrow">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+    <a href="<%= prefix %>/<%= token %>" class="btn btn-quiet btn-sm">
+      <%- include('../icon', { name: 'fa-solid fa-arrow-left' }) %> Back to <%= backLabel %>
+    </a>
+
+    <% if (hasNeighbours) { %>
+      <div class="flex items-center gap-2">
+        <%- include('neighbour', { dir: 'prev', id: near.prev }) %>
+        <%- include('neighbour', { dir: 'next', id: near.next }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <%- include('../image-card', {
+        imageUrl: picUrl,
+        downloadUrl: `${prefix}/${token}/i/${id}/download`,
+        downloadAttr: false,
+        pageUrl: pageUrl,
+      }) %>
+</div>
+<%- include('../page-scripts', {
+      scripts: ['ui', 'copy-link', 'share-page'],
+    }) %>

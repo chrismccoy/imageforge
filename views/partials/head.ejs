@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="csrf-token" content="<%= locals.csrfToken ?? '' %>" />
+  <% if (locals.noindex) { %>
+    <meta name="robots" content="noindex, nofollow" />
+  <% } %>
+  <% if (locals.card) { %>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= brand.name %>" />
+    <meta property="og:title" content="<%= card.title %>" />
+    <% if (card.url) { %>
+      <meta property="og:url" content="<%= card.url %>" />
+    <% } %>
+    <% if (card.image) { %>
+      <meta property="og:image" content="<%= card.image %>" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:image" content="<%= card.image %>" />
+    <% } else { %>
+      <meta name="twitter:card" content="summary" />
+    <% } %>
+    <meta name="twitter:title" content="<%= card.title %>" />
+  <% } %>
+  <title><%= title %> · <%= brand.name %></title>
+  <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body class="h-full bg-slate-100 text-slate-800">

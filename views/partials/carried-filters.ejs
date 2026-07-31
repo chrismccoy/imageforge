@@ -1,0 +1,2 @@
+<% carried.forEach(function (key) { %><% if (filters[key]) { %>
+<input type="hidden" name="<%= key %>" value="<%= filters[key] %>" /><% } %><% }); %>

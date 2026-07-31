@@ -1,0 +1,44 @@
+<section class="card">
+  <div class="card-head"><%- include('../icon', { name: 'fa-solid fa-tag' }) %><h2>Branding</h2></div>
+  <div class="card-body space-y-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <label for="brand_name" class="field-label">Name</label>
+        <input id="brand_name" name="brand_name" type="text" maxlength="40"
+          value="<%= branding.name %>" placeholder="<%= branding.nameFallback %>"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none" />
+        <p class="help">
+          What the sidebar, the login page, the browser tab and every public page call this
+          install. Leave blank to use <%= branding.nameFallback %>.
+        </p>
+      </div>
+
+      <div>
+        <label for="brand_icon" class="field-label">
+          Mark
+          <span class="ml-1 text-slate-400"><%- include('../icon', { name: brand.icon }) %></span>
+        </label>
+        <input id="brand_icon" name="brand_icon" type="text"
+          value="<%= branding.icon %>" placeholder="<%= branding.iconFallback %>"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none" />
+        <p class="help">
+          The Font Awesome class of the icon drawn beside the name, for example
+          <code class="font-mono">fa-solid fa-camera</code>. The icon shown next to this
+          label is the one in use now. Anything that is not a Font Awesome class is
+          ignored, so a typo leaves the mark as it was. Leave blank to use
+          <code class="font-mono"><%= branding.iconFallback %></code>.
+        </p>
+      </div>
+    </div>
+
+    <%- include('../toggle', {
+          name: 'brand_mark',
+          title: 'Footer credit',
+          help: `Show a "Made with ..." line at the foot of every public page — a shared image,
+                 a shared collection, the favourites link and the gallery. It carries the name
+                 above, not this app's.`,
+          stored: settings.brand_mark,
+          fallback: true
+        }) %>
+  </div>
+</section>

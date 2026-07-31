@@ -1,0 +1,92 @@
+<%- include('partials/header') %>
+<% if (rows.length > 0) { %>
+  <form action="<%= pages.trash %>/empty" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <button type="submit" class="btn btn-danger">
+      <%- include('partials/icon', { name: 'fa-solid fa-fire' }) %> Empty trash
+    </button>
+  </form>
+<% } %>
+<%- include('partials/page-head-end') %>
+
+<div class="max-w-5xl space-y-6">
+
+  <% if (rows.length === 0) { %>
+    <%- include('partials/empty-state', {
+          icon: 'fa-regular fa-trash-can',
+          text: 'There is nothing in the trash.',
+          note: 'Deleting an image sends it here, and nothing is destroyed until you empty it.',
+          link: { href: pages.generations, label: 'Back to your images' },
+        }) %>
+  <% } else { %>
+
+    <p class="text-sm text-slate-500">
+      <%= rows.length %> image<%= rows.length === 1 ? '' : 's' %> waiting ·
+      uploads are using <%= storageUsed %> of <%= storageQuota %>
+    </p>
+
+    <div class="card">
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="w-[42px]"><span class="sr-only">Image</span></th>
+              <th>Prompt</th>
+              <th>Deleted</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% rows.forEach(function (row) { %>
+              <tr>
+                <td>
+                  <img src="<%= uploadPrefix %>/<%= row.filename %>" alt="" loading="lazy"
+                    class="h-[42px] w-[42px] rounded-md object-cover" />
+                </td>
+                <td class="max-w-md">
+                  <p class="truncate text-slate-700"><%= row.prompt || row.filename %></p>
+                  <p class="mt-0.5 text-xs text-slate-400">
+                    <%= row.model || "uploaded" %><% if (row.size) { %> · <%= row.size %><% } %>
+                  </p>
+                </td>
+                <td class="whitespace-nowrap text-slate-500">
+                  <%= row.deleted_at ? row.deleted_at.slice(0, 10) : "" %>
+                </td>
+                <td class="text-right">
+                  <div class="flex flex-wrap items-center justify-end gap-2" data-confirm>
+                    <form action="<%= pages.trash %>/<%= row.id %>/restore" method="post" data-confirm-hide>
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <button type="submit" class="btn btn-quiet btn-sm">
+                        <%- include('partials/icon', { name: 'fa-solid fa-rotate-left' }) %> Restore
+                      </button>
+                    </form>
+                    <button type="button" data-confirm-open
+                      class="btn btn-quiet btn-sm text-red-600 hover:text-red-700">
+                      <%- include('partials/icon', { name: 'fa-solid fa-fire' }) %> Delete for good
+                    </button>
+                    <%- include('partials/confirm-panel', {
+                          action: `${pages.trash}/${row.id}/purge`,
+                          label: 'Destroy? This cannot be undone'
+                        }) %>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="notice notice-warn mb-0">
+      <%- include('partials/icon', { name: 'fa-solid fa-triangle-exclamation' }) %>
+      <p>
+        A trashed image leaves your library at once: its share link stops working and it drops out of
+        any shared collection. Restoring brings all of that back. Nothing is destroyed until you empty the trash.
+      </p>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/page-scripts', { scripts: ['ui'] }) %>
+<%- include('partials/inline-confirm') %>
+<%- include('partials/chrome-foot') %>

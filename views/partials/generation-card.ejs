@@ -1,0 +1,112 @@
+<div data-generation-card data-gen-id="<%= gen.id %>" class="card flex flex-col overflow-hidden">
+  <% if (sharing) { %>
+    <div class="flex items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-xs" data-share-row>
+      <span class="flex items-center gap-1.5">
+        <span data-share-badge <%= gen.share_token ? '' : 'hidden' %> class="pill pill-green">
+          <%- include('icon', { name: 'fa-solid fa-circle-check' }) %> Shared
+        </span>
+        <span data-share-none <%= gen.share_token ? 'hidden' : '' %>
+          class="text-slate-400">Not shared</span>
+        <span data-share-unshare data-confirm <%= gen.share_token ? '' : 'hidden' %>
+          class="inline-flex items-center gap-1.5">
+          <button type="button" data-confirm-open aria-label="Unshare"
+            class="rounded px-1 leading-none text-slate-400 hover:text-slate-700">
+            <%- include('icon', { name: 'fa-solid fa-xmark' }) %>
+          </button>
+          <%- include('confirm-panel', {
+                action: `${pages.generations}/${gen.id}/unshare`,
+                label: 'Unshare?'
+              }) %>
+        </span>
+      </span>
+      <span class="flex items-center gap-2">
+        <button type="button" data-share="link" data-gen-id="<%= gen.id %>"
+          <% if (gen.share_link) { %>data-share-url="<%= gen.share_link %>"<% } %>
+          class="btn btn-quiet btn-sm">
+          <%- include('icon', { name: 'fa-solid fa-link' }) %> Share Link
+        </button>
+        <button type="button" data-share="image" data-gen-id="<%= gen.id %>"
+          <% if (gen.share_image) { %>data-share-url="<%= gen.share_image %>"<% } %>
+          class="btn btn-quiet btn-sm">
+          <%- include('icon', { name: 'fa-regular fa-image' }) %> Share Image
+        </button>
+      </span>
+    </div>
+  <% } %>
+  <div class="<%= view === 'list' ? 'flex items-stretch' : 'contents' %>">
+  <div class="relative bg-slate-50 <%= view === 'list' ? 'w-40 shrink-0' : '' %>">
+    <a href="<%= uploadPrefix %>/<%= gen.filename %>" target="_blank" rel="noopener" class="block">
+      <img src="<%= uploadPrefix %>/<%= gen.filename %>" alt="<%= gen.prompt %>" loading="lazy"
+        class="aspect-square w-full object-cover" />
+    </a>
+    <label data-bulk-cell hidden class="absolute left-2 top-2 rounded bg-black/40 p-1">
+      <input type="checkbox" name="ids" value="<%= gen.id %>" form="bulk-generations"
+        aria-label="Select this image" />
+    </label>
+    <button type="button" data-favorite data-gen-id="<%= gen.id %>"
+      aria-pressed="<%= gen.favorite ? 'true' : 'false' %>"
+      aria-label="Favorite"
+      class="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-sm leading-none <%= gen.favorite ? 'text-amber-400' : 'text-white/70' %> hover:text-amber-300">
+      <%- include('icon', { name: 'fa-solid fa-star' }) %>
+    </button>
+  </div>
+  <div class="flex flex-1 flex-col p-4">
+    <div class="flex flex-wrap items-center gap-1.5">
+      <% if (gen.model) { %><span class="chip"><%= gen.model %></span><% } %>
+      <% if (gen.size) { %><span class="chip"><%= gen.size %></span><% } %>
+      <% if (gen.tokens) { %><span class="chip"><%= gen.tokens %> tokens<% if (gen.cost) { %> · <%= gen.cost %><% } %></span><% } %>
+      <% if (gen.edited_from) { %><a href="<%= pages.generations %>/<%= gen.id %>/compare"
+        title="Compare with the image it was made from"
+        class="chip font-medium text-slate-600 hover:bg-brand-100 hover:text-brand-700">From #<%= gen.edited_from %></a><% } %>
+
+      <div data-collections data-gen-id="<%= gen.id %>"
+        class="ml-auto flex flex-wrap items-center justify-end gap-1">
+        <span data-collection-chips class="contents">
+          <% gen.collections.forEach(function (collection) { %>
+            <span data-collection-chip data-collection-id="<%= collection.id %>"
+              class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+              <%= collection.name %>
+              <button type="button" data-collection-remove aria-label="Take out of <%= collection.name %>"
+                class="text-slate-400 hover:text-red-600">&times;</button>
+            </span>
+          <% }); %>
+        </span>
+        <% if (collectionList.length) { %>
+          <select data-collection-add aria-label="Add to a collection"
+            class="rounded-full border border-dashed border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-500 hover:border-brand-500 hover:text-brand-700 focus:border-brand-500 focus:outline-none">
+            <option value="">+ Collection</option>
+            <% collectionList.forEach(function (collection) { %>
+              <option value="<%= collection.id %>"><%= collection.name %><%= collection.shared ? ' · shared' : '' %></option>
+            <% }); %>
+          </select>
+        <% } %>
+      </div>
+    </div>
+    <% if (view === 'list') { %>
+      <p data-row-prompt class="mt-1.5 line-clamp-2 whitespace-pre-wrap break-words text-sm text-slate-600"><%= gen.prompt || '(no prompt)' %></p>
+    <% } %>
+    <div class="<%= view === 'list' ? 'mt-auto pt-2' : 'mt-4' %> flex flex-wrap items-center justify-end gap-1.5" data-confirm>
+      <a href="<%= pages.generate %>?from=<%= gen.id %>" data-confirm-hide class="btn btn-quiet btn-sm">
+        <%- include('icon', { name: 'fa-solid fa-rotate' }) %> Regenerate
+      </a>
+      <a href="<%= pages.edit %>/<%= gen.id %>" data-confirm-hide class="btn btn-quiet btn-sm">
+        <%- include('icon', { name: 'fa-solid fa-paintbrush' }) %> Edit
+      </a>
+      <a href="<%= pages.crop %>/<%= gen.id %>" data-confirm-hide class="btn btn-quiet btn-sm">
+        <%- include('icon', { name: 'fa-solid fa-crop-simple' }) %> Crop
+      </a>
+      <button type="button" data-prompt-show data-prompt="<%= gen.prompt || '(no prompt)' %>" data-confirm-hide
+        class="btn btn-quiet btn-sm">
+        <%- include('icon', { name: 'fa-regular fa-comment' }) %> Show Prompt
+      </button>
+      <a href="<%= pages.generations %>/<%= gen.id %>/download" data-confirm-hide class="btn btn-primary btn-sm">
+        <%- include('icon', { name: 'fa-solid fa-download' }) %> Download
+      </a>
+      <button type="button" data-confirm-open aria-label="Delete" class="btn btn-danger btn-sm">
+        <%- include('icon', { name: 'fa-regular fa-trash-can' }) %>
+      </button>
+      <%- include('confirm-panel', { action: `${pages.generations}/${gen.id}/delete` }) %>
+    </div>
+  </div>
+  </div>
+</div>

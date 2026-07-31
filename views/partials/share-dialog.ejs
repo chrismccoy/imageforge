@@ -1,0 +1,18 @@
+<div id="share-dialog" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
+  <div class="w-full max-w-lg overflow-hidden rounded-xl bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-3">
+      <h2 class="text-sm font-semibold text-slate-800">Copy this link</h2>
+      <button type="button" data-share-dialog-close aria-label="Close"
+        class="text-xl leading-none text-slate-400 hover:text-slate-700">&times;</button>
+    </div>
+    <div class="px-5 py-4">
+      <input id="share-dialog-url" type="text" readonly
+        class="w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm text-slate-700" />
+      <p class="mt-2 text-xs text-slate-500">Your browser blocked the automatic copy. Select the link and copy it.</p>
+    </div>
+    <div class="flex items-center justify-end border-t border-slate-200 px-5 py-3">
+      <button type="button" data-share-dialog-close
+        class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Close</button>
+    </div>
+  </div>
+</div>

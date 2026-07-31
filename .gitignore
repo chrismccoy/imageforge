@@ -1,0 +1,11 @@
+package-lock.json
+node_modules/
+.env
+data/*.db
+data/*.db-*
+data/backups/
+data/*.zip
+data/*.bak-*
+public/uploads/*
+!public/uploads/.gitkeep
+tests/

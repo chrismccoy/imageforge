@@ -1,0 +1,37 @@
+<%- include('partials/head') %>
+<%- include('partials/public/header') %>
+  <div class="pub-centre">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-[17px] text-white">
+          <%- include('partials/icon', { name: brand.icon }) %>
+        </div>
+        <h1 class="text-[17px] font-semibold text-slate-900"><%= brand.name %></h1>
+        <p class="mt-1 text-[13px] text-slate-500">Sign in to the dashboard.</p>
+      </div>
+      <% if (error) { %>
+        <div class="notice notice-error" role="alert">
+          <%- include('partials/icon', { name: 'fa-solid fa-circle-exclamation' }) %>
+          <span><%= error %></span>
+        </div>
+      <% } %>
+      <form action="<%= pages.login %>" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <div class="mb-3.5">
+          <label for="username" class="field-label">Username</label>
+          <input id="username" name="username" type="text" autocomplete="username" autofocus
+            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none" />
+        </div>
+        <div class="mb-3.5">
+          <label for="password" class="field-label">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password"
+            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none" />
+        </div>
+        <button type="submit" class="btn btn-dark w-full">
+          Log in
+        </button>
+      </form>
+    </div>
+  </div>
+<%- include('partials/public/foot', { mark: false }) %>
+<%- include('partials/foot') %>

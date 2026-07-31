@@ -1,0 +1,8 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+<%- include('partials/empty-state', {
+      icon: 'fa-solid fa-magnifying-glass',
+      text: 'Page not found.',
+      link: { href: pages.dashboard, label: 'Back to the dashboard' },
+    }) %>
+<%- include('partials/chrome-foot') %>

@@ -1,0 +1,11 @@
+<form method="get" action="<%= action %>" class="flex items-center gap-2">
+  <input type="search" name="q" value="<%= q %>" placeholder="Search prompts…"
+    class="w-56 rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none" />
+  <button type="submit"
+    class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+    Search
+  </button>
+  <% if (q) { %>
+    <a href="<%= action %>" class="text-sm text-slate-500 hover:text-slate-700">Clear</a>
+  <% } %>
+</form>

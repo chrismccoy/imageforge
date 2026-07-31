@@ -1,0 +1,42 @@
+<section data-widget="by-model" class="card">
+  <div class="card-head">
+    <%- include('../icon', { name: 'fa-solid fa-microchip', extra: 'text-slate-400' }) %>
+    <h2>By model</h2>
+  </div>
+  <% if (byModel.length) { %>
+    <div class="overflow-x-auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th class="text-right">Images</th>
+            <th class="text-right">Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% byModel.forEach(function (row) { %>
+            <tr>
+              <td>
+                <span class="flex items-center gap-3">
+                  <span class="w-4 text-center">
+                    <%- include('../icon', { name: row.model ? 'fa-solid fa-circle-nodes' : 'fa-regular fa-file-image', extra: 'text-slate-400' }) %>
+                  </span>
+                  <%= row.label %>
+                </span>
+              </td>
+              <td class="text-right tabular-nums"><%= row.images %></td>
+              <td class="text-right tabular-nums<%= row.cost ? '' : ' text-slate-400' %>">
+                <%= row.cost || "—" %><% if (row.partial) { %><span class="text-slate-400">*</span><% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <% if (byModel.some(function (r) { return r.partial; })) { %>
+      <p class="help px-4 pb-3">* only some of those images recorded their tokens.</p>
+    <% } %>
+  <% } else { %>
+    <p class="card-empty">Nothing generated yet.</p>
+  <% } %>
+</section>

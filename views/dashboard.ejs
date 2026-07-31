@@ -1,0 +1,41 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<div class="space-y-6">
+
+  <%- include('partials/dashboard/figures') %>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <%- include('partials/dashboard/recent') %>
+    <%- include('partials/dashboard/library') %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <%- include('partials/dashboard/output') %>
+    <%- include('partials/dashboard/by-model') %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <%- include('partials/dashboard/prompt-list', {
+          widget: 'top-rated',
+          title: 'Top rated',
+          allUrl: `${pages.prompts}?sort=rating`,
+          rows: topRated,
+          badge: 'rating',
+          empty: 'No prompt has been rated yet.'
+        }) %>
+
+    <%- include('partials/dashboard/prompt-list', {
+          widget: 'most-used',
+          title: 'Most used',
+          allUrl: pages.prompts,
+          rows: mostUsed,
+          badge: 'uses',
+          empty: 'No prompt has made an image yet.'
+        }) %>
+
+    <%- include('partials/dashboard/collections') %>
+  </div>
+</div>
+
+<%- include('partials/chrome-foot') %>

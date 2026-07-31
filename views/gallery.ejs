@@ -1,0 +1,19 @@
+<%- include('partials/head') %>
+<%- include('partials/public/header') %>
+  <%- include('partials/public/head', {
+        heading: 'Generated Images',
+        total: total,
+        actions: canManage && favouritesUrl
+          ? [{ href: favouritesUrl, icon: 'fa-solid fa-star', label: 'Favourites', small: true }]
+          : [],
+      }) %>
+
+  <%- include('partials/public/grid', {
+        tiles: images.map(function (image) {
+          return { href: image.share_link, src: image.share_image };
+        }),
+        emptyIcon: 'fa-regular fa-images',
+        emptyText: 'No shared images yet.'
+      }) %>
+<%- include('partials/public/foot') %>
+<%- include('partials/foot') %>

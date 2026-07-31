@@ -1,0 +1,23 @@
+<header class="pub-header-sticky">
+  <div class="mx-auto flex h-14 max-w-[1120px] items-center gap-3 px-5">
+    <span class="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight text-slate-900">
+      <span class="grid h-[26px] w-[26px] place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-xs text-white">
+        <%- include('../icon', { name: brand.icon }) %>
+      </span>
+      <%= brand.name %>
+    </span>
+    <span class="flex-1"></span>
+    <% if (locals.canManage) { %>
+      <span class="owner-only">
+        <%- include('../icon', { name: 'fa-solid fa-eye' }) %> You are signed in
+      </span>
+      <a href="<%= pages.dashboard %>" class="btn btn-quiet btn-sm">
+        <%- include('../icon', { name: 'fa-solid fa-gauge-high' }) %> Dashboard
+      </a>
+    <% } %>
+  </div>
+
+  <%#- include('github-ribbon') %>
+
+</header>
+<main class="pub-main">

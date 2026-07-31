@@ -1,0 +1,34 @@
+    <section class="card">
+      <div class="card-head">
+        <%- include('icon', { name: 'fa-solid fa-coins' }) %><h2>Token prices</h2>
+        <span class="ml-auto text-xs font-normal text-slate-500">per million tokens</span>
+      </div>
+      <div class="card-body space-y-3">
+      <p class="text-xs text-slate-500">
+        What you are charged per million tokens, as published. A cost is shown only
+        for models priced here — nothing is estimated. Leave both boxes empty to
+        forget a model's price.
+        <% if (pricesUpdatedAt) { %>
+          Last saved <%= pricesUpdatedAt.slice(0, 10) %>.
+        <% } %>
+      </p>
+
+      <% models.forEach(function (token) { %>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-sm font-medium"><%= modelIds[token] %></span>
+          <label class="text-xs text-slate-500">
+            Input
+            <input type="number" step="any" min="0" name="price_in_<%= token %>"
+              value="<%= modelPrices[modelIds[token]] ? modelPrices[modelIds[token]].input : '' %>"
+              class="ml-1 w-24 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none" />
+          </label>
+          <label class="text-xs text-slate-500">
+            Output
+            <input type="number" step="any" min="0" name="price_out_<%= token %>"
+              value="<%= modelPrices[modelIds[token]] ? modelPrices[modelIds[token]].output : '' %>"
+              class="ml-1 w-24 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none" />
+          </label>
+        </div>
+      <% }); %>
+      </div>
+    </section>

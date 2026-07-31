@@ -1,0 +1,61 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<div class="mb-6">
+  <a href="<%= pages.generations %>" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to generations</a>
+</div>
+
+<div class="mx-auto max-w-3xl">
+  <section class="card p-5">
+    <div class="mx-auto w-fit">
+    <div id="stage" class="relative w-fit select-none overflow-hidden rounded-md bg-slate-100">
+      <img id="original" src="<%= uploadPrefix %>/<%= original.filename %>"
+        alt="Before the edit" class="mx-auto block max-h-[70vh] w-auto object-contain" />
+      <img id="edited" src="<%= uploadPrefix %>/<%= edit.filename %>"
+        alt="After the edit"
+        class="absolute inset-0 h-full w-full object-contain" />
+
+      <div id="handle"
+        class="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white/80 shadow"></div>
+    </div>
+
+    <label for="slider" class="field-label mt-4">
+      Drag to wipe between them
+    </label>
+    <input type="range" id="slider" min="0" max="100" value="50" step="1"
+      aria-label="How much of the edit to show"
+      class="mt-1 w-full accent-brand-600" />
+
+    <div class="mt-1 flex justify-between text-xs text-slate-500">
+      <span>Before</span>
+      <span>After</span>
+    </div>
+    </div>
+
+    <dl class="mt-5 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+      <div>
+        <dt class="font-medium text-slate-700">Before &middot; #<%= original.id %></dt>
+        <dd class="mt-1 whitespace-pre-wrap break-words text-slate-500"><%= original.prompt || "(no prompt)" %></dd>
+        <dd class="mt-1 text-xs text-slate-400"><%= original.model %> <%= original.size %></dd>
+      </div>
+      <div>
+        <dt class="font-medium text-slate-700">After &middot; #<%= edit.id %></dt>
+        <dd class="mt-1 whitespace-pre-wrap break-words text-slate-500"><%= edit.prompt || "(no prompt)" %></dd>
+        <dd class="mt-1 text-xs text-slate-400"><%= edit.model %> <%= edit.size %></dd>
+      </div>
+    </dl>
+
+    <div class="mt-5 flex flex-wrap items-center gap-2">
+      <a href="<%= pages.edit %>/<%= edit.id %>" class="btn btn-quiet">
+        <%- include('partials/icon', { name: 'fa-solid fa-paintbrush' }) %> Edit this again
+      </a>
+      <a href="<%= pages.generations %>/<%= edit.id %>/download" class="btn btn-primary">
+        <%- include('partials/icon', { name: 'fa-solid fa-download' }) %> Download the edit
+      </a>
+    </div>
+  </section>
+</div>
+
+<%- include('partials/page-scripts', { scripts: ['wipe', 'compare'] }) %>
+
+<%- include('partials/chrome-foot') %>

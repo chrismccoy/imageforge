@@ -1,0 +1,115 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<% if (saved) { %>
+  <div class="notice notice-ok"><%- include('partials/icon', { name: 'fa-solid fa-circle-check' }) %><span>Settings saved.</span></div>
+<% } %>
+<% if (error) { %>
+  <div class="notice notice-error"><%- include('partials/icon', { name: 'fa-solid fa-circle-exclamation' }) %><span><%= error %></span></div>
+<% } %>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="space-y-6 lg:col-span-2">
+    <form action="<%= pages.settings %>" method="post" class="space-y-6">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+      <section class="card">
+        <div class="card-head"><%- include('partials/icon', { name: 'fa-solid fa-sliders' }) %><h2>Generating</h2></div>
+        <div class="card-body space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label for="model" class="field-label">OpenAI image model</label>
+              <select id="model" name="model"
+                class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+                <% models.forEach(function (token) { %>
+                  <option value="<%= token %>" <%= settings.model === token ? 'selected' : '' %>>
+                    <%= modelIds[token] %>
+                  </option>
+                <% }); %>
+              </select>
+              <p class="help">Which model the Generate page uses.</p>
+            </div>
+
+            <div>
+              <label for="default_size" class="field-label">Default size</label>
+              <select id="default_size" name="default_size"
+                class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+                <% sizes.forEach(function (size) { %>
+                  <option value="<%= size %>" <%= settings.default_size === size ? 'selected' : '' %>><%= size %></option>
+                <% }); %>
+              </select>
+              <p class="help">Pre-selected size on the Generate page.</p>
+            </div>
+          </div>
+
+          <div>
+            <label for="page_size" class="field-label">Items per page</label>
+            <input id="page_size" name="page_size" type="number" min="1" max="100" step="1"
+              value="<%= settings.page_size > 0 ? settings.page_size : '' %>"
+              placeholder="<%= pageFallback %>"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none" />
+            <p class="help">
+              How many items the Generations and Prompts pages show at a time.
+              Leave blank to use <%= pageFallback %>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <%- include('partials/settings/branding') %>
+
+      <%- include('partials/settings/public-access') %>
+
+      <%- include('partials/token-prices') %>
+
+      <section class="card">
+        <div class="card-head"><%- include('partials/icon', { name: 'fa-solid fa-key' }) %><h2>OpenAI API key</h2></div>
+        <div class="card-body space-y-3">
+          <div>
+            <label for="api_key" class="field-label">API key</label>
+            <input id="api_key" name="api_key" type="password" autocomplete="off"
+              placeholder="<%= keyMasked ? 'Current: ' + keyMasked + ' — leave blank to keep' : 'sk-…' %>"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none" />
+            <p class="help">
+              Stored in the local database and used for all image requests. Leave blank to keep the current key.
+              Paste a new key here to replace a revoked one — takes effect immediately, no restart.
+            </p>
+          </div>
+          <% if (envFallback && !hasStoredKey) { %>
+            <div class="notice notice-info mb-0">
+              <%- include('partials/icon', { name: 'fa-solid fa-circle-info' }) %>
+              <span>
+                Currently falling back to the <code class="font-mono">OPENAI_API_KEY</code> environment
+                variable until you save a key here.
+              </span>
+            </div>
+          <% } else if (envFallback) { %>
+            <div class="notice notice-info mb-0">
+              <%- include('partials/icon', { name: 'fa-solid fa-circle-info' }) %>
+              <span>
+                An <code class="font-mono">OPENAI_API_KEY</code> environment variable is set as a fallback
+                for when no key is saved here.
+              </span>
+            </div>
+          <% } %>
+        </div>
+      </section>
+
+      <div>
+        <button type="submit" class="btn btn-primary">
+          <%- include('partials/icon', { name: 'fa-solid fa-floppy-disk' }) %> Save settings
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="space-y-6">
+    <%- include('partials/settings/favourites-link') %>
+    <%- include('partials/settings/storage') %>
+    <%- include('partials/settings/access') %>
+  </div>
+</div>
+
+<%- include('partials/page-scripts', { scripts: ['copy-link'] }) %>
+
+<%- include('partials/chrome-foot') %>

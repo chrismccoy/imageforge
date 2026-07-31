@@ -1,0 +1,70 @@
+<div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+  <section data-widget="images" class="card p-4">
+    <div class="flex items-start justify-between gap-3">
+      <p class="kpi-label">Images</p>
+      <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand-500/10 text-sm text-brand-600">
+        <%- include('../icon', { name: 'fa-regular fa-images' }) %>
+      </span>
+    </div>
+    <p class="kpi-value"><%= images %></p>
+    <p class="help flex items-center gap-1.5">
+      <% if (week) { %>
+        <span class="inline-flex items-center gap-1 font-semibold text-green-600">
+          <%- include('../icon', { name: 'fa-solid fa-arrow-trend-up' }) %> <%= week %>
+        </span>
+        in the last 7 days
+      <% } else { %>none this week<% } %>
+    </p>
+  </section>
+
+  <section data-widget="spend" class="card p-4">
+    <div class="flex items-start justify-between gap-3">
+      <p class="kpi-label">Lifetime spend</p>
+      <span class="grid h-8 w-8 place-items-center rounded-lg bg-green-50 text-sm text-green-600">
+        <%- include('../icon', { name: 'fa-solid fa-dollar-sign' }) %>
+      </span>
+    </div>
+    <p class="kpi-value"><%= spend || "—" %></p>
+    <p class="help">
+      <% if (spend) { %>every priced model, since you started<% } else { %>set prices in Settings<% } %>
+    </p>
+  </section>
+
+  <section data-widget="storage" class="card p-4">
+    <div class="flex items-start justify-between gap-3">
+      <p class="kpi-label">Storage</p>
+      <span class="grid h-8 w-8 place-items-center rounded-lg bg-slate-100 text-sm text-slate-600">
+        <%- include('../icon', { name: 'fa-solid fa-hard-drive' }) %>
+      </span>
+    </div>
+    <p class="kpi-value"><%= storageUsed %></p>
+    <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+      <div class="h-full w-0 rounded-full <%= storagePercent > 90 ? 'bg-red-500' : 'bg-brand-600' %>"
+        data-bar-percent="<%= storagePercent %>"></div>
+    </div>
+    <p class="help">of <%= storageQuota %></p>
+  </section>
+
+  <section data-widget="favourites" class="card p-4">
+    <div class="flex items-start justify-between gap-3">
+      <p class="kpi-label">Favourites</p>
+      <span class="grid h-8 w-8 place-items-center rounded-lg bg-amber-50 text-sm text-amber-500">
+        <%- include('../icon', { name: 'fa-solid fa-star' }) %>
+      </span>
+    </div>
+    <p class="kpi-value"><%= favourites %></p>
+    <% if (favouriteImages.length) { %>
+      <div class="mt-2 grid grid-cols-4 gap-1.5">
+        <% favouriteImages.slice(0, 4).forEach(function (image) { %>
+          <a href="<%= pages.generations %>?fav=1" title="<%= image.prompt %>"
+            class="block overflow-hidden rounded border border-slate-200 hover:border-brand-500">
+            <img src="<%= uploadPrefix %>/<%= image.filename %>" alt="<%= image.prompt %>" loading="lazy"
+              class="aspect-square w-full object-cover" />
+          </a>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <p class="help">star an image to keep it here</p>
+    <% } %>
+  </section>
+</div>

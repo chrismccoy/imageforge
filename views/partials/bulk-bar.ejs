@@ -1,0 +1,29 @@
+<form id="bulk-generations" method="post" hidden class="filter-bar" data-bulk="bulk-generations">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <label class="flex items-center gap-2 text-sm text-slate-600">
+    <input type="checkbox" data-bulk-all /> Select all on this page
+  </label>
+  <span data-bulk-count class="text-sm text-slate-500">None selected</span>
+  <span class="flex-1"></span>
+  <% if (collectionList.length) { %>
+    <select name="collectionId"
+      class="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none">
+      <option value="">Add selected to&hellip;</option>
+      <% collectionList.forEach(function (c) { %>
+        <option value="<%= c.id %>"><%= c.name %><%= c.shared ? ' · shared' : '' %></option>
+      <% }); %>
+    </select>
+    <button type="submit" data-bulk-action formaction="<%= pages.generations %>/bulk-collect" class="btn btn-quiet btn-sm">
+      <%- include('icon', { name: 'fa-solid fa-folder-plus' }) %> Add to collection
+    </button>
+  <% } %>
+  <button type="submit" data-bulk-action formaction="<%= pages.generations %>/bulk-download" class="btn btn-quiet btn-sm">
+    <%- include('icon', { name: 'fa-solid fa-download' }) %> Download selected
+  </button>
+  <button type="submit" data-bulk-action formaction="<%= pages.generations %>/bulk-delete" class="btn btn-danger btn-sm">
+    <%- include('icon', { name: 'fa-regular fa-trash-can' }) %> Delete selected
+  </button>
+  <button type="button" data-bulk-cancel class="btn btn-quiet btn-sm">
+    Cancel
+  </button>
+</form>

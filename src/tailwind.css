@@ -1,0 +1,337 @@
+@tailwind base;
+@tailwind components;
+
+/*
+ * This block sits here, between @tailwind components and @tailwind utilities,
+ * rather than inside `@layer components` as component CSS normally would.
+ * Tailwind 3 tree-shakes `@layer components` rules: a class defined there is
+ * only emitted once Tailwind sees it used in a scanned view file, and no view
+ * uses these names yet (they are introduced by later tasks), so putting this
+ * block in `@layer components` would build to nothing. Plain CSS at this
+ * position in the sheet is always emitted regardless of usage, and utility
+ * classes still win over it because @tailwind utilities is injected after
+ * this point in the cascade -- which is what later view tasks need, since
+ * they layer one-off utilities on top of these names.
+ */
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-transparent px-3.5 py-1.5 text-sm font-medium;
+}
+.btn-primary {
+  @apply bg-brand-600 text-white hover:bg-brand-700;
+}
+.btn-quiet {
+  @apply border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900;
+}
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700;
+}
+.btn-dark {
+  @apply bg-slate-900 text-white hover:bg-slate-700;
+}
+.btn-sm {
+  @apply gap-1.5 rounded-md px-2.5 py-1 text-xs;
+}
+.btn:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+/*
+ * A control that is present but has nowhere to go: the Previous link on the
+ * first page, the Next link on the last, the neighbour arrows at either end of
+ * a shared image. They are rendered as spans rather than links, so :disabled
+ * above cannot reach them, and the six utilities were spelled out at three
+ * places in the templates. After .btn-quiet in this sheet, so the hover
+ * overrides win on source order.
+ */
+.btn-disabled {
+  @apply cursor-not-allowed border-slate-200 bg-slate-50 text-slate-300 hover:bg-slate-50 hover:text-slate-300;
+}
+
+.card {
+  @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+}
+.card-head {
+  @apply flex items-center gap-2.5 border-b border-slate-200 px-4 py-3 text-[13px] font-semibold text-slate-900;
+}
+.card-body {
+  @apply p-4;
+}
+
+.pill {
+  @apply inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11.5px] font-semibold tabular-nums text-slate-600;
+}
+.pill-green {
+  @apply bg-green-100 text-green-700;
+}
+.pill-amber {
+  @apply bg-amber-100 text-amber-700;
+}
+.chip {
+  @apply inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-0.5 text-[11.5px] text-slate-500;
+}
+
+.filter-bar {
+  @apply mb-4 flex flex-wrap items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm;
+}
+
+.kpi-label {
+  @apply text-[11px] font-semibold uppercase tracking-wider text-slate-500;
+}
+.kpi-value {
+  @apply mt-2.5 text-[27px] font-semibold leading-tight tracking-tight tabular-nums text-slate-900;
+}
+
+.field-label {
+  @apply mb-1.5 block text-[13px] font-medium text-slate-700;
+}
+.help {
+  @apply mt-1.5 text-xs text-slate-500;
+}
+
+.empty {
+  @apply rounded-xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center;
+}
+/*
+ * The in-card one-liner: "nothing here" said in a single sentence inside a
+ * list that is otherwise a table or a ul, rather than the standalone panel
+ * `.empty` and partials/empty-state.ejs cover. Eight sites repeated the same
+ * four utilities (p-6 text-center text-sm text-slate-400) around one <p> —
+ * one class here replaces all eight.
+ */
+.card-empty {
+  @apply p-6 text-center text-sm text-slate-400;
+}
+/*
+ * Scoped to .pub-main: unscoped, these two beat the logged-in views' own
+ * utilities (text-5xl, mt-3, text-slate-500 on views/trash.ejs,
+ * views/generations.ejs and views/notfound.ejs) at specificity 0-1-1 against
+ * their 0-1-0, so source order alone does not let the utility win. The
+ * public empty state (partials/public-grid.ejs) always renders inside
+ * <main class="pub-main">, so scoping here changes nothing for it.
+ */
+.pub-main .empty i {
+  @apply text-[34px] text-slate-300;
+}
+.pub-main .empty p {
+  @apply mt-3.5 text-[13.5px] text-slate-500;
+}
+
+.data-table {
+  @apply w-full border-collapse text-left text-[13.5px];
+}
+.data-table thead th {
+  @apply whitespace-nowrap border-b border-slate-200 bg-slate-50 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500;
+}
+.data-table tbody td {
+  @apply border-b border-slate-100 px-4 py-3 align-middle text-slate-700;
+}
+.data-table tbody tr:last-child td {
+  @apply border-b-0;
+}
+.data-table tbody tr:hover td {
+  @apply bg-slate-50;
+}
+
+.toggle-row {
+  @apply flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-3;
+}
+
+/*
+ * docs/mockups/assets/mockup.css is the design authority for these; its
+ * amber, red and green custom properties are the stock Tailwind shades of
+ * the same names, and its brand-50 and brand-700 are, in hex, exactly
+ * Tailwind's indigo-50 and indigo-700 — the app's own `brand` colour
+ * (tailwind.config.js) only defines 500/600/700, so notice-info is built on
+ * indigo rather than a brand-50 utility that does not exist.
+ */
+.notice {
+  @apply mb-[18px] flex items-start gap-2.5 rounded-lg border px-3.5 py-[11px] text-[13px];
+}
+.notice i {
+  @apply mt-0.5;
+}
+.notice-warn {
+  @apply border-amber-200 bg-amber-50 text-amber-700;
+}
+.notice-error {
+  @apply border-red-200 bg-red-50 text-red-700;
+}
+.notice-ok {
+  @apply border-green-200 bg-green-50 text-green-700;
+}
+.notice-info {
+  @apply border-indigo-200 bg-indigo-50 text-indigo-700;
+}
+
+/*
+ * The public pages' own shell (docs/mockups/public/assets/public.css is the
+ * design authority) — the sticky branded bar, the centred content column,
+ * the footer line, and the dashed "you are signed in" owner marker that
+ * partials/public-header.ejs and partials/public-foot.ejs render. Each is
+ * used by every later public view (ten different pages share one <main>,
+ * one footer, one owner chip), so a repeated utility string would drift the
+ * moment one page's copy changed and the others did not follow.
+ */
+.pub-header-sticky {
+  @apply sticky top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur-sm;
+}
+.pub-header {
+  @apply border-b border-slate-200 bg-white/80 backdrop-blur-sm;
+}
+.pub-main {
+  @apply mx-auto max-w-[1120px] px-5 py-7 pb-14;
+}
+.pub-foot {
+  @apply mx-auto flex max-w-[1120px] items-center justify-center gap-2 px-5 pb-10 text-[11.5px] text-slate-400;
+}
+.owner-only {
+  @apply inline-flex items-center gap-1.5 rounded-full border border-dashed border-slate-300 bg-white px-2.5 py-0.5 text-[11.5px] text-slate-500;
+}
+
+/*
+ * A listing's own heading row, and the grid of tiles under it — the
+ * mockups' `.pub-head` and `.pub-grid` / `.pub-tile`. Three public pages
+ * share this shell (the gallery, a shared collection, the favourites view),
+ * each including partials/public-grid.ejs for the grid itself, so a repeated
+ * utility string would drift the moment one page's spacing changed and the
+ * others did not follow.
+ */
+.pub-head {
+  @apply mb-[18px] flex flex-wrap items-end justify-between gap-4;
+}
+.pub-grid {
+  @apply grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3.5 sm:grid-cols-[repeat(auto-fill,minmax(210px,1fr))];
+}
+.pub-tile {
+  @apply relative block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:border-brand-500;
+}
+
+/*
+ * The narrower content column a single image's own page reads in — the
+ * mockups' `.pub-main.narrow`. It cannot be that compound selector here:
+ * partials/public-header.ejs (Task 1, out of this task's scope) is what
+ * emits the <main class="pub-main">, and it takes no local to add a second
+ * class to that element. This wraps the content a task-2 view puts inside
+ * that <main> instead, narrowing it from the inside without touching the
+ * shell partial.
+ */
+.pub-narrow {
+  @apply mx-auto max-w-[780px];
+}
+
+/*
+ * One image's own picture and the card of facts under it — the mockups'
+ * `.shot-frame` / `.shot-body`. The frame only clips the picture's corners;
+ * it never forces a picture's own aspect ratio, which is what lets a tall
+ * picture and a wide one share the same markup.
+ */
+.shot-frame {
+  @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm;
+}
+.shot-body {
+  @apply p-5;
+}
+
+/*
+ * A public page's own heading over the prompt text — never used behind the
+ * login, so unlike the chip override below it needs no scope of its own.
+ * Translated straight from the mockup's .prompt-label.
+ */
+.prompt-label {
+  @apply mb-1.5 text-[11px] font-semibold uppercase tracking-[.07em] text-slate-700;
+}
+.prompt-text {
+  @apply m-0 whitespace-pre-wrap text-sm leading-[1.55] text-slate-700;
+}
+
+/*
+ * The fact row under a prompt and the action row under that — the mockups'
+ * `.meta-row` and `.act-row`. The chips within `.meta-row` read darker than
+ * the app's own .chip: there they are one control among many on a busy
+ * card, but here they are the only thing under the prompt and a visitor is
+ * meant to read them, not skim past them. A descendant rule under
+ * .meta-row — rather than a utility on each chip — reaches every chip that
+ * row renders without the view repeating an override on each one. Scoped to
+ * .meta-row rather than the whole of .pub-main so a chip anywhere else on a
+ * public page (a listing's tile, say) keeps the app's own .chip weight;
+ * scoping it that widely would have caught chips the spec never asked to
+ * darken.
+ */
+.meta-row {
+  @apply mt-4 flex flex-wrap gap-1.5 border-t border-slate-100 pt-4;
+}
+.meta-row .chip {
+  @apply bg-slate-100 text-slate-600;
+}
+.meta-row .chip i {
+  @apply text-slate-500;
+}
+.act-row {
+  @apply mt-4 flex flex-wrap gap-2;
+}
+
+/*
+ * The vertical centring column login and the three small state pages sit
+ * in — the mockups' `.centre` (docs/mockups/public/assets/public.css). The
+ * mockup sizes that div against the viewport directly, as a sibling of its
+ * own <header>; here it wraps the content a view puts inside
+ * <main class="pub-main"> instead, the same way `.pub-narrow` does, because
+ * that <main> is opened by partials/public-header.ejs (Task 1, out of this
+ * task's scope) and takes no local to add a second class to it. A viewport
+ * height minus the header's own height would double-count pub-main's
+ * padding once nested inside it, so this leans on a viewport fraction
+ * rather than reproducing the mockup's exact calc.
+ */
+.pub-centre {
+  @apply flex min-h-[60vh] items-center justify-center;
+}
+
+/*
+ * The white card login and the three small state pages float on the slate
+ * ground — the mockups' `.panel`. Reused by all four: a sign-in form and an
+ * icon-heading-sentence page both read as one card, so a stranger meets the
+ * same shape whichever of the four they land on.
+ */
+.panel {
+  @apply mx-auto w-full max-w-[380px] rounded-2xl border border-slate-200 bg-white p-[30px];
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.06),
+    0 8px 24px rgba(15, 23, 42, 0.06);
+}
+.panel-head {
+  @apply mb-[22px] text-center;
+}
+
+/*
+ * The icon tile atop each of the three small state pages — denied, error,
+ * share-notfound — the mockups' `.state-mark` and its colour variants. One
+ * shape, three tints: slate for a page that says nothing went wrong (a link
+ * is simply gone), amber for a refusal, red for a real error.
+ */
+.state-mark {
+  @apply mx-auto mb-3.5 grid h-[52px] w-[52px] place-items-center rounded-2xl text-xl;
+}
+.state-slate {
+  @apply bg-slate-100 text-slate-500;
+}
+.state-amber {
+  @apply bg-amber-50 text-amber-500;
+}
+.state-red {
+  @apply bg-red-50 text-red-600;
+}
+
+@tailwind utilities;
+
+@layer base {
+  /*
+   * Tailwind's display utilities (flex, grid, table-cell) match [hidden] on
+   * specificity and come later in the sheet, so an element carrying one stays
+   * on screen when the attribute is set. Four scripts used to work around that
+   * by setting hidden, a class, and style.display all at once; this rule means
+   * the attribute alone is enough.
+   */
+  [hidden] {
+    display: none !important;
+  }
+}

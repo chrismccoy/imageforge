@@ -1,0 +1,40 @@
+<aside class="fixed inset-y-0 left-0 z-20 hidden w-[244px] flex-col bg-slate-900 text-slate-300 lg:flex">
+  <a href="<%= pages.dashboard %>" class="flex h-16 items-center gap-2.5 border-b border-white/5 px-5">
+    <span class="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-[13px] text-white">
+      <%- include('icon', { name: brand.icon }) %>
+    </span>
+    <span class="text-base font-semibold text-white"><%= brand.name %></span>
+  </a>
+
+  <nav class="flex-1 overflow-y-auto px-3 py-3.5 text-sm">
+    <% navGroups.forEach(function (group) { %>
+      <p class="px-3 pb-1.5 pt-3.5 text-[10.5px] font-semibold uppercase tracking-[0.09em] text-slate-500"><%= group.title %></p>
+      <% navLinks.filter(function (l) { return l.group === group.key; }).forEach(function (link) { const badge = link.count ? chrome.counts[link.count] : 0; %>
+        <a href="<%= link.href %>"<% if (link.newTab) { %> target="_blank" rel="noopener"<% } %> class="flex items-center gap-3 rounded-lg px-3 py-2 <%= active === link.key ? 'bg-brand-600 font-medium text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' %>">
+          <span class="w-4 text-center text-[13px] <%= active === link.key ? 'text-white' : 'text-slate-400' %>"><%- include('icon', { name: link.icon }) %></span>
+          <span><%= link.label %></span><% if (badge) { %><span class="ml-auto text-[11px] tabular-nums <%= active === link.key ? 'text-white/75' : 'text-slate-100' %>"><%= badge %></span><% } %>
+        </a>
+      <% }); %>
+    <% }); %>
+  </nav>
+
+  <div class="border-t border-white/5 p-3">
+    <div class="px-3 pb-2.5 pt-1 text-[11.5px] text-slate-300">
+      <div class="flex items-center gap-1.5">
+        <%- include('icon', { name: 'fa-solid fa-hard-drive' }) %>
+        <span><%= chrome.storage.used %> of <%= chrome.storage.quota %></span>
+      </div>
+      <div class="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-white/10">
+        <div class="h-full w-0 rounded-full <%= chrome.storage.percent > 90 ? 'bg-red-500' : 'bg-brand-500' %>" data-bar-percent="<%= chrome.storage.percent %>"></div>
+      </div>
+      <div class="mt-1"><%= chrome.storage.percent %>% of quota used</div>
+    </div>
+    <form action="<%= pages.logout %>" method="post">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white">
+        <span class="w-4 text-center text-[13px] text-slate-400"><%- include('icon', { name: 'fa-solid fa-right-from-bracket' }) %></span>
+        <span>Log out</span>
+      </button>
+    </form>
+  </div>
+</aside>

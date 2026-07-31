@@ -1,0 +1,15 @@
+<%
+  
+  const starsRating = Number(rating) || 0;
+  const starsSize = locals.size ?? "text-sm";
+  const starsClickable = Boolean(locals.button);
+%>
+<% [1, 2, 3, 4, 5].forEach(function (value) { %>
+  <% const lit = value <= starsRating ? 'text-amber-400' : 'text-slate-300'; %>
+  <% if (starsClickable) { %>
+    <button type="button" data-star="<%= value %>" aria-label="Rate <%= value %>"
+      class="<%= starsSize %> leading-none <%= lit %> hover:text-amber-300"><%- include('icon', { name: 'fa-solid fa-star' }) %></button>
+  <% } else { %>
+    <%- include('icon', { name: 'fa-solid fa-star', extra: lit }) %>
+  <% } %>
+<% }); %>

@@ -1,0 +1,99 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<div class="mb-6">
+  <a href="<%= pages.generations %>" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to generations</a>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
+
+  <section class="card">
+    <div class="card-head"><%- include('partials/icon', { name: 'fa-solid fa-crop-simple' }) %><h2>Shape</h2></div>
+    <div class="card-body space-y-4">
+      <div>
+        <span class="field-label">Shape</span>
+        <div class="flex flex-wrap gap-2" data-ratios>
+          <button type="button" data-ratio="" aria-pressed="true"
+            class="btn btn-quiet aria-pressed:border-brand-500 aria-pressed:bg-indigo-50 aria-pressed:text-brand-700">
+            Free
+          </button>
+          <% aspects.forEach(function (shape) { %>
+            <button type="button" data-ratio="<%= shape.ratio %>" aria-pressed="false"
+              class="btn btn-quiet aria-pressed:border-brand-500 aria-pressed:bg-indigo-50 aria-pressed:text-brand-700">
+              <%= shape.label %>
+            </button>
+          <% }); %>
+        </div>
+      </div>
+
+      <div>
+        <span class="field-label">Size</span>
+        <p id="crop-size" aria-live="polite" class="text-sm tabular-nums text-slate-600">&mdash;</p>
+        <p class="help">
+          In the picture's own pixels, which is what gets saved.
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="button" id="reset-btn"
+          class="btn btn-quiet flex-1">
+          <%- include('partials/icon', { name: 'fa-solid fa-expand' }) %> Whole image
+        </button>
+      </div>
+
+      <button id="crop-btn" type="button" class="btn btn-dark w-full py-2.5">
+        <%- include('partials/icon', { name: 'fa-solid fa-scissors' }) %>
+        <span id="crop-label">Crop</span>
+      </button>
+
+      <p id="status" role="status" aria-live="polite" class="mt-3 min-h-5 text-sm"></p>
+
+      <div id="saved" hidden class="mt-3">
+        <a href="<%= pages.generations %>" class="text-sm text-brand-600 hover:underline">See it in generations</a>
+      </div>
+
+      <p class="help">
+        Cropping from
+        <a href="<%= pages.generations %>" class="underline">#<%= image.id %></a>.
+        The picture you started from is kept, and the crop is saved beside it.
+      </p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-body">
+      <div class="mx-auto w-fit">
+        <div id="stage" class="relative select-none">
+          <img id="source" src="<%= uploadPrefix %>/<%= image.filename %>" alt=""
+            class="block max-h-[70vh] w-auto rounded-md" />
+
+          <div id="shade-top" class="pointer-events-none absolute bg-slate-900/50"></div>
+          <div id="shade-bottom" class="pointer-events-none absolute bg-slate-900/50"></div>
+          <div id="shade-left" class="pointer-events-none absolute bg-slate-900/50"></div>
+          <div id="shade-right" class="pointer-events-none absolute bg-slate-900/50"></div>
+
+          <div id="crop-box" data-source-id="<%= image.id %>" class="absolute cursor-move border-2 border-white shadow-[0_0_0_1px_rgba(15,23,42,0.4)]">
+            <span data-handle="nw" class="absolute -left-1.5 -top-1.5 h-3 w-3 cursor-nwse-resize rounded-sm bg-white shadow"></span>
+            <span data-handle="ne" class="absolute -right-1.5 -top-1.5 h-3 w-3 cursor-nesw-resize rounded-sm bg-white shadow"></span>
+            <span data-handle="sw" class="absolute -bottom-1.5 -left-1.5 h-3 w-3 cursor-nesw-resize rounded-sm bg-white shadow"></span>
+            <span data-handle="se" class="absolute -bottom-1.5 -right-1.5 h-3 w-3 cursor-nwse-resize rounded-sm bg-white shadow"></span>
+            <span data-handle="n" class="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 cursor-ns-resize rounded-sm bg-white shadow"></span>
+            <span data-handle="s" class="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 cursor-ns-resize rounded-sm bg-white shadow"></span>
+            <span data-handle="w" class="absolute -left-1.5 top-1/2 h-3 w-3 -translate-y-1/2 cursor-ew-resize rounded-sm bg-white shadow"></span>
+            <span data-handle="e" class="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 cursor-ew-resize rounded-sm bg-white shadow"></span>
+          </div>
+        </div>
+      </div>
+
+      <p class="help mt-3 text-center">
+        Drag inside the box to move it, or a handle to resize it.
+      </p>
+    </div>
+  </section>
+</div>
+
+<%- include('partials/page-scripts', {
+      scripts: ['ui', 'api', 'crop-geometry', 'crop'],
+    }) %>
+
+<%- include('partials/chrome-foot') %>

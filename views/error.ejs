@@ -1,0 +1,18 @@
+<%- include('partials/head') %>
+<%- include('partials/public/header') %>
+  <div class="pub-centre">
+    <div class="panel text-center">
+      <div class="state-mark state-red">
+        <%- include('partials/icon', { name: 'fa-solid fa-circle-exclamation' }) %>
+      </div>
+      <h1 class="text-[16px] font-semibold text-slate-900">Something went wrong</h1>
+      <p class="help">Please try again in a moment.</p>
+      <% if (locals.canManage) { %>
+        <a href="<%= pages.dashboard %>" class="btn btn-quiet btn-sm mt-3.5">
+          <%- include('partials/icon', { name: 'fa-solid fa-gauge-high' }) %> Back to the dashboard
+        </a>
+      <% } %>
+    </div>
+  </div>
+<%- include('partials/public/foot', { mark: false }) %>
+<%- include('partials/foot') %>

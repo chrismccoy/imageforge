@@ -1,0 +1,57 @@
+<section class="card">
+  <div class="card-head"><%- include('../icon', { name: 'fa-solid fa-globe' }) %><h2>Public access</h2></div>
+  <div class="card-body space-y-3">
+
+  <%- include('../toggle', {
+        name: 'public_share',
+        title: 'Public sharing',
+        help: `Let anyone holding a share link open it, from any address. With this off, share
+               links only work from an address on your allow list.`,
+        stored: settings.public_share,
+        fallback: shareFallback,
+        envVar: 'PUBLIC_SHARE'
+      }) %>
+
+  <%- include('../toggle', {
+        name: 'public_gallery',
+        title: 'Public gallery',
+        help: `Publish the page listing every image you have shared. Needs public sharing as well.`,
+        stored: settings.public_gallery,
+        fallback: galleryFallback,
+        envVar: 'PUBLIC_GALLERY'
+      }) %>
+
+  <%- include('../toggle', {
+        name: 'public_favourites',
+        title: 'Public favourites',
+        help: `Let one link show every image you have starred, whether or not each one is shared.
+               The link is on this page once you create it, and revoking it kills every URL under it.`,
+        stored: settings.public_favourites,
+        fallback: favouritesFallback,
+        envVar: 'PUBLIC_FAVOURITES'
+      }) %>
+
+  <%- include('../toggle', {
+        name: 'public_collections',
+        title: 'Public collections',
+        help: `Let a shared collection's link work for anyone. Each collection is still shared one at a time,
+               and shows the public title you give it rather than its own name. Needs nothing else turned on.`,
+        stored: settings.public_collections,
+        fallback: collectionsFallback,
+        envVar: 'PUBLIC_COLLECTIONS'
+      }) %>
+
+  <%- include('../toggle', {
+        name: 'public_share_slug',
+        title: 'Descriptive links',
+        help: `Put the start of the prompt in the share URL, so a link reads
+               <code class="font-mono">/s/a-blue-sky-k3f9Qa72vX</code> instead of
+               <code class="font-mono">/s/k3f9Qa72vX</code>. Anyone who sees the link then
+               sees that much of the prompt, including in chat previews and server logs,
+               before they open it. Links already handed out keep working either way.`,
+        stored: settings.public_share_slug,
+        fallback: slugFallback,
+        envVar: 'PUBLIC_SHARE_SLUG'
+      }) %>
+  </div>
+</section>

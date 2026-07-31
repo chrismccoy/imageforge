@@ -1,0 +1,24 @@
+<%
+  
+  const headActions = locals.actions ?? [];
+  const headIcon = locals.headingIcon ?? null;
+%>
+<div class="pub-head">
+  <div>
+    <h1 class="text-xl font-semibold tracking-tight text-slate-900">
+      <% if (headIcon) { %><%- include('../icon', { name: headIcon.name, extra: headIcon.extra }) %><% } %><%= heading %>
+    </h1>
+    <p class="mt-1 text-sm text-slate-500">
+      <%= total %> image<%= total === 1 ? '' : 's' %>
+    </p>
+  </div>
+  <% if (headActions.length) { %>
+    <div class="flex flex-wrap items-center gap-2">
+      <% headActions.forEach(function (action) { %>
+        <a href="<%= action.href %>" class="btn btn-quiet<%= action.small ? ' btn-sm' : '' %>">
+          <%- include('../icon', { name: action.icon }) %> <%= action.label %>
+        </a>
+      <% }); %>
+    </div>
+  <% } %>
+</div>

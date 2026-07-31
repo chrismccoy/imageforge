@@ -1,0 +1,32 @@
+<header class="sticky top-0 z-10 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur sm:px-6">
+  <form method="get" action="<%= pages.generations %>" class="relative w-full max-w-md">
+    <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+      <%- include('icon', { name: 'fa-solid fa-magnifying-glass' }) %>
+    </span>
+    <input type="search" name="q" placeholder="Search images by prompt…" aria-label="Search images by prompt"
+      class="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-3 text-sm focus:border-brand-500 focus:bg-white focus:outline-none" />
+  </form>
+
+  <span class="flex-1"></span>
+
+  <a href="<%= pages.upload %>" class="hidden items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 sm:inline-flex">
+    <%- include('icon', { name: 'fa-solid fa-arrow-up-from-bracket' }) %> Upload
+  </a>
+  <a href="<%= pages.generate %>" class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3.5 py-1.5 text-sm font-medium text-white hover:bg-brand-700">
+    <%- include('icon', { name: 'fa-solid fa-plus' }) %> New generation
+  </a>
+  <a href="<%= pages.settings %>" aria-label="Settings" class="grid h-8 w-8 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+    <%- include('icon', { name: 'fa-solid fa-gear' }) %>
+  </a>
+  <span class="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-2.5 text-sm text-slate-600">
+    <span class="grid h-6 w-6 place-items-center rounded-full bg-brand-600 text-[11px] font-semibold text-white"><%= adminUser.slice(0, 1).toUpperCase() %></span>
+    <%= adminUser %>
+  </span>
+</header>
+
+<nav class="flex flex-nowrap items-center gap-1 overflow-x-auto whitespace-nowrap border-b border-slate-200 bg-white px-4 py-2 text-sm lg:hidden">
+  <% navLinks.forEach(function (link) { %>
+    <a href="<%= link.href %>" <% if (link.newTab) { %>target="_blank" rel="noopener"<% } %>
+      class="rounded px-2 py-1 <%= active === link.key ? 'font-medium text-brand-600' : 'text-slate-500' %>"><%= link.label %></a>
+  <% }); %>
+</nav>

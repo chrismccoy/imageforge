@@ -1,0 +1,134 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<% if (!hasKey) { %>
+  <div class="notice notice-warn">
+    <%- include('partials/icon', { name: 'fa-solid fa-triangle-exclamation' }) %>
+    <span>No OpenAI API key is set. Add <code class="font-mono">OPENAI_API_KEY</code> to your <code class="font-mono">.env</code> file.</span>
+  </div>
+<% } %>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
+
+  <section class="card">
+    <div class="card-head"><%- include('partials/icon', { name: 'fa-solid fa-sliders' }) %><h2>Settings</h2></div>
+    <div class="card-body space-y-4">
+      <div>
+        <label for="prompt-select" class="field-label">Saved prompt</label>
+        <select id="prompt-select"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+          <option value="">Select a saved prompt</option>
+          <% prompts.forEach(function (prompt) { %>
+            <option value="<%= prompt.prompt %>" data-id="<%= prompt.id %>"
+              data-size="<%= prompt.default_size || '' %>"
+              data-model="<%= prompt.default_model || '' %>"
+              <%= fromPromptId === prompt.id ? 'selected' : '' %>><%= prompt.name %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div id="variables" hidden></div>
+
+      <div>
+        <label for="prompt" class="field-label">Prompt</label>
+        <textarea id="prompt" rows="7" placeholder="Describe the image you want."
+          class="w-full resize-y rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none"><%= startingPrompt %></textarea>
+        <p data-char-count="prompt" class="help text-right"></p>
+      </div>
+
+      <div>
+        <label for="model" class="field-label">Model</label>
+        <select id="model"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+          <% modelTokens.forEach(function (token) { %>
+            <option value="<%= token %>" <%= token === selectedModel ? 'selected' : '' %>><%= modelIds[token] %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div>
+        <label for="size" class="field-label">Size</label>
+        <select id="size"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+          <% sizes.forEach(function (size) { %>
+            <option value="<%= size %>" <%= size === defaultSize ? 'selected' : '' %>><%= size %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div>
+        <label class="flex items-start gap-2.5 text-sm text-slate-700">
+          <input type="checkbox" id="compare" class="mt-0.5 accent-brand-600" />
+          <span>
+            <span class="font-medium">Compare the two models</span>
+            <span class="help block">
+              The same prompt to both, side by side. One picture from each, so it
+              always costs two.
+            </span>
+          </span>
+        </label>
+      </div>
+
+      <div>
+        <label for="count" class="field-label">Images</label>
+        <select id="count"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+          <% counts.forEach(function (count) { %>
+            <option value="<%= count %>" <%= count === defaultCount ? 'selected' : '' %>><%= count %></option>
+          <% }); %>
+        </select>
+        <p class="help">Each one is charged separately.</p>
+      </div>
+
+      <button id="generate-btn" type="button" <%= hasKey ? '' : 'disabled' %> class="btn btn-dark w-full py-2.5">
+        <%- include('partials/spinner', { id: 'generate-spinner', size: 'h-4 w-4', hide: true }) %>
+        <span id="generate-label">Generate</span>
+      </button>
+
+      <p id="status" role="status" aria-live="polite" class="min-h-5 text-sm"></p>
+    </div>
+  </section>
+
+  <section class="flex flex-col">
+    <div class="card flex min-h-[440px] flex-1 items-center justify-center p-[22px]">
+      <div id="placeholder" class="text-center text-slate-400">
+        <%- include('partials/icon', { name: 'fa-regular fa-image', extra: 'text-4xl text-slate-300' }) %>
+        <p class="mt-3 text-sm">Your generated image will appear here.</p>
+      </div>
+      <div id="spinner" hidden class="text-center text-slate-400">
+        <%- include('partials/spinner', { size: 'h-10 w-10', extra: 'mx-auto block text-brand-600' }) %>
+        <p id="spinner-text" class="mt-3 text-sm">Generating your image</p>
+      </div>
+      <div id="result" hidden class="w-full text-center">
+        <div class="inline-block max-w-full rounded-lg border border-slate-200 bg-white p-2 shadow">
+          <img id="image" alt="Generated image" class="mx-auto block h-auto max-w-full rounded" />
+        </div>
+      </div>
+
+      <div id="grid" hidden class="w-full self-stretch">
+        <div id="tiles" class="grid grid-cols-2 gap-3"></div>
+        <p class="help mt-3 text-center">Select the ones to keep.</p>
+      </div>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <button id="save-btn" type="button" hidden class="btn btn-primary">Save</button>
+      <button id="again-btn" type="button" hidden class="btn btn-quiet">
+        <%- include('partials/icon', { name: 'fa-solid fa-rotate' }) %> Generate again
+      </button>
+      <a id="view-link" href="<%= pages.generations %>" hidden class="btn btn-quiet">
+        <%- include('partials/icon', { name: 'fa-regular fa-images' }) %> View in generations
+      </a>
+    </div>
+  </section>
+</div>
+
+<%- include('partials/page-scripts', {
+      scripts: [
+        'ui', 'api', 'char-count',
+        'template', 'template-fields',
+        'generate-batch', 'generate',
+      ],
+    }) %>
+
+<%- include('partials/chrome-foot') %>

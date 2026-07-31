@@ -1,0 +1,19 @@
+/**
+ * The screenshot gallery's stylesheet
+ *
+ * Built separately from the app's: the gallery is one static page with its own
+ * content list, and it must not carry the component layer the app's views use.
+ * Built rather than fetched from a CDN because the app serves this page under
+ * `script-src 'self'`, and because a page describing an offline-capable install
+ * should not need someone else's host to draw itself.
+ */
+
+@tailwind base;
+
+/* Hiding is the attribute, the way it is in the app: a utility class setting
+   `display` would otherwise win on source order and leave the lightbox open. */
+[hidden] {
+  display: none !important;
+}
+
+@tailwind utilities;

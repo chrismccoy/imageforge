@@ -1,0 +1,79 @@
+<%- include('partials/header') %>
+<%- include('partials/page-head-end') %>
+
+<div class="max-w-2xl space-y-6">
+  <% if (error) { %>
+    <div class="notice notice-error mb-0">
+      <%- include('partials/icon', { name: 'fa-solid fa-circle-exclamation' }) %>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <form action="<%= pages.categories %>" method="post" class="card">
+    <div class="card-body flex items-end gap-3">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div class="flex-1">
+        <label for="name" class="field-label">New category</label>
+        <input id="name" name="name" type="text" required placeholder="landscapes"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none" />
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <%- include('partials/icon', { name: 'fa-solid fa-plus' }) %> Add
+      </button>
+    </div>
+  </form>
+
+  <div class="card">
+    <% if (categories.length === 0) { %>
+      <p class="card-empty">No categories yet.</p>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="text-center">Prompts</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% categories.forEach(function (category) { %>
+              <tr>
+                <td>
+                  <form action="<%= pages.categories %>/<%= category.id %>" method="post" class="flex items-center gap-2">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <input name="name" type="text" value="<%= category.name %>" required
+                      class="w-56 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none" />
+                    <button type="submit" class="btn btn-quiet btn-sm">
+                      <%- include('partials/icon', { name: 'fa-solid fa-pen' }) %> Rename
+                    </button>
+                  </form>
+                </td>
+                <td class="text-center">
+                  <span class="pill"><%= category.uses %></span>
+                </td>
+                <td class="text-right">
+                  <div class="flex flex-wrap items-center justify-end gap-2" data-confirm>
+                    <button type="button" data-confirm-open class="btn btn-danger btn-sm">
+                      <%- include('partials/icon', { name: 'fa-regular fa-trash-can' }) %> Delete
+                    </button>
+                    <%- include('partials/confirm-panel', {
+                          action: `${pages.categories}/${category.id}/delete`,
+                          label: category.uses > 0
+                            ? 'Delete? ' + category.uses + ' prompts become uncategorised'
+                            : 'Delete?'
+                        }) %>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/page-scripts', { scripts: ['ui'] }) %>
+<%- include('partials/inline-confirm') %>
+<%- include('partials/chrome-foot') %>

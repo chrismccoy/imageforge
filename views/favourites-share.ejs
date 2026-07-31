@@ -1,0 +1,22 @@
+<%- include('partials/head') %>
+<%- include('partials/public/header') %>
+  <%- include('partials/public/head', {
+        heading: 'Favourites',
+        headingIcon: { name: 'fa-solid fa-star', extra: 'mr-1.5 text-amber-500' },
+        total: total,
+        actions: total > 0
+          ? [{
+              href: `${prefix}/${token}/download`,
+              icon: 'fa-solid fa-file-zipper',
+              label: 'Download all (.zip)',
+            }]
+          : [],
+      }) %>
+
+  <%- include('partials/public/grid', {
+        tiles: tiles,
+        emptyIcon: 'fa-solid fa-star',
+        emptyText: 'No favourites yet.'
+      }) %>
+<%- include('partials/public/foot') %>
+<%- include('partials/foot') %>

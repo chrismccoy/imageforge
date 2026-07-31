@@ -1,0 +1,11 @@
+<span data-confirm-panel hidden class="inline-flex flex-wrap items-center gap-2">
+  <span class="pill pill-amber">
+    <%- include('icon', { name: 'fa-solid fa-triangle-exclamation' }) %>
+    <%= locals.label || 'Delete?' %>
+  </span>
+  <form action="<%= action %>" method="post" class="inline">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <button type="submit" class="btn btn-danger btn-sm">Yes</button>
+  </form>
+  <button type="button" data-confirm-cancel class="btn btn-quiet btn-sm">No</button>
+</span>

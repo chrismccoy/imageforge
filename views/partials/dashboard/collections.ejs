@@ -1,0 +1,26 @@
+<section data-widget="collections-widget" class="card">
+  <div class="card-head">
+    <%- include('../icon', { name: 'fa-regular fa-folder-open', extra: 'text-slate-400' }) %>
+    <h2>Collections</h2>
+    <a href="<%= pages.collections %>" class="ml-auto text-xs text-brand-600 hover:underline">All</a>
+  </div>
+  <div class="card-body">
+    <% if (collectionsWidget.length) { %>
+      <ul class="space-y-2 text-sm">
+        <% collectionsWidget.forEach(function (row) { %>
+          <li class="flex items-center gap-2.5">
+            <% if (row.shared) { %>
+              <%- include('../icon', { name: 'fa-solid fa-share-nodes', extra: 'text-brand-500' }) %>
+            <% } else { %>
+              <%- include('../icon', { name: 'fa-solid fa-folder', extra: 'text-slate-300' }) %>
+            <% } %>
+            <a href="<%= pages.generations %>?collection=<%= row.id %>" class="truncate text-slate-700 hover:text-brand-600"><%= row.name %></a>
+            <span class="pill ml-auto"><%= row.images %></span>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <p class="card-empty">No collections yet.</p>
+    <% } %>
+  </div>
+</section>
