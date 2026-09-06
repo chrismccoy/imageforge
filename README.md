@@ -117,6 +117,8 @@ Generate images from prompts, right from a simple admin dashboard. Type what you
 - The search stays as you page through the results, and Clear resets the results
 - See the prompt an image was made from, in a pop-up on its card
 - Copy an image's prompt to your clipboard with one click
+- Edit an image's prompt in that same pop-up, without leaving the page you are on
+- An edited prompt is what the list searches next, and the card updates without a reload
 - Download any saved image with one click
 - Download all your generated images at once, as a zip file
 - Press Select to reveal the checkboxes, so a list you are reading is not covered in controls
