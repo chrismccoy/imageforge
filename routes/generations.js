@@ -30,6 +30,7 @@ module.exports = (deps) => {
   router.post("/generations/bulk-collect", collections.bulkCollect);
   router.post("/generations/:id/delete", ctrl.remove);
   router.post("/generations/:id/favorite", ctrl.favorite);
+  router.post("/generations/:id/prompt", ctrl.setPrompt);
   router.post(
     "/generations/:id/collections/:collectionId/remove",
     collections.removeFromCollection

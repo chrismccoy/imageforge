@@ -7,10 +7,18 @@
     </div>
     <div class="max-h-80 overflow-y-auto px-5 py-4">
       <p id="prompt-modal-text" class="whitespace-pre-wrap break-words text-sm text-slate-700"></p>
+      <textarea id="prompt-modal-edit" rows="6" hidden aria-label="Prompt"
+        class="w-full resize-y rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"></textarea>
     </div>
     <div class="flex items-center justify-end gap-2 border-t border-slate-200 px-5 py-3">
       <button type="button" id="prompt-modal-copy"
         class="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Copy</button>
+      <button type="button" id="prompt-modal-edit-start" hidden
+        class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Edit</button>
+      <button type="button" id="prompt-modal-save" hidden
+        class="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Save</button>
+      <button type="button" id="prompt-modal-cancel" hidden
+        class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
       <button type="button" data-prompt-close
         class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Close</button>
     </div>

@@ -189,6 +189,22 @@ module.exports = (deps) => {
     },
 
     /**
+     * Edit the prompt on a saved image
+     */
+    setPrompt(req, res) {
+      const id = parseId(req.params.id);
+      const row = id ? Generation.get(id) : null;
+      if (!row) {
+        return problem(res, 404, "That image is not saved.");
+      }
+
+      const prompt = field(req.body, "prompt");
+      Generation.setPrompt(id, prompt);
+
+      res.json({ prompt });
+    },
+
+    /**
      * Flip whether a saved image is a favorite.
      */
     favorite(req, res) {

@@ -7,7 +7,7 @@
 "use strict";
 
 const { statementCache } = require("./criteria");
-const { parseId } = require("../utils/domain/coerce");
+const { parseId, toTrimmedString } = require("../utils/domain/coerce");
 const { allocateToken } = require("./allocateToken");
 const { tokenCount } = require("../utils/domain/tokenCount");
 
@@ -63,6 +63,7 @@ module.exports = (db) => {
     toggleFavorite: db.prepare(
       "UPDATE generations SET favorite = CASE favorite WHEN 1 THEN 0 ELSE 1 END WHERE id = ?"
     ),
+    setPrompt: db.prepare("UPDATE generations SET prompt = ? WHERE id = ?"),
     getFavorite: db.prepare("SELECT favorite FROM live_generations WHERE id = ?"),
     favouriteAnchor: db.prepare(
       "SELECT created_at FROM live_generations WHERE id = ? AND favorite = 1"
@@ -215,6 +216,13 @@ module.exports = (db) => {
           usage_output_image_tokens: tokenCount(usage.outputImage),
         }).lastInsertRowid
       );
+    },
+
+    /**
+     * Edit the prompt on a saved image
+     */
+    setPrompt(id, text) {
+      return stmts.setPrompt.run(toTrimmedString(text), id).changes > 0;
     },
 
     /**

@@ -95,7 +95,8 @@
       <a href="<%= pages.crop %>/<%= gen.id %>" data-confirm-hide class="btn btn-quiet btn-sm">
         <%- include('icon', { name: 'fa-solid fa-crop-simple' }) %> Crop
       </a>
-      <button type="button" data-prompt-show data-prompt="<%= gen.prompt || '(no prompt)' %>" data-confirm-hide
+      <button type="button" data-prompt-show data-prompt="<%= gen.prompt || '' %>"
+        data-prompt-save="<%= pages.generations %>/<%= gen.id %>/prompt" data-confirm-hide
         class="btn btn-quiet btn-sm">
         <%- include('icon', { name: 'fa-regular fa-comment' }) %> Show Prompt
       </button>
