@@ -7,7 +7,11 @@
 const { FAVOURITES_PREFIX, PAGES } = require("../config/urls");
 const { brandName, brandIcon } = require("../config/brand");
 const { env } = require("../config/env");
-const { ALLOWED_SIZES, MODELS, MODEL_TOKENS } = require("../config/images");
+const {
+  ALLOWED_SIZES,
+  MODELS,
+  MODEL_TOKENS,
+} = require("../config/images");
 const { DEFAULT_PAGE_SIZE } = require("../config/limits");
 const { TOGGLE_COLUMNS } = require("../config/toggles");
 const { maskKey } = require("../utils/domain/mask");

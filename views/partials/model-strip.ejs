@@ -1,0 +1,16 @@
+<div role="group" aria-label="Image model" data-model-strip
+  class="<%= { 2: 'grid grid-cols-2', 3: 'grid grid-cols-3' }[locals.columns] || 'flex flex-wrap' %> gap-2">
+  <% tokens.forEach(function (token) { %>
+    <label title="<%= ids[token] %>"
+      class="btn btn-quiet cursor-pointer
+             has-[:checked]:border-brand-600 has-[:checked]:bg-brand-600 has-[:checked]:text-white
+             has-[:checked]:hover:bg-brand-700 has-[:checked]:hover:text-white
+             has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500 has-[:focus-visible]:ring-offset-1">
+      <input type="radio" name="<%= name %>" value="<%= token %>" class="sr-only"
+        <%= selected === token ? 'checked' : '' %>
+        <% if (locals.describedBy) { %>aria-describedby="<%= describedBy %>"<% } %> />
+      <%# The button drops "-image" from the name; the title keeps it in full. %>
+      <%= ids[token].replace("-image", "") %>
+    </label>
+  <% }); %>
+</div>

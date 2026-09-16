@@ -11,6 +11,11 @@
     "dev": "node --watch server.js",
     "test": "node --test \"tests/**/*.test.js\"",
     "test-report": "node --test --test-reporter=./scripts/minimal-reporter.js \"tests/**/*.test.js\"",
+    "test:e2e": "playwright test",
+    "test:e2e:chrome": "playwright test --project=chrome",
+    "test:e2e:headed": "playwright test --project=chromium --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "seed:e2e": "node scripts/seed-e2e.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -26,6 +31,7 @@
     "yauzl": "^3.4.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "prettier": "^3.9.6",
     "tailwindcss": "^3.4.19"
   }

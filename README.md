@@ -263,7 +263,7 @@ Generate images from prompts, right from a simple admin dashboard. Type what you
 - A public link can only be opened so many times a minute
 - Anyone stopped by a limit gets an error message
 
-### Keeping it safe
+### Security
 
 - On a live setup the app will not start until you have set the password and its two secret keys, so it never runs unprotected
 - If it is set up wrong for the proxy web server, the log will notify you as the blocking of other addresses is required a valid setup

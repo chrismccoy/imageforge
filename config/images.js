@@ -8,11 +8,13 @@ const { toTrimmedString } = require("../utils/domain/coerce");
 
 // Image models, keyed by the short token shown in the UI.
 const MODELS = {
-  1.5: "gpt-image-1.5",
+  "1.5": "gpt-image-1.5",
   2: "gpt-image-2",
+  "2.5-sunburst": "gpt-image-2.5-sunburst",
+  "2.5-flare": "gpt-image-2.5-flare",
 };
 
-const MODEL_TOKENS = ["1.5", "2"];
+const MODEL_TOKENS = ["1.5", "2", "2.5-sunburst", "2.5-flare"];
 
 const MODEL_BY_ID = Object.fromEntries(
   Object.entries(MODELS).map(([token, id]) => [id, token])

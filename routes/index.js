@@ -20,6 +20,8 @@ module.exports = (deps) => {
 
   router.use("/screenshots", noIndex, express.static(SCREENSHOTS_DIR));
 
+  router.use(require("./health")(deps));
+
   router.use(require("./share")(deps));
   router.use(require("./collectionShare")(deps));
   router.use(require("./favouritesShare")(deps));

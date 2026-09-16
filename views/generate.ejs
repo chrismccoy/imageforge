@@ -37,13 +37,14 @@
       </div>
 
       <div>
-        <label for="model" class="field-label">Model</label>
-        <select id="model"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
-          <% modelTokens.forEach(function (token) { %>
-            <option value="<%= token %>" <%= token === selectedModel ? 'selected' : '' %>><%= modelIds[token] %></option>
-          <% }); %>
-        </select>
+        <span class="field-label">Model</span>
+        <%- include('partials/model-strip', {
+              name: 'model',
+              tokens: modelTokens,
+              ids: modelIds,
+              selected: selectedModel,
+              columns: 2,
+            }) %>
       </div>
 
       <div>
@@ -60,10 +61,10 @@
         <label class="flex items-start gap-2.5 text-sm text-slate-700">
           <input type="checkbox" id="compare" class="mt-0.5 accent-brand-600" />
           <span>
-            <span class="font-medium">Compare the two models</span>
+            <span class="font-medium">Compare the models</span>
             <span class="help block">
-              The same prompt to both, side by side. One picture from each, so it
-              always costs two.
+              The same prompt to every model, side by side. One picture from each,
+              so it always costs <%= modelTokens.length %>.
             </span>
           </span>
         </label>

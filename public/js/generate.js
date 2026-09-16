@@ -9,7 +9,18 @@
   const promptSelect = el("prompt-select");
   const promptField = el("prompt");
   const sizeSelect = el("size");
-  const modelSelect = el("model");
+  const modelRadios = document.querySelectorAll('[data-model-strip] input[name="model"]');
+
+  function pickedModel() {
+    const on = document.querySelector('[data-model-strip] input[name="model"]:checked');
+    return on ? on.value : "";
+  }
+
+  function pickModel(token) {
+    Array.prototype.forEach.call(modelRadios, function (radio) {
+      if (radio.value === token) radio.checked = true;
+    });
+  }
   const countSelect = el("count");
   const compareBox = el("compare");
   const grid = el("grid");
@@ -190,7 +201,9 @@
 
   function syncCompare() {
     const on = Boolean(compareBox && compareBox.checked);
-    if (modelSelect) modelSelect.disabled = on;
+    Array.prototype.forEach.call(modelRadios, function (radio) {
+      radio.disabled = on;
+    });
     if (countSelect) countSelect.disabled = on;
   }
 
@@ -209,7 +222,7 @@
     const size = opt ? opt.getAttribute("data-size") : "";
     const model = opt ? opt.getAttribute("data-model") : "";
     if (size) sizeSelect.value = size;
-    if (model && modelSelect) modelSelect.value = model;
+    if (model) pickModel(model);
   });
 
   /**
@@ -239,7 +252,7 @@
       const body = await api.post("/api/generate", {
         prompt: prompt,
         size: sizeSelect.value,
-        model: modelSelect ? modelSelect.value : "",
+        model: pickedModel(),
         count: countSelect ? countSelect.value : "1",
         compare: comparing ? "1" : "",
       });

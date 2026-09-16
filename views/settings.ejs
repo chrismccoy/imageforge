@@ -16,30 +16,27 @@
       <section class="card">
         <div class="card-head"><%- include('partials/icon', { name: 'fa-solid fa-sliders' }) %><h2>Generating</h2></div>
         <div class="card-body space-y-4">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label for="model" class="field-label">OpenAI image model</label>
-              <select id="model" name="model"
-                class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
-                <% models.forEach(function (token) { %>
-                  <option value="<%= token %>" <%= settings.model === token ? 'selected' : '' %>>
-                    <%= modelIds[token] %>
-                  </option>
-                <% }); %>
-              </select>
-              <p class="help">Which model the Generate page uses.</p>
-            </div>
+          <div>
+            <span class="field-label">OpenAI image model</span>
+            <%- include('partials/model-strip', {
+                  name: 'model',
+                  tokens: models,
+                  ids: modelIds,
+                  selected: settings.model,
+                  describedBy: 'model-help',
+                }) %>
+            <p id="model-help" class="help">Which model the Generate page uses.</p>
+          </div>
 
-            <div>
-              <label for="default_size" class="field-label">Default size</label>
-              <select id="default_size" name="default_size"
-                class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
-                <% sizes.forEach(function (size) { %>
-                  <option value="<%= size %>" <%= settings.default_size === size ? 'selected' : '' %>><%= size %></option>
-                <% }); %>
-              </select>
-              <p class="help">Pre-selected size on the Generate page.</p>
-            </div>
+          <div>
+            <label for="default_size" class="field-label">Default size</label>
+            <select id="default_size" name="default_size"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none">
+              <% sizes.forEach(function (size) { %>
+                <option value="<%= size %>" <%= settings.default_size === size ? 'selected' : '' %>><%= size %></option>
+              <% }); %>
+            </select>
+            <p class="help">Pre-selected size on the Generate page.</p>
           </div>
 
           <div>
