@@ -181,7 +181,7 @@
    * How many images the picker is currently asking for.
    */
   function askedFor() {
-    if (compareBox && compareBox.checked) return 2;
+    if (compareBox && compareBox.checked) return modelRadios.length;
     return countSelect ? Number(countSelect.value) || 1 : 1;
   }
 
