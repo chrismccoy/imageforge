@@ -10,6 +10,7 @@ const { shareNotFound } = require("../utils/http/pages");
 const { buildShareUrls } = require("../utils/domain/shareUrl");
 const { linkCard } = require("../utils/http/linkCard");
 const { formatTokens } = require("../utils/domain/usage");
+const { formatDuration } = require("../utils/domain/duration");
 const { costOf, formatCost } = require("../utils/domain/cost");
 const { buildTokenGatedImages } = require("./support/builders/tokenGatedImages");
 const { VIEWS } = require("../config/views");
@@ -85,6 +86,7 @@ module.exports = (deps) => {
         size: row.size,
         tokens: formatTokens(row.usage_total_tokens),
         cost: formatCost(costOf(row, ModelPrice.all()[row.model])),
+        duration: formatDuration(row.duration_ms),
         createdAt: row.created_at,
       });
     },

@@ -12,6 +12,7 @@
       <% if (createdAt) { %><span class="chip"><%- include('icon', { name: 'fa-regular fa-calendar' }) %> <%= createdAt.slice(0, 10) %></span><% } %>
       <% if (tokens) { %><span class="chip"><%- include('icon', { name: 'fa-solid fa-coins' }) %> <%= tokens %> tokens</span><% } %>
       <% if (cost) { %><span class="chip"><%- include('icon', { name: 'fa-solid fa-dollar-sign' }) %> <%= cost %></span><% } %>
+      <% if (locals.duration) { %><span class="chip"><%- include('icon', { name: 'fa-regular fa-clock' }) %> <%= duration %></span><% } %>
     </div>
 
     <div class="act-row">

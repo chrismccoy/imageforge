@@ -10,9 +10,10 @@ const { statementCache } = require("./criteria");
 const { parseId, toTrimmedString } = require("../utils/domain/coerce");
 const { allocateToken } = require("./allocateToken");
 const { tokenCount } = require("../utils/domain/tokenCount");
+const { durationMs } = require("../utils/domain/duration");
 
 const LIST_COLUMNS = `id, filename, prompt, model, size, created_at, share_token,
-       favorite, edited_from,
+       favorite, edited_from, duration_ms,
        usage_total_tokens, usage_input_tokens, usage_output_tokens`;
 
 /**
@@ -27,13 +28,13 @@ module.exports = (db) => {
     insert: db.prepare(
       `INSERT INTO generations (
          filename, prompt, prompt_id, model, size, created_at, edited_from,
-         spend_counted,
+         spend_counted, duration_ms,
          usage_total_tokens, usage_input_tokens, usage_output_tokens,
          usage_input_text_tokens, usage_input_image_tokens,
          usage_output_text_tokens, usage_output_image_tokens
        ) VALUES (
          @filename, @prompt, @prompt_id, @model, @size, @created_at, @edited_from,
-         @spend_counted,
+         @spend_counted, @duration_ms,
          @usage_total_tokens, @usage_input_tokens, @usage_output_tokens,
          @usage_input_text_tokens, @usage_input_image_tokens,
          @usage_output_text_tokens, @usage_output_image_tokens
@@ -207,6 +208,7 @@ module.exports = (db) => {
           created_at: new Date().toISOString(),
           edited_from: row.edited_from ?? null,
           spend_counted: row.spend_counted === 1 ? 1 : 0,
+          duration_ms: durationMs(row.duration_ms),
           usage_total_tokens: tokenCount(usage.total),
           usage_input_tokens: tokenCount(usage.input),
           usage_output_tokens: tokenCount(usage.output),

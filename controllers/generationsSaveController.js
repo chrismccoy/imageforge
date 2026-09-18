@@ -78,6 +78,7 @@ module.exports = (deps) => {
           model: claimed.meta.model,
           size: claimed.meta.size,
           usage: claimed.meta.usage,
+          duration_ms: claimed.meta.duration_ms,
           edited_from: claimed.meta.edited_from ?? null,
           spend_counted: 1,
         });

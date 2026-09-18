@@ -54,7 +54,8 @@
     <div class="flex flex-wrap items-center gap-1.5">
       <% if (gen.model) { %><span class="chip"><%= gen.model %></span><% } %>
       <% if (gen.size) { %><span class="chip"><%= gen.size %></span><% } %>
-      <% if (gen.tokens) { %><span class="chip"><%= gen.tokens %> tokens<% if (gen.cost) { %> · <%= gen.cost %><% } %></span><% } %>
+      <% const figures = [gen.tokens && `${gen.tokens} tokens`, gen.cost, gen.duration].filter(Boolean); %>
+      <% if (figures.length) { %><span class="chip"><%= figures.join(' · ') %></span><% } %>
       <% if (gen.edited_from) { %><a href="<%= pages.generations %>/<%= gen.id %>/compare"
         title="Compare with the image it was made from"
         class="chip font-medium text-slate-600 hover:bg-brand-100 hover:text-brand-700">From #<%= gen.edited_from %></a><% } %>

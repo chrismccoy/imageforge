@@ -141,6 +141,7 @@ async function imageRequest({
   const api = client || makeClient(key, { baseUrl, log: (m) => log.error(m) });
 
   let payload;
+  const started = performance.now();
   try {
     payload = await call(api, model);
   } catch (err) {
@@ -150,6 +151,7 @@ async function imageRequest({
     );
     throw new Error(describeUpstreamError(err));
   }
+  const durationMs = Math.round(performance.now() - started);
 
   const items = payload && Array.isArray(payload.data) ? payload.data : [];
   if (!items.length) {
@@ -165,7 +167,7 @@ async function imageRequest({
     });
   }
 
-  return { model, usage: readUsage(payload), images };
+  return { model, usage: readUsage(payload), images, durationMs };
 }
 
 /**
@@ -238,6 +240,7 @@ async function editImage({
   return {
     model: result.model,
     usage: result.usage,
+    durationMs: result.durationMs,
     bytes: image.bytes,
     dataUrl: image.dataUrl,
   };

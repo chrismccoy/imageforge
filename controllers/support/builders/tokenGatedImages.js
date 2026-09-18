@@ -8,6 +8,7 @@ const { PUBLIC_IMAGE_CACHE } = require("../../../config/limits");
 const { shareNotFound } = require("../../../utils/http/pages");
 const { uploadPath } = require("../../../utils/files/uploads");
 const { formatTokens } = require("../../../utils/domain/usage");
+const { formatDuration } = require("../../../utils/domain/duration");
 const { costOf, formatCost } = require("../../../utils/domain/cost");
 const { extensionOf, extMatches } = require("../../../utils/domain/imageExt");
 
@@ -58,6 +59,7 @@ function buildTokenGatedImages({
             tokens: formatTokens(found.row.usage_total_tokens),
             ext: extensionOf(found.row.filename),
             cost: formatCost(costOf(found.row, ModelPrice.all()[found.row.model])),
+            duration: formatDuration(found.row.duration_ms),
             createdAt: found.row.created_at,
           },
           extraLocals ? extraLocals(found, req) : {}

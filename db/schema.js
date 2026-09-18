@@ -43,7 +43,8 @@ function tables(db) {
       usage_output_image_tokens INTEGER,
       deleted_at                TEXT,
       edited_from               INTEGER,
-      spend_counted             INTEGER NOT NULL DEFAULT 0
+      spend_counted             INTEGER NOT NULL DEFAULT 0,
+      duration_ms               INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS settings (

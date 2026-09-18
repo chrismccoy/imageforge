@@ -142,6 +142,7 @@ module.exports = (deps) => {
           size,
           model: result.model,
           usage: result.usage,
+          duration_ms: result.durationMs,
           edited_from: row.id,
           prompt_id: row.prompt_id || null,
         });

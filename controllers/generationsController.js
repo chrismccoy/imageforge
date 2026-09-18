@@ -13,6 +13,7 @@ const { problem } = require("../utils/http/http");
 const { notFound } = require("../utils/http/pages");
 const { buildShareUrls } = require("../utils/domain/shareUrl");
 const { formatTokens } = require("../utils/domain/usage");
+const { formatDuration } = require("../utils/domain/duration");
 const { costOf, formatCost } = require("../utils/domain/cost");
 const { pageLink } = require("../utils/http/pageLink");
 const { requireDeps } = require("./support/helpers/requireDeps");
@@ -72,6 +73,7 @@ module.exports = (deps) => {
           share_image: urls.image,
           tokens: formatTokens(row.usage_total_tokens),
           cost: formatCost(costOf(row, priceList[row.model])),
+          duration: formatDuration(row.duration_ms),
           collections: chips[row.id] || [],
         });
       }),

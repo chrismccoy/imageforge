@@ -166,6 +166,8 @@ Generate images from prompts, right from a simple admin dashboard. Type what you
 - Whoever you send it to can copy that prompt or download the image, without an account
 - The shared page also shows what the image cost to make, so the person you sent it to can see what one like it would cost them
 - The cost only appears for a model you have priced
+- Every generated or edited image records how long OpenAI took to generate it, shown on its card and on the shared page
+- Images saved before this, uploads and crops have no duration, so it shows nothing
 - Every image in your list shows whether it is currently shared
 
 ### The public gallery
