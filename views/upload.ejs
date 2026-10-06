@@ -100,13 +100,14 @@
 
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label for="model" class="field-label">Model</label>
-          <select id="model" name="model"
-            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
-            <% models.forEach(function (token) { %>
-              <option value="<%= token %>" <%= token === selectedModel ? 'selected' : '' %>><%= modelIds[token] %></option>
-            <% }); %>
-          </select>
+          <span class="field-label">Model</span>
+          <%- include('partials/model-strip', {
+                name: 'model',
+                tokens: models,
+                ids: modelIds,
+                selected: selectedModel,
+                columns: 2,
+              }) %>
           <p class="help">Recorded with the picture, the same as a generated one.</p>
         </div>
 

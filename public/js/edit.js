@@ -49,7 +49,6 @@
   const brushInput = el("brush");
   const undoBtn = el("undo-btn");
   const clearBtn = el("clear-btn");
-  const modelSelect = el("model");
   const sizeSelect = el("size");
   const editBtn = el("edit-btn");
   const editLabel = el("edit-label");
@@ -78,6 +77,14 @@
   let stroke = null;
   let painting = false;
   let currentToken = null;
+
+  /**
+   * The model token picked in the strip of model buttons.
+   */
+  function pickedModel() {
+    const on = document.querySelector('[data-model-strip] input[name="model"]:checked');
+    return on ? on.value : "";
+  }
 
   /**
    * Show a status message, coloured by kind.
@@ -398,7 +405,7 @@
       const body = new FormData();
       body.append("_csrf", api.csrfToken);
       body.append("prompt", prompt);
-      body.append("model", modelSelect.value);
+      body.append("model", pickedModel());
       body.append("size", sizeSelect.value);
       body.append("source_id", mask.getAttribute("data-source-id") || "");
       body.append("image", await sourceBlob(), "source.png");

@@ -306,3 +306,20 @@ test("the page loads the edit modules before the script that reads them", async 
     app.stop();
   }
 });
+
+test("the model is picked with the same buttons as Generate, set to the image's own", async () => {
+  const db = freshDb();
+  const id = anImage(db, "a dog in a hat");
+  const app = await startApp(db);
+  try {
+    const cookie = await signIn(app.base);
+    const html = await (await fetch(`${app.base}/edit/${id}`, { headers: { cookie } })).text();
+
+    assert.match(html, /data-model-strip/, "the button strip");
+    assert.doesNotMatch(html, /<select id="model"/, "and no drop down");
+    assert.match(html, /name="model" value="2"\s+class="sr-only"\s+checked/);
+  } finally {
+    app.stop();
+    db.close();
+  }
+});

@@ -334,3 +334,20 @@ test("the upload form is given the real size limit, not a hardcoded one", () => 
   const { uploadMaxBytes } = resolveLimits();
   assert.equal(res.rendered.data.maxBytes, uploadMaxBytes);
 });
+
+test("the upload page picks its model with the same buttons as Generate", async () => {
+  const db = freshDb();
+  require("../../models/settings")(db).update({ model: "2" });
+  const app = await startApp(db);
+  try {
+    const cookie = await signIn(app.base);
+    const html = await (await fetch(`${app.base}/upload`, { headers: { cookie } })).text();
+
+    assert.match(html, /data-model-strip/, "the button strip");
+    assert.doesNotMatch(html, /<select id="model"/, "and no drop down");
+    assert.match(html, /name="model" value="2"\s+class="sr-only"\s+checked/);
+  } finally {
+    app.stop();
+    db.close();
+  }
+});

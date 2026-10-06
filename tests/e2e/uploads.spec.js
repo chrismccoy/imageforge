@@ -9,7 +9,7 @@ const os = require("os");
 const path = require("path");
 
 const { expect, test } = require("@playwright/test");
-const { signIn, field, uniqueSlug } = require("./support/app");
+const { signIn, field, uniqueSlug, pickModel } = require("./support/app");
 const { PROMPTS } = require("./support/seed");
 
 const FIXTURES = path.join(__dirname, "fixtures");
@@ -89,7 +89,7 @@ test("an upload carries the prompt, model and size chosen for the batch", async 
 
   await page.locator("#image").setInputFiles([SMALL, PORTRAIT]);
   await field(page, "prompt").fill(prompt);
-  await field(page, "model").selectOption("2");
+  await pickModel(page, "2");
   await field(page, "size").selectOption("1024x1024");
   await page.getByRole("button", { name: "Upload" }).click();
 
