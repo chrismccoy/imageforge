@@ -1,5 +1,5 @@
 <div role="group" aria-label="Image model" data-model-strip
-  class="<%= { 2: 'grid grid-cols-2', 3: 'grid grid-cols-3' }[locals.columns] || 'flex flex-wrap' %> gap-2">
+  class="<%= { 2: 'grid grid-cols-2', 3: 'grid grid-cols-3', 4: 'grid grid-cols-2 sm:grid-cols-4' }[locals.columns] || 'flex flex-wrap' %> gap-2">
   <% tokens.forEach(function (token) { %>
     <label title="<%= ids[token] %>"
       class="btn btn-quiet cursor-pointer

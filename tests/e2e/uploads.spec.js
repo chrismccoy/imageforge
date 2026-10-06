@@ -135,3 +135,20 @@ test("one bad file among good ones does not fail the whole batch", async ({ page
   await page.goto("/generations");
   await expect(page.locator(`[data-prompt-show][data-prompt="${prompt}"]`)).toHaveCount(1);
 });
+
+test("the four model buttons share one row, with the resolution below them", async ({ page }) => {
+  const buttons = page.locator("[data-model-strip] label");
+  await expect(buttons).toHaveCount(4);
+
+  const boxes = await buttons.evaluateAll((labels) =>
+    labels.map((label) => {
+      const box = label.getBoundingClientRect();
+      return { top: box.top, bottom: box.bottom, clipped: label.scrollWidth > label.clientWidth };
+    })
+  );
+  expect(new Set(boxes.map((box) => box.top)).size, "one row").toBe(1);
+  expect(boxes.filter((box) => box.clipped), "no name cut off").toEqual([]);
+
+  const size = await page.locator("#size").boundingBox();
+  expect(size.y).toBeGreaterThan(boxes[0].bottom);
+});

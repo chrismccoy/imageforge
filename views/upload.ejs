@@ -98,7 +98,7 @@
         <p class="help">Used only when no saved prompt is picked above. Shows up under Show Prompt.</p>
       </div>
 
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div class="space-y-5">
         <div>
           <span class="field-label">Model</span>
           <%- include('partials/model-strip', {
@@ -106,7 +106,7 @@
                 tokens: models,
                 ids: modelIds,
                 selected: selectedModel,
-                columns: 2,
+                columns: 4,
               }) %>
           <p class="help">Recorded with the picture, the same as a generated one.</p>
         </div>
