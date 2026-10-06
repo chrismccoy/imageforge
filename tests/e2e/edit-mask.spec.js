@@ -200,3 +200,17 @@ test("zooming in makes the same stroke finer on the picture itself", async ({ pa
 
   expect(await holes(canvas)).toBeLessThan(atFit);
 });
+
+test("every model button is wide enough for its name", async ({ page }) => {
+  await openEditor(page);
+
+  const buttons = page.locator("[data-model-strip] label");
+  await expect(buttons).not.toHaveCount(0);
+
+  const clipped = await buttons.evaluateAll((labels) =>
+    labels
+      .filter((label) => label.scrollWidth > label.clientWidth)
+      .map((label) => label.textContent.trim())
+  );
+  expect(clipped).toEqual([]);
+});

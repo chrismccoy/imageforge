@@ -21,6 +21,7 @@ const MODEL_BY_ID = Object.fromEntries(
 );
 const DEFAULT_MODEL = "1.5";
 const DEFAULT_OPENAI_MODEL = MODELS[DEFAULT_MODEL];
+const DEFAULT_EDIT_MODEL = "2.5-sunburst";
 
 // Image sizes the API accepts.
 const ALLOWED_SIZES = ["1024x1024", "1024x1536", "1536x1024", "auto"];
@@ -71,6 +72,7 @@ module.exports = {
   MODEL_BY_ID,
   DEFAULT_MODEL,
   DEFAULT_OPENAI_MODEL,
+  DEFAULT_EDIT_MODEL,
   ALLOWED_SIZES,
   DEFAULT_SIZE,
   ALLOWED_COUNTS,

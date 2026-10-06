@@ -8,7 +8,7 @@ const {
   ALLOWED_SIZES,
   normalizeSize,
   normalizeModel,
-  pickerModel,
+  DEFAULT_EDIT_MODEL,
   MODEL_TOKENS,
   MODELS,
 } = require("../config/images");
@@ -64,7 +64,7 @@ module.exports = (deps) => {
         defaultSize: normalizeSize(row.size, settings.default_size),
         modelTokens: MODEL_TOKENS,
         modelIds: MODELS,
-        selectedModel: pickerModel(row.model, openaiCredentials.model()),
+        selectedModel: DEFAULT_EDIT_MODEL,
         startingPrompt: row.prompt || "",
         hasKey: Boolean(openaiCredentials.apiKey()),
       });
