@@ -63,6 +63,14 @@ function describeUpstreamError(err) {
   const message = (err && err.message) || "";
   const status = err && err.status;
 
+  if (status === 429) {
+    const code = err.code || "";
+    if (code === "insufficient_quota" || /credits|quota|billing/i.test(message)) {
+      return "You are out of credits, please add funds to continue generating images";
+    }
+    return "OpenAI is limiting requests right now. Wait a moment and try again.";
+  }
+
   if (/is not valid JSON|Unexpected token/i.test(message)) {
     const where = status ? ` (status ${status})` : "";
     return (

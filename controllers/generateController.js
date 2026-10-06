@@ -94,6 +94,8 @@ module.exports = (deps) => {
     });
 
     if (!images.length) {
+      const reasons = new Set(failed.map((one) => one.message));
+      if (reasons.size === 1) return problem(res, 400, failed[0].message);
       return problem(
         res,
         400,

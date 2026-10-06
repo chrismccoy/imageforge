@@ -29,7 +29,7 @@ openai.generateImage = async ({ model, n, prompt }) => {
   const rule = behaviour[model] || {};
   await new Promise((resolve) => setTimeout(resolve, rule.delay || 20));
 
-  if (rule.fail) throw new Error(`${model} said no`);
+  if (rule.fail) throw new Error(rule.message || `${model} said no`);
 
   return {
     model: `gpt-image-${model}`,
@@ -138,6 +138,17 @@ test("every model failing is a failure, not an empty page", async () => {
 
   const out = await ask({ compare: "1" });
   assert.equal(out.status, 400);
+});
+
+test("every model failing for the same reason says that reason once", async () => {
+  const message = "You are out of credits, please add funds to continue generating images";
+  behaviour = Object.fromEntries(
+    MODEL_TOKENS.map((token) => [token, { fail: true, message }])
+  );
+
+  const out = await ask({ compare: "1" });
+  assert.equal(out.status, 400);
+  assert.equal(out.body.message, message);
 });
 
 test("a plain generation still asks one model, as it always did", async () => {

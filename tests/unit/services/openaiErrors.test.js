@@ -36,6 +36,37 @@ test("an ordinary API error keeps its own message", () => {
   );
 });
 
+const NO_CREDITS =
+  "You are out of credits, please add funds to continue generating images";
+
+function apiError(status, code, message) {
+  const err = new Error(message);
+  err.status = status;
+  err.code = code;
+  return err;
+}
+
+test("running out of credits becomes one short sentence", () => {
+  const err = apiError(
+    429,
+    "insufficient_quota",
+    "429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
+  );
+  assert.equal(describeUpstreamError(err), NO_CREDITS);
+});
+
+test("an out of credits reply is recognised by its wording when it has no code", () => {
+  const err = apiError(429, undefined, "429 You exceeded your current quota, please check your plan and billing details.");
+  assert.equal(describeUpstreamError(err), NO_CREDITS);
+});
+
+test("a rate limit is not mistaken for running out of credits", () => {
+  const err = apiError(429, "rate_limit_exceeded", "429 Rate limit reached for images per minute.");
+  const message = describeUpstreamError(err);
+  assert.notEqual(message, NO_CREDITS);
+  assert.match(message, /wait a moment/i);
+});
+
 test("an error with no message still says something", () => {
   assert.match(describeUpstreamError(new Error("")), /image request failed/i);
 });
