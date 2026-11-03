@@ -27,7 +27,7 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "multer": "^2.2.0",
-    "openai": "^7.3.0",
+    "openai": "^7.48.0",
     "yauzl": "^3.4.0"
   },
   "devDependencies": {
