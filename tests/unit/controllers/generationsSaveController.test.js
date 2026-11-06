@@ -38,7 +38,7 @@ function fakeGeneration(trashed = []) {
 }
 
 const credentials = {
-  model: () => "2.5-sunburst",
+  model: () => "2.6-sunburst",
   apiKey: () => "k",
   apiKeyFromEnv: () => false,
 };

@@ -142,7 +142,7 @@ function seed() {
   }
 
   db.prepare(
-    "UPDATE settings SET page_size = ?, model = '2.5-sunburst', default_size = '1024x1024' WHERE id = 1"
+    "UPDATE settings SET page_size = ?, model = '2.6-sunburst', default_size = '1024x1024' WHERE id = 1"
   ).run(PAGE_SIZE);
 
   db.close();

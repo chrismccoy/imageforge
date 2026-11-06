@@ -29,26 +29,63 @@ const preferredOf = (db) =>
 test("the saved model moves off 1.5 at startup", () => {
   const db = dbHolding({ setting: "1.5", preferred: null });
   schema.init(db);
-  assert.equal(settingOf(db), "2.5-sunburst");
+  assert.equal(settingOf(db), "2.6-sunburst");
 });
 
 test("a prompt's preferred model moves off 1.5 at startup", () => {
   const db = dbHolding({ setting: "2", preferred: "1.5" });
   schema.init(db);
-  assert.equal(preferredOf(db), "2.5-sunburst");
+  assert.equal(preferredOf(db), "2.6-sunburst");
+});
+
+test("a saved 2.5 model moves to its 2.6 version at startup", () => {
+  for (const [old, current] of [
+    ["2.5-sunburst", "2.6-sunburst"],
+    ["2.5-flare", "2.6-flare"],
+  ]) {
+    const db = dbHolding({ setting: old, preferred: null });
+    schema.init(db);
+    assert.equal(settingOf(db), current);
+  }
+});
+
+test("a prompt's preferred 2.5 model moves to its 2.6 version at startup", () => {
+  for (const [old, current] of [
+    ["2.5-sunburst", "2.6-sunburst"],
+    ["2.5-flare", "2.6-flare"],
+  ]) {
+    const db = dbHolding({ setting: "2", preferred: old });
+    schema.init(db);
+    assert.equal(preferredOf(db), current);
+  }
 });
 
 test("choices that were never 1.5 are left alone", () => {
-  const db = dbHolding({ setting: "2", preferred: "2.5-flare" });
+  const db = dbHolding({ setting: "2", preferred: "2.6-flare" });
   schema.init(db);
   assert.equal(settingOf(db), "2");
-  assert.equal(preferredOf(db), "2.5-flare");
+  assert.equal(preferredOf(db), "2.6-flare");
 });
 
 test("a prompt with no preference keeps having none", () => {
   const db = dbHolding({ setting: "2", preferred: null });
   schema.init(db);
   assert.equal(preferredOf(db), null);
+});
+
+test("images made by a 2.5 model keep that model", () => {
+  const db = dbHolding({ setting: "2.5-flare", preferred: null });
+  db.prepare(
+    `INSERT INTO generations (filename, prompt, model, size, created_at)
+     VALUES ('a.png', '', 'gpt-image-2.5-flare', '', '2026-08-13T00:00:00.000Z')`
+  ).run();
+
+  schema.init(db);
+
+  assert.equal(
+    db.prepare("SELECT model FROM generations").get().model,
+    "gpt-image-2.5-flare"
+  );
 });
 
 test("images already made keep the model that made them", () => {

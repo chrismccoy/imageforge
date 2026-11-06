@@ -307,7 +307,7 @@ test("the page loads the edit modules before the script that reads them", async 
   }
 });
 
-test("the model is picked with the same buttons as Generate, starting on 2.5-sunburst", async () => {
+test("the model is picked with the same buttons as Generate, starting on 2.6-sunburst", async () => {
   const db = freshDb();
   const id = anImage(db, "a dog in a hat");
   const app = await startApp(db);
@@ -319,7 +319,7 @@ test("the model is picked with the same buttons as Generate, starting on 2.5-sun
     assert.doesNotMatch(html, /<select id="model"/, "and no drop down");
     assert.match(
       html,
-      /name="model" value="2.5-sunburst"\s+class="sr-only"\s+checked/,
+      /name="model" value="2.6-sunburst"\s+class="sr-only"\s+checked/,
       "sunburst, not the gpt-image-2 that made the image"
     );
     assert.equal((html.match(/name="model"[^>]*checked/g) || []).length, 1, "only one is picked");

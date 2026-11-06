@@ -9,7 +9,7 @@ Generate images from prompts, right from a simple admin dashboard. Type what you
 - Type a few words and get an image back
 - Pick the image size you want
 - Let the service pick a size for you with the auto option
-- Choose which image model to use: 2, 2.5 Sunburst or 2.5 Flare
+- Choose which image model to use: 2, 2.6 Sunburst or 2.6 Flare
 - Choose the model on the Generate page, not just in Settings
 - See the generated image first, before you save it
 - See how long your prompt is as you type it, under the box

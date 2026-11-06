@@ -17,7 +17,7 @@ const PROMPTS = {
     rating: 3,
     pinned: 0,
     size: "1536x1024",
-    model: "2.5-sunburst",
+    model: "2.6-sunburst",
     notes: "",
   },
   variables: {
@@ -27,7 +27,7 @@ const PROMPTS = {
     rating: null,
     pinned: 0,
     size: "1024x1024",
-    model: "2.5-sunburst",
+    model: "2.6-sunburst",
     notes: "",
   },
   pinned: {
@@ -47,7 +47,7 @@ const PROMPTS = {
     rating: 2,
     pinned: 0,
     size: "1024x1024",
-    model: "2.5-sunburst",
+    model: "2.6-sunburst",
     notes: "Reference for the autumn set",
   },
 };

@@ -9,18 +9,18 @@ const { toTrimmedString } = require("../utils/domain/coerce");
 // Image models, keyed by the short token shown in the UI.
 const MODELS = {
   2: "gpt-image-2",
-  "2.5-sunburst": "gpt-image-2.5-sunburst",
-  "2.5-flare": "gpt-image-2.5-flare",
+  "2.6-sunburst": "gpt-image-2.6-sunburst",
+  "2.6-flare": "gpt-image-2.6-flare",
 };
 
-const MODEL_TOKENS = ["2", "2.5-sunburst", "2.5-flare"];
+const MODEL_TOKENS = ["2", "2.6-sunburst", "2.6-flare"];
 
 const MODEL_BY_ID = Object.fromEntries(
   Object.entries(MODELS).map(([token, id]) => [id, token])
 );
-const DEFAULT_MODEL = "2.5-sunburst";
+const DEFAULT_MODEL = "2.6-sunburst";
 const DEFAULT_OPENAI_MODEL = MODELS[DEFAULT_MODEL];
-const DEFAULT_EDIT_MODEL = "2.5-sunburst";
+const DEFAULT_EDIT_MODEL = "2.6-sunburst";
 
 // One image per model, plus a second from the selected one: the 2x2 grid.
 const COMPARE_IMAGES = MODEL_TOKENS.length + 1;

@@ -6,7 +6,11 @@
 
 const { DEFAULT_SIZE, DEFAULT_MODEL } = require("../config/images");
 
-const RETIRED_MODEL = "1.5";
+const RETIRED_MODELS = {
+  1.5: DEFAULT_MODEL,
+  "2.5-sunburst": "2.6-sunburst",
+  "2.5-flare": "2.6-flare",
+};
 
 /**
  * The tables this app owns.
@@ -52,7 +56,7 @@ function tables(db) {
     CREATE TABLE IF NOT EXISTS settings (
       id                INTEGER PRIMARY KEY CHECK (id = 1),
       default_size      TEXT NOT NULL,
-      model             TEXT NOT NULL DEFAULT '2.5-sunburst',
+      model             TEXT NOT NULL DEFAULT '2.6-sunburst',
       api_key           TEXT NOT NULL DEFAULT '',
       page_size         INTEGER NOT NULL DEFAULT 0,
       public_share      INTEGER,
@@ -190,23 +194,23 @@ function init(db, { seedModel = DEFAULT_MODEL } = {}) {
     "INSERT OR IGNORE INTO settings (id, default_size, model, api_key) VALUES (1, ?, ?, '')"
   ).run(DEFAULT_SIZE, seedModel);
 
-  moveOffRetiredModel(db);
+  moveOffRetiredModels(db);
   seedSpendFromGenerations(db);
 }
 
 /**
- * Point saved choices at the default once their model is gone. Generations are
+ * Point saved choices at a current model once theirs is gone. Generations are
  * left alone: they record what made them, and their spend and prices still apply.
  */
-function moveOffRetiredModel(db) {
-  db.prepare("UPDATE settings SET model = ? WHERE model = ?").run(
-    DEFAULT_MODEL,
-    RETIRED_MODEL
+function moveOffRetiredModels(db) {
+  const setting = db.prepare("UPDATE settings SET model = ? WHERE model = ?");
+  const prompts = db.prepare(
+    "UPDATE prompts SET default_model = ? WHERE default_model = ?"
   );
-  db.prepare("UPDATE prompts SET default_model = ? WHERE default_model = ?").run(
-    DEFAULT_MODEL,
-    RETIRED_MODEL
-  );
+  for (const [retired, current] of Object.entries(RETIRED_MODELS)) {
+    setting.run(current, retired);
+    prompts.run(current, retired);
+  }
 }
 
 /**

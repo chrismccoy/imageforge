@@ -129,12 +129,12 @@ test("settings model: seed present and invalid values fall back", () => {
 
   const seeded = Settings.get();
   assert.equal(seeded.default_size, "1024x1024");
-  assert.equal(seeded.model, "2.5-sunburst");
+  assert.equal(seeded.model, "2.6-sunburst");
 
   Settings.update({ default_size: "bogus", model: "99", api_key: "sk-test" });
   const after = Settings.get();
   assert.equal(after.default_size, "1024x1024"); 
-  assert.equal(after.model, "2.5-sunburst"); 
+  assert.equal(after.model, "2.6-sunburst"); 
   assert.equal(after.api_key, "sk-test");
 
   Settings.update({ default_size: "auto", model: "2", api_key: undefined });

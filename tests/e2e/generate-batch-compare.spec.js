@@ -83,17 +83,17 @@ test("comparing asks every model, the selected one twice, and labels what came b
   const labels = await page.locator("#tiles [data-model]").allTextContents();
   expect(labels).toEqual([
     "gpt-image-2",
-    "gpt-image-2.5-sunburst #1",
-    "gpt-image-2.5-sunburst #2",
-    "gpt-image-2.5-flare",
+    "gpt-image-2.6-sunburst #1",
+    "gpt-image-2.6-sunburst #2",
+    "gpt-image-2.6-flare",
   ]);
 
   const log = await stubRequests(request);
   expect(log.map((call) => call.model).sort()).toEqual([
     "gpt-image-2",
-    "gpt-image-2.5-flare",
-    "gpt-image-2.5-sunburst",
-    "gpt-image-2.5-sunburst",
+    "gpt-image-2.6-flare",
+    "gpt-image-2.6-sunburst",
+    "gpt-image-2.6-sunburst",
   ]);
   expect(log.every((call) => call.n === 1)).toBe(true);
 });
@@ -111,8 +111,8 @@ test("the model can still be picked while comparing, and that is the one doubled
   expect(labels).toEqual([
     "gpt-image-2 #1",
     "gpt-image-2 #2",
-    "gpt-image-2.5-sunburst",
-    "gpt-image-2.5-flare",
+    "gpt-image-2.6-sunburst",
+    "gpt-image-2.6-flare",
   ]);
 });
 

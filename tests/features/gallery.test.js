@@ -92,7 +92,7 @@ function addImage(Generation, prompt, token) {
   Generation.add({
     filename: galleryFile,
     prompt,
-    model: "2.5-sunburst",
+    model: "2.6-sunburst",
     size: "1024x1024",
   });
   const id = Generation.all()[0].id;

@@ -82,7 +82,7 @@ test("comparing asks every model the same prompt, and the selected one twice", a
   assert.equal(out.status, 200);
   assert.deepEqual(
     calls.map((call) => call.model).sort(),
-    ["2", "2", "2.5-flare", "2.5-sunburst"]
+    ["2", "2", "2.6-flare", "2.6-sunburst"]
   );
   assert.equal(
     new Set(calls.map((call) => call.prompt)).size,
@@ -104,7 +104,7 @@ test("the doubled model follows the selection", async () => {
 test("with nothing posted, the model from Settings is the one doubled", async () => {
   await ask({ compare: "1" });
 
-  assert.equal(calls.filter((call) => call.model === "2.5-sunburst").length, 2);
+  assert.equal(calls.filter((call) => call.model === "2.6-sunburst").length, 2);
 });
 
 test("each picture says which model made it, and tells a doubled model apart", async () => {
@@ -115,8 +115,8 @@ test("each picture says which model made it, and tells a doubled model apart", a
     [
       ["gpt-image-2", "gpt-image-2 #1"],
       ["gpt-image-2", "gpt-image-2 #2"],
-      ["gpt-image-2.5-sunburst", "gpt-image-2.5-sunburst"],
-      ["gpt-image-2.5-flare", "gpt-image-2.5-flare"],
+      ["gpt-image-2.6-sunburst", "gpt-image-2.6-sunburst"],
+      ["gpt-image-2.6-flare", "gpt-image-2.6-flare"],
     ]
   );
 });
@@ -142,20 +142,20 @@ test("the calls run alongside each other, not one after the other", async () => 
 });
 
 test("one model failing still shows the others, and says which is missing", async () => {
-  behaviour = { "2.5-flare": { fail: true } };
+  behaviour = { "2.6-flare": { fail: true } };
 
   const out = await ask({ compare: "1", model: "2" });
 
   assert.equal(out.status, 200, "a partial answer is still an answer");
   assert.equal(out.body.images.length, 3);
   assert.equal(
-    out.body.images.some((image) => image.model === MODELS["2.5-flare"]),
+    out.body.images.some((image) => image.model === MODELS["2.6-flare"]),
     false
   );
   assert.equal(out.body.failed.length, 1);
   assert.equal(
     out.body.failed[0].model,
-    MODELS["2.5-flare"],
+    MODELS["2.6-flare"],
     "and it names the one that did not"
   );
 });
@@ -237,8 +237,8 @@ test("every model is charged for, on its own line", async () => {
   const added = (model) => (after[model] || 0) - (before[model] || 0);
 
   assert.equal(added("gpt-image-2"), 2, "the doubled model is charged twice");
-  assert.equal(added("gpt-image-2.5-sunburst"), 1);
-  assert.equal(added("gpt-image-2.5-flare"), 1);
+  assert.equal(added("gpt-image-2.6-sunburst"), 1);
+  assert.equal(added("gpt-image-2.6-flare"), 1);
 });
 
 test("a compare that half failed only charges for the half that worked", async () => {
@@ -247,7 +247,7 @@ test("a compare that half failed only charges for the half that worked", async (
   const before = db
     .prepare("SELECT images FROM model_spend WHERE model = 'gpt-image-2'")
     .get();
-  await ask({ compare: "1", model: "2.5-flare" });
+  await ask({ compare: "1", model: "2.6-flare" });
   const after = db
     .prepare("SELECT images FROM model_spend WHERE model = 'gpt-image-2'")
     .get();

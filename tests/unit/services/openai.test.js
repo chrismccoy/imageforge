@@ -62,11 +62,11 @@ test("sends the resolved model, size, prompt, and n to the SDK", async () => {
     prompt: "p",
     size: "1536x1024",
     apiKey: "k",
-    model: "2.5-sunburst",
+    model: "2.6-sunburst",
     client,
   });
 
-  assert.equal(seen.model, "gpt-image-2.5-sunburst");
+  assert.equal(seen.model, "gpt-image-2.6-sunburst");
   assert.equal(seen.size, "1536x1024");
   assert.equal(seen.prompt, "p");
   assert.equal(seen.n, 1);
@@ -90,7 +90,7 @@ test("surfaces an SDK error as its message, and keeps the detail in the log", as
   );
 
   assert.ok(log.said(/Billing hard limit/), "the reason is written down");
-  assert.ok(log.said(/gpt-image-2\.5-sunburst/), "beside which model refused");
+  assert.ok(log.said(/gpt-image-2\.6-sunburst/), "beside which model refused");
   assert.ok(log.said(/1024x1024/), "and at what size");
 });
 
@@ -135,7 +135,7 @@ test("generateImage returns the usage the API reported", async () => {
     prompt: "a blue sky",
     size: "1024x1024",
     apiKey: "sk-test",
-    model: "2.5-sunburst",
+    model: "2.6-sunburst",
     client,
   });
 
@@ -156,7 +156,7 @@ test("generateImage still works when the API reports no usage", async () => {
     prompt: "a blue sky",
     size: "1024x1024",
     apiKey: "sk-test",
-    model: "2.5-sunburst",
+    model: "2.6-sunburst",
     client,
   });
 

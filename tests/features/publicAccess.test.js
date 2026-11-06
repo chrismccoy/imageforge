@@ -130,7 +130,7 @@ async function signIn(base) {
 function saveSettings(base, cookie, csrf, fields) {
   const body = new URLSearchParams(
     Object.assign(
-      { _csrf: csrf, default_size: "1024x1024", model: "2.5-sunburst" },
+      { _csrf: csrf, default_size: "1024x1024", model: "2.6-sunburst" },
       fields
     )
   );

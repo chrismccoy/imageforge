@@ -20,7 +20,7 @@ const { toTrimmedString } = require("../utils/domain/coerce");
 const { readUsage } = require("../utils/domain/usage");
 
 /**
- * Turn a UI token ("2" or "2.5-flare") into the full OpenAI model name.
+ * Turn a UI token ("2" or "2.6-flare") into the full OpenAI model name.
  */
 function resolveModel(token) {
   return MODELS[toTrimmedString(token)] || DEFAULT_OPENAI_MODEL;

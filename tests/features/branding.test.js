@@ -40,7 +40,7 @@ function saveSettings(base, cookie, csrf, fields) {
       {
         _csrf: csrf,
         default_size: "1024x1024",
-        model: "2.5-sunburst",
+        model: "2.6-sunburst",
         public_share: "on",
       },
       fields

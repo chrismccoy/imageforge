@@ -38,7 +38,7 @@ function freshDb() {
 }
 
 function addGeneration(Generation, filename, prompt) {
-  Generation.add({ filename, prompt, model: "2.5-sunburst", size: "1024x1024" });
+  Generation.add({ filename, prompt, model: "2.6-sunburst", size: "1024x1024" });
   return Generation.all().find((row) => row.filename === filename).id;
 }
 

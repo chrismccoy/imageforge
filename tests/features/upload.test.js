@@ -123,7 +123,7 @@ test("upload assigns a chosen prompt and stores the image", async () => {
   assert.equal(rows[0].prompt, "a blue sky");
   assert.equal(Generation.get(rows[0].id).prompt_id, pid);
   assert.equal(rows[0].size, "1536x1024");
-  assert.equal(rows[0].model, "gpt-image-2.5-sunburst");
+  assert.equal(rows[0].model, "gpt-image-2.6-sunburst");
   assert.match(rows[0].filename, /\.png$/);
 
   const { full } = uploadPath(rows[0].filename, UPLOAD_DIR);
@@ -320,7 +320,7 @@ test("an unknown model is not stored", async () => {
   );
 
   const row = Generation.all()[0];
-  assert.equal(row.model, "gpt-image-2.5-sunburst", "falls back to the default");
+  assert.equal(row.model, "gpt-image-2.6-sunburst", "falls back to the default");
   fs.rmSync(uploadPath(row.filename, UPLOAD_DIR).full, { force: true });
   db.close();
 });

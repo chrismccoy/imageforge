@@ -56,12 +56,12 @@ test("an edit sends the picture and the painted mask, once", async ({ page, requ
 
 test("an edit is sent to the model picked on the buttons", async ({ page, request }) => {
   const canvas = await openEditor(page);
-  await pickModel(page, "2.5-flare");
+  await pickModel(page, "2.6-flare");
   await makeEdit(page, canvas, "a white circle in the middle");
 
   const log = await stubRequests(request);
   expect(log).toHaveLength(1);
-  expect(log[0].model).toBe("gpt-image-2.5-flare");
+  expect(log[0].model).toBe("gpt-image-2.6-flare");
 });
 
 test("the result appears over the original, with a slider between them", async ({ page }) => {
