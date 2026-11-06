@@ -1,8 +1,9 @@
 <div role="group" aria-label="Image model" data-model-strip
-  class="<%= { 2: 'grid grid-cols-2', 3: 'grid grid-cols-3', 4: 'grid grid-cols-2 sm:grid-cols-4' }[locals.columns] || 'flex flex-wrap' %> gap-2">
-  <% tokens.forEach(function (token) { %>
+  class="<%= { 2: 'grid grid-cols-2', 3: 'grid grid-cols-1 sm:grid-cols-3' }[locals.columns] || 'flex flex-wrap' %> gap-2">
+  <% tokens.forEach(function (token, at) { %>
+    <% const alone = locals.columns === 2 && at === tokens.length - 1 && at % 2 === 0; %>
     <label title="<%= ids[token] %>"
-      class="btn btn-quiet cursor-pointer
+      class="btn btn-quiet cursor-pointer <%= alone ? 'col-span-2' : '' %>
              has-[:checked]:border-brand-600 has-[:checked]:bg-brand-600 has-[:checked]:text-white
              has-[:checked]:hover:bg-brand-700 has-[:checked]:hover:text-white
              has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500 has-[:focus-visible]:ring-offset-1">

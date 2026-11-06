@@ -136,9 +136,9 @@ test("one bad file among good ones does not fail the whole batch", async ({ page
   await expect(page.locator(`[data-prompt-show][data-prompt="${prompt}"]`)).toHaveCount(1);
 });
 
-test("the four model buttons share one row, with the resolution below them", async ({ page }) => {
+test("the three model buttons share one row, with the resolution below them", async ({ page }) => {
   const buttons = page.locator("[data-model-strip] label");
-  await expect(buttons).toHaveCount(4);
+  await expect(buttons).toHaveCount(3);
 
   const boxes = await buttons.evaluateAll((labels) =>
     labels.map((label) => {

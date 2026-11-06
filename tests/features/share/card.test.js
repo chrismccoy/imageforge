@@ -288,7 +288,7 @@ test("the share page degrades cleanly with no prompt, no tokens and no cost", as
 
     const row = attrTag(html, "meta-row", "div");
     assert.ok(row, "no fact row found");
-    assert.match(row, /1\.5/, "the known model still shows");
+    assert.match(row, /2\.5-sunburst/, "the known model still shows");
     assert.match(row, /1024x1024/, "the known size still shows");
     assert.equal(row.includes("tokens"), false, "no tokens chip");
     assert.equal(row.includes("$"), false, "no bare cost chip");

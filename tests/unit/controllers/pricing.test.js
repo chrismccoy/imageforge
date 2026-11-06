@@ -140,7 +140,7 @@ function settingsSetup() {
   const credentials = {
     apiKey: () => "",
     apiKeyFromEnv: () => false,
-    model: () => "1.5",
+    model: () => "2.5-sunburst",
   };
   return {
     models,
@@ -170,7 +170,7 @@ test("the settings form saves a rate pair per model", () => {
     settingsReq(
       {
         default_size: "1024x1024",
-        model: "1.5",
+        model: "2.5-sunburst",
         price_in_2: "5",
         price_out_2: "40",
       },
@@ -193,7 +193,7 @@ test("clearing both fields forgets a model's price", () => {
     settingsReq(
       {
         default_size: "1024x1024",
-        model: "1.5",
+        model: "2.5-sunburst",
         price_in_2: "",
         price_out_2: "",
       },
@@ -213,7 +213,7 @@ test("a nonsense rate leaves the stored price alone", () => {
     settingsReq(
       {
         default_size: "1024x1024",
-        model: "1.5",
+        model: "2.5-sunburst",
         price_in_2: "banana",
         price_out_2: "40",
       },

@@ -9,6 +9,7 @@ process.env.ADMIN_USERNAME = "admin";
 process.env.ADMIN_PASSWORD = "test-pass";
 process.env.ALLOWED_IPS = "";
 process.env.TRUST_PROXY = "";
+process.env.RATE_LIMIT_GENERATE_MAX = "1000";
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -30,6 +31,10 @@ openai.generateImage = async ({ model, n, prompt }) => {
   await new Promise((resolve) => setTimeout(resolve, rule.delay || 20));
 
   if (rule.fail) throw new Error(rule.message || `${model} said no`);
+  if (rule.failOnce) {
+    rule.failOnce = false;
+    throw new Error(`${model} said no`);
+  }
 
   return {
     model: `gpt-image-${model}`,
@@ -71,44 +76,62 @@ async function ask(body) {
   return { status: res.status, body: await res.json() };
 }
 
-test("comparing asks every model the same prompt", async () => {
-  const out = await ask({ compare: "1" });
+test("comparing asks every model the same prompt, and the selected one twice", async () => {
+  const out = await ask({ compare: "1", model: "2" });
 
   assert.equal(out.status, 200);
-  assert.equal(calls.length, MODEL_TOKENS.length, "one call per model");
   assert.deepEqual(
     calls.map((call) => call.model).sort(),
-    [...MODEL_TOKENS].sort(),
-    "one to each model"
+    ["2", "2", "2.5-flare", "2.5-sunburst"]
   );
   assert.equal(
     new Set(calls.map((call) => call.prompt)).size,
     1,
-    "and the same words to both, or the comparison means nothing"
+    "and the same words to all, or the comparison means nothing"
   );
 });
 
-test("each picture says which model made it", async () => {
-  const out = await ask({ compare: "1" });
+test("the doubled model follows the selection", async () => {
+  for (const token of MODEL_TOKENS) {
+    calls = [];
+    await ask({ compare: "1", model: token });
 
-  assert.equal(out.body.images.length, MODEL_TOKENS.length);
+    assert.equal(calls.length, 4, token);
+    assert.equal(calls.filter((call) => call.model === token).length, 2, token);
+  }
+});
+
+test("with nothing posted, the model from Settings is the one doubled", async () => {
+  await ask({ compare: "1" });
+
+  assert.equal(calls.filter((call) => call.model === "2.5-sunburst").length, 2);
+});
+
+test("each picture says which model made it, and tells a doubled model apart", async () => {
+  const out = await ask({ compare: "1", model: "2" });
+
   assert.deepEqual(
-    out.body.images.map((image) => image.model).sort(),
-    MODEL_TOKENS.map((token) => MODELS[token]).sort()
+    out.body.images.map((image) => [image.model, image.label]),
+    [
+      ["gpt-image-2", "gpt-image-2 #1"],
+      ["gpt-image-2", "gpt-image-2 #2"],
+      ["gpt-image-2.5-sunburst", "gpt-image-2.5-sunburst"],
+      ["gpt-image-2.5-flare", "gpt-image-2.5-flare"],
+    ]
   );
 });
 
-test("comparing is one picture per model however many the picker asked for", async () => {
+test("comparing is one picture per call however many the picker asked for", async () => {
   const out = await ask({ compare: "1", count: "4" });
 
-  assert.equal(out.body.images.length, MODEL_TOKENS.length, "one each, not four each");
+  assert.equal(out.body.images.length, 4, "four in all, not four each");
   assert.deepEqual(
     calls.map((call) => call.n),
-    MODEL_TOKENS.map(() => 1)
+    [1, 1, 1, 1]
   );
 });
 
-test("the two calls run alongside each other, not one after the other", async () => {
+test("the calls run alongside each other, not one after the other", async () => {
   behaviour = Object.fromEntries(MODEL_TOKENS.map((token) => [token, { delay: 120 }]));
 
   const started = Date.now();
@@ -119,18 +142,47 @@ test("the two calls run alongside each other, not one after the other", async ()
 });
 
 test("one model failing still shows the others, and says which is missing", async () => {
-  behaviour = { 2: { fail: true } };
+  behaviour = { "2.5-flare": { fail: true } };
 
-  const out = await ask({ compare: "1" });
+  const out = await ask({ compare: "1", model: "2" });
 
   assert.equal(out.status, 200, "a partial answer is still an answer");
-  assert.equal(out.body.images.length, MODEL_TOKENS.length - 1);
+  assert.equal(out.body.images.length, 3);
   assert.equal(
-    out.body.images.some((image) => image.model === MODELS["2"]),
+    out.body.images.some((image) => image.model === MODELS["2.5-flare"]),
     false
   );
   assert.equal(out.body.failed.length, 1);
-  assert.equal(out.body.failed[0].model, MODELS["2"], "and it names the one that did not");
+  assert.equal(
+    out.body.failed[0].model,
+    MODELS["2.5-flare"],
+    "and it names the one that did not"
+  );
+});
+
+test("a doubled model failing names both of its pictures", async () => {
+  behaviour = { 2: { fail: true } };
+
+  const out = await ask({ compare: "1", model: "2" });
+
+  assert.equal(out.body.images.length, 2);
+  assert.deepEqual(
+    out.body.failed.map((one) => one.label),
+    ["gpt-image-2 #1", "gpt-image-2 #2"]
+  );
+});
+
+test("one half of a doubled model failing keeps the other half", async () => {
+  behaviour = { 2: { failOnce: true } };
+
+  const out = await ask({ compare: "1", model: "2" });
+
+  assert.equal(out.body.images.length, 3);
+  assert.deepEqual(
+    out.body.failed.map((one) => one.label),
+    ["gpt-image-2 #1"]
+  );
+  assert.ok(out.body.images.some((image) => image.label === "gpt-image-2 #2"));
 });
 
 test("every model failing is a failure, not an empty page", async () => {
@@ -151,6 +203,15 @@ test("every model failing for the same reason says that reason once", async () =
   assert.equal(out.body.message, message);
 });
 
+test("every model failing for different reasons names each picture", async () => {
+  behaviour = Object.fromEntries(MODEL_TOKENS.map((token) => [token, { fail: true }]));
+
+  const out = await ask({ compare: "1", model: "2" });
+
+  assert.match(out.body.message, /gpt-image-2 #1: 2 said no/);
+  assert.match(out.body.message, /gpt-image-2 #2: 2 said no/);
+});
+
 test("a plain generation still asks one model, as it always did", async () => {
   const out = await ask({ model: "2", count: "2" });
 
@@ -161,16 +222,23 @@ test("a plain generation still asks one model, as it always did", async () => {
   assert.equal(out.body.images[0].model, "gpt-image-2", "and says so too");
 });
 
-test("both models are charged for, on their own lines", async () => {
-  await ask({ compare: "1" });
+test("every model is charged for, on its own line", async () => {
+  const images = () =>
+    Object.fromEntries(
+      db
+        .prepare("SELECT model, images FROM model_spend")
+        .all()
+        .map((row) => [row.model, row.images])
+    );
 
-  const rows = db
-    .prepare("SELECT model, images FROM model_spend ORDER BY model")
-    .all();
-  const seen = Object.fromEntries(rows.map((row) => [row.model, row.images]));
+  const before = images();
+  await ask({ compare: "1", model: "2" });
+  const after = images();
+  const added = (model) => (after[model] || 0) - (before[model] || 0);
 
-  assert.ok(seen["gpt-image-1.5"] >= 1, "1.5 was charged");
-  assert.ok(seen["gpt-image-2"] >= 1, "and so was 2");
+  assert.equal(added("gpt-image-2"), 2, "the doubled model is charged twice");
+  assert.equal(added("gpt-image-2.5-sunburst"), 1);
+  assert.equal(added("gpt-image-2.5-flare"), 1);
 });
 
 test("a compare that half failed only charges for the half that worked", async () => {
@@ -179,7 +247,7 @@ test("a compare that half failed only charges for the half that worked", async (
   const before = db
     .prepare("SELECT images FROM model_spend WHERE model = 'gpt-image-2'")
     .get();
-  await ask({ compare: "1" });
+  await ask({ compare: "1", model: "2.5-flare" });
   const after = db
     .prepare("SELECT images FROM model_spend WHERE model = 'gpt-image-2'")
     .get();
@@ -197,9 +265,22 @@ test("the page offers the compare toggle", async () => {
   ).text();
 
   assert.match(html, /id="compare"/);
-  assert.match(
-    html,
-    new RegExp(`always costs ${MODEL_TOKENS.length}`),
-    "and says what it will cost"
+  assert.match(html, /always costs 4/, "and says what it will cost");
+  assert.match(html, /id="compare"[^>]*data-images="4"/, "and tells the spinner");
+});
+
+test("the page offers three models, the third filling its own row", async () => {
+  const html = await (
+    await fetch(`${app.base}/generate`, { headers: { cookie } })
+  ).text();
+
+  assert.doesNotMatch(html, /value="1\.5"/);
+  assert.match(html, /data-model-strip\s+class="grid grid-cols-2/);
+
+  const labels = html.split("<label ").filter((part) => part.includes('name="model"'));
+  assert.equal(labels.length, 3);
+  assert.deepEqual(
+    labels.map((label) => label.includes("col-span-2")),
+    [false, false, true]
   );
 });

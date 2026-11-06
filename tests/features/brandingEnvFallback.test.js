@@ -24,7 +24,10 @@ const BRAND_COLUMNS = ["brand_name", "brand_icon", "brand_mark"];
 
 function saveSettings(base, cookie, csrf, fields) {
   const body = new URLSearchParams(
-    Object.assign({ _csrf: csrf, default_size: "1024x1024", model: "1.5" }, fields)
+    Object.assign(
+      { _csrf: csrf, default_size: "1024x1024", model: "2.5-sunburst" },
+      fields
+    )
   );
   return fetch(`${base}/settings`, {
     method: "POST",

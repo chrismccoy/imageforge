@@ -90,15 +90,14 @@ test("budgets are kept per client", () => {
   assert.equal(run(limiter, { ip: "1.1.1.1", body: { count: 1 } }), false);
 });
 
-test("a compare costs one image per model, because that is what it calls", () => {
+test("a compare costs the four images it calls for", () => {
   const { costOfGenerate } = require("../../../routes/apiCost");
-  const { MODEL_TOKENS } = require("../../../config/images");
 
   assert.equal(costOfGenerate({ body: { count: "1" } }), 1, "one image, one");
   assert.equal(costOfGenerate({ body: { count: "4" } }), 4, "four images, four");
   assert.equal(
     costOfGenerate({ body: { compare: "1", count: "4" } }),
-    MODEL_TOKENS.length,
-    "a compare is one picture per model whatever the picker says"
+    4,
+    "a compare is the same four pictures whatever the picker says"
   );
 });

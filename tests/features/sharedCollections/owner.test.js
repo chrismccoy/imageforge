@@ -103,7 +103,7 @@ test("the public collections toggle round-trips through settings", async () => {
     await post(app.base, "/settings", cookie, {
       _csrf: csrf,
       default_size: "1024x1024",
-      model: "1.5",
+      model: "2.5-sunburst",
       page_size: "12",
       public_collections: "on",
     });
@@ -112,7 +112,7 @@ test("the public collections toggle round-trips through settings", async () => {
     await post(app.base, "/settings", cookie, {
       _csrf: csrf,
       default_size: "1024x1024",
-      model: "1.5",
+      model: "2.5-sunburst",
       page_size: "12",
     });
     assert.equal(models(db).Settings.get().public_collections, 0);

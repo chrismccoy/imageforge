@@ -10,7 +10,7 @@ const OpenAI = require("openai");
 const { toFile } = OpenAI;
 
 const FIXTURES = path.join(__dirname, "..", "tests", "e2e", "fixtures");
-const MODEL = "gpt-image-1.5";
+const MODEL = "gpt-image-2";
 const SIZE = "1024x1024";
 
 function redact(payload) {

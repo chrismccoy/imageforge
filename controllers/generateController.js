@@ -16,6 +16,8 @@ const {
   pickerModel,
   MODEL_TOKENS,
   MODELS,
+  COMPARE_IMAGES,
+  compareLineup,
 } = require("../config/images");
 const { sizeFrom, field } = require("../utils/http/request");
 const { parseId } = require("../utils/domain/coerce");
@@ -72,23 +74,27 @@ module.exports = (deps) => {
   }
 
   /**
-   * Ask every model the same thing, and answer with whatever came back.
+   * Ask every model the same thing, the selected one twice, and answer with
+   * whatever came back.
    */
-  async function compareModels({ res, prompt, size, log }) {
+  async function compareModels({ res, prompt, size, selected, log }) {
+    const lineup = compareLineup(selected);
     const answers = await Promise.allSettled(
-      MODEL_TOKENS.map((modelToken) => oneFrom({ modelToken, prompt, size, log }))
+      lineup.map(({ token }) => oneFrom({ modelToken: token, prompt, size, log }))
     );
 
     const images = [];
     const failed = [];
 
     answers.forEach((answer, at) => {
+      const { token, label } = lineup[at];
       if (answer.status === "fulfilled") {
-        images.push(answer.value);
+        images.push({ ...answer.value, label });
         return;
       }
       failed.push({
-        model: MODELS[MODEL_TOKENS[at]],
+        model: MODELS[token],
+        label,
         message: (answer.reason && answer.reason.message) || "It failed.",
       });
     });
@@ -99,7 +105,7 @@ module.exports = (deps) => {
       return problem(
         res,
         400,
-        failed.map((one) => `${one.model}: ${one.message}`).join(" ")
+        failed.map((one) => `${one.label}: ${one.message}`).join(" ")
       );
     }
 
@@ -126,6 +132,7 @@ module.exports = (deps) => {
         defaultSize: normalizeSize(source && source.size, settings.default_size),
         modelTokens: MODEL_TOKENS,
         modelIds: MODELS,
+        compareImages: COMPARE_IMAGES,
         selectedModel: pickerModel(
           source && source.model,
           openaiCredentials.model()
@@ -159,7 +166,7 @@ module.exports = (deps) => {
 
       try {
         if (comparing) {
-          return await compareModels({ res, prompt, size, log });
+          return await compareModels({ res, prompt, size, selected: model, log });
         }
 
         const result = await generateImage({

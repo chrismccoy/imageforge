@@ -25,7 +25,7 @@ test("apiKey falls back to the environment key when none is saved", () => {
   process.env.OPENAI_API_KEY = "env-key";
   try {
     const c = createOpenaiCredentials(fakeSettings({ api_key: "", model: "" }));
-    assert.equal(c.model(), "1.5"); 
+    assert.equal(c.model(), "2.5-sunburst"); 
   } finally {
     if (prev === undefined) delete process.env.OPENAI_API_KEY;
     else process.env.OPENAI_API_KEY = prev;
@@ -34,5 +34,5 @@ test("apiKey falls back to the environment key when none is saved", () => {
 
 test("model defaults when the saved value is blank", () => {
   const c = createOpenaiCredentials(fakeSettings({ api_key: "k", model: "   " }));
-  assert.equal(c.model(), "1.5");
+  assert.equal(c.model(), "2.5-sunburst");
 });

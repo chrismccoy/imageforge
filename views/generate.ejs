@@ -59,12 +59,13 @@
 
       <div>
         <label class="flex items-start gap-2.5 text-sm text-slate-700">
-          <input type="checkbox" id="compare" class="mt-0.5 accent-brand-600" />
+          <input type="checkbox" id="compare" data-images="<%= compareImages %>"
+            class="mt-0.5 accent-brand-600" />
           <span>
             <span class="font-medium">Compare the models</span>
             <span class="help block">
-              The same prompt to every model, side by side. One picture from each,
-              so it always costs <%= modelTokens.length %>.
+              The same prompt to every model, side by side. One picture from each
+              and a second from the selected model, so it always costs <%= compareImages %>.
             </span>
           </span>
         </label>

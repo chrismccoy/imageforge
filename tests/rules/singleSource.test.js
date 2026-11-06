@@ -11,7 +11,7 @@ const assert = require("node:assert/strict");
 const fs = require("fs");
 const path = require("path");
 
-const { MODEL_TOKENS } = require("../../config/images");
+const { MODEL_TOKENS, compareLineup } = require("../../config/images");
 const { NAV_LINKS } = require("../../config/navigation");
 const { PAGES } = require("../../config/urls");
 const { COMPARE_IMAGES } = require("../../routes/apiCost");
@@ -25,16 +25,24 @@ const {
   CARRIED: PROMPT_FILTERS,
 } = require("../../controllers/support/helpers/promptLinks");
 
-test("a compare costs one image per model the app offers", () => {
+test("a compare costs what it asks for, and fills the 2x2 grid", () => {
+  for (const token of MODEL_TOKENS) {
+    assert.equal(
+      COMPARE_IMAGES,
+      compareLineup(token).length,
+      "routes/apiCost.js charges " +
+        COMPARE_IMAGES +
+        " images for a compare, but selecting " +
+        token +
+        " asks for " +
+        compareLineup(token).length +
+        "."
+    );
+  }
   assert.equal(
     COMPARE_IMAGES,
-    MODEL_TOKENS.length,
-    "routes/apiCost.js charges " +
-      COMPARE_IMAGES +
-      " images for a compare, but config/images.js offers " +
-      MODEL_TOKENS.length +
-      " models. Decide what the Generate page should do with a third model, " +
-      "then update both."
+    4,
+    "The compare grid is 2x2. Decide what it should show, then update both."
   );
 });
 

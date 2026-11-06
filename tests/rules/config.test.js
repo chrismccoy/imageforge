@@ -14,20 +14,20 @@ const { env } = require("../../config/env");
 const NOT_ENV_VARS = ["IS_PRODUCTION"];
 
 test("model catalog and token list agree", () => {
-  assert.deepEqual(images.MODEL_TOKENS, ["1.5", "2", "2.5-sunburst", "2.5-flare"]);
-  assert.equal(images.MODELS["1.5"], "gpt-image-1.5");
+  assert.deepEqual(images.MODEL_TOKENS, ["2", "2.5-sunburst", "2.5-flare"]);
+  assert.equal(images.MODELS["1.5"], undefined);
   assert.equal(images.MODELS["2"], "gpt-image-2");
   assert.equal(images.MODELS["2.5-sunburst"], "gpt-image-2.5-sunburst");
   assert.equal(images.MODELS["2.5-flare"], "gpt-image-2.5-flare");
-  assert.equal(images.DEFAULT_OPENAI_MODEL, "gpt-image-1.5");
+  assert.equal(images.DEFAULT_OPENAI_MODEL, "gpt-image-2.5-sunburst");
 });
 
 test("normalizeModel forces unknown tokens to the fallback", () => {
   assert.equal(images.normalizeModel("2"), "2");
-  assert.equal(images.normalizeModel("  1.5 "), "1.5");
-  assert.equal(images.normalizeModel("nope"), "1.5");
+  assert.equal(images.normalizeModel("  2 "), "2");
+  assert.equal(images.normalizeModel("nope"), "2.5-sunburst");
   assert.equal(images.normalizeModel("nope", "2"), "2");
-  assert.equal(images.normalizeModel(undefined), "1.5");
+  assert.equal(images.normalizeModel(undefined), "2.5-sunburst");
 });
 
 test("normalizeSize forces unknown sizes to the fallback", () => {

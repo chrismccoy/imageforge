@@ -9,16 +9,16 @@ Generate images from prompts, right from a simple admin dashboard. Type what you
 - Type a few words and get an image back
 - Pick the image size you want
 - Let the service pick a size for you with the auto option
-- Choose which image model to use, 1.5 or 2
+- Choose which image model to use: 2, 2.5 Sunburst or 2.5 Flare
 - Choose the model on the Generate page, not just in Settings
 - See the generated image first, before you save it
 - See how long your prompt is as you type it, under the box
 - The count follows a prompt filled in from a saved one, and its variables, not only what you type
 - Generate one, two or four images at a time from the same prompt
-- Put the same prompt to both models at once and see the two results side by side, each labelled with which model it came from
-- Comparing is always one picture from each, so it counts as two generations
-- The two run at the same time rather than one after the other, so comparing takes as long as generating once
-- If one model fails you still get the other, and the page says which one did not generate
+- Put the same prompt to every model at once and see the results side by side, each labelled with which model it came from
+- Comparing is one picture from each model and a second from the selected model, so it always counts as four generations
+- The four run at the same time rather than one after the other, so comparing takes as long as generating once
+- If one model fails you still get the others, and the page says which one did not generate
 - Compare a batch of four side by side and keep any of them, or none
 - Watch a spinner while your image is being generated
 - Until you have set your OpenAI key the Generate button is switched off, with a notice telling you why

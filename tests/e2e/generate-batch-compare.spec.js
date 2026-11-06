@@ -5,10 +5,14 @@
 "use strict";
 
 const { expect, test } = require("@playwright/test");
-const { signIn, resetStub, armStubFailure, stubRequests } = require("./support/app");
-const { MODEL_TOKENS, MODELS } = require("../../config/images");
-
-const ALL_MODEL_IDS = MODEL_TOKENS.map((token) => MODELS[token]).sort();
+const {
+  signIn,
+  resetStub,
+  armStubFailure,
+  stubRequests,
+  pickModel,
+  modelRadio,
+} = require("./support/app");
 
 const PROMPT = "a plain grey square for a batch";
 
@@ -66,7 +70,7 @@ test("a batch can be thrown away without saving any of it", async ({ page }) => 
   ).toHaveCount(0);
 });
 
-test("comparing asks every model once each and labels what came back", async ({
+test("comparing asks every model, the selected one twice, and labels what came back", async ({
   page,
   request,
 }) => {
@@ -74,15 +78,53 @@ test("comparing asks every model once each and labels what came back", async ({
   await page.locator("#generate-btn").click();
 
   const tiles = page.locator("#tiles > *");
-  await expect(tiles).toHaveCount(ALL_MODEL_IDS.length, { timeout: 30_000 });
+  await expect(tiles).toHaveCount(4, { timeout: 30_000 });
 
   const labels = await page.locator("#tiles [data-model]").allTextContents();
-  expect(labels.sort()).toEqual(ALL_MODEL_IDS);
+  expect(labels).toEqual([
+    "gpt-image-2",
+    "gpt-image-2.5-sunburst #1",
+    "gpt-image-2.5-sunburst #2",
+    "gpt-image-2.5-flare",
+  ]);
 
   const log = await stubRequests(request);
-  expect(log).toHaveLength(ALL_MODEL_IDS.length);
-  expect(log.map((call) => call.model).sort()).toEqual(ALL_MODEL_IDS);
+  expect(log.map((call) => call.model).sort()).toEqual([
+    "gpt-image-2",
+    "gpt-image-2.5-flare",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-sunburst",
+  ]);
   expect(log.every((call) => call.n === 1)).toBe(true);
+});
+
+test("the model can still be picked while comparing, and that is the one doubled", async ({
+  page,
+}) => {
+  await page.locator("#compare").check();
+  await expect(modelRadio(page, "2")).toBeEnabled();
+  await pickModel(page, "2");
+  await page.locator("#generate-btn").click();
+
+  await expect(page.locator("#tiles > *")).toHaveCount(4, { timeout: 30_000 });
+  const labels = await page.locator("#tiles [data-model]").allTextContents();
+  expect(labels).toEqual([
+    "gpt-image-2 #1",
+    "gpt-image-2 #2",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-flare",
+  ]);
+});
+
+test("every model button is wide enough for its name", async ({ page }) => {
+  const clipped = await page
+    .locator("[data-model-strip] label")
+    .evaluateAll((labels) =>
+      labels
+        .filter((label) => label.scrollWidth > label.clientWidth)
+        .map((label) => label.textContent.trim())
+    );
+  expect(clipped).toEqual([]);
 });
 
 test("while comparing, the page says how many images it is waiting for", async ({ page }) => {
@@ -98,18 +140,14 @@ test("while comparing, the page says how many images it is waiting for", async (
   await page.locator("#compare").check();
   await page.locator("#generate-btn").click();
 
-  await expect(page.locator("#spinner-text")).toHaveText(
-    `Generating your ${MODEL_TOKENS.length} images`
-  );
+  await expect(page.locator("#spinner-text")).toHaveText("Generating your 4 images");
 
   release();
-  await expect(page.locator("#tiles > *")).toHaveCount(MODEL_TOKENS.length, {
-    timeout: 30_000,
-  });
+  await expect(page.locator("#tiles > *")).toHaveCount(4, { timeout: 30_000 });
 });
 
 test("the compare toggle says what it will cost before it is used", async ({ page }) => {
-  await expect(page.getByText(`always costs ${MODEL_TOKENS.length}`)).toBeVisible();
+  await expect(page.getByText("always costs 4")).toBeVisible();
 });
 
 test("when one model fails the other still arrives, and the page says which", async ({
@@ -121,9 +159,7 @@ test("when one model fails the other still arrives, and the page says which", as
   await page.locator("#compare").check();
   await page.locator("#generate-btn").click();
 
-  await expect(page.locator("#tiles > *")).toHaveCount(ALL_MODEL_IDS.length - 1, {
-    timeout: 30_000,
-  });
+  await expect(page.locator("#tiles > *")).toHaveCount(3, { timeout: 30_000 });
   const labels = await page.locator("#tiles [data-model]").allTextContents();
   expect(labels).not.toContain("gpt-image-2");
   await expect(page.locator("#status")).toContainText("gpt-image-2 did not answer.");

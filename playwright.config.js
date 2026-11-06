@@ -34,7 +34,7 @@ const appEnv = {
 
   OPENAI_API_KEY: "e2e-test-key",
   OPENAI_BASE_URL: `${stubURL}/v1`,
-  OPENAI_MODEL: "1.5",
+  OPENAI_MODEL: "2.5-sunburst",
 
   ALLOWED_IPS: "",
   TRUST_PROXY: "false",

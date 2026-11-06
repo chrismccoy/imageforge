@@ -97,7 +97,7 @@
       label.setAttribute("data-model", "");
       label.className =
         "absolute inset-x-0 top-0 bg-slate-900/75 px-2 py-1 text-xs font-medium text-white";
-      label.textContent = item.model;
+      label.textContent = item.label;
       button.appendChild(label);
     }
 
@@ -181,7 +181,9 @@
    * How many images the picker is currently asking for.
    */
   function askedFor() {
-    if (compareBox && compareBox.checked) return modelRadios.length;
+    if (compareBox && compareBox.checked) {
+      return Number(compareBox.getAttribute("data-images"));
+    }
     return countSelect ? Number(countSelect.value) || 1 : 1;
   }
 
@@ -201,9 +203,6 @@
 
   function syncCompare() {
     const on = Boolean(compareBox && compareBox.checked);
-    Array.prototype.forEach.call(modelRadios, function (radio) {
-      radio.disabled = on;
-    });
     if (countSelect) countSelect.disabled = on;
   }
 

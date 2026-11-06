@@ -21,14 +21,13 @@ const { MODELS } = require("../../config/images");
 
 const IMAGE_BYTES = Buffer.from("PNGBYTES");
 const TIMES = {
-  "gpt-image-1.5": 8421,
   "gpt-image-2": 65000,
-  "gpt-image-2.5-sunburst": 21000,
+  "gpt-image-2.5-sunburst": 8421,
   "gpt-image-2.5-flare": 4200,
 };
 
 openai.generateImage = async ({ model, n = 1 }) => {
-  const id = MODELS[model] || "gpt-image-1.5";
+  const id = MODELS[model] || "gpt-image-2.5-sunburst";
   return {
     model: id,
     usage: { total: 1000 },
@@ -92,7 +91,7 @@ test("a generated image is saved with how long it took", async () => {
     const [filename] = await generateAndSave(app.base, cookie, csrf, {
       prompt: "a red bicycle",
       size: "1024x1024",
-      model: "1.5",
+      model: "2.5-sunburst",
     });
 
     assert.equal(rowFor(db, filename).duration_ms, 8421);
@@ -158,7 +157,7 @@ test("the shared page and the generations card show the time", async () => {
     const [filename] = await generateAndSave(app.base, cookie, csrf, {
       prompt: "a red bicycle",
       size: "1024x1024",
-      model: "1.5",
+      model: "2.5-sunburst",
     });
 
     const { Generation, Settings } = buildModels(db);

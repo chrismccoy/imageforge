@@ -84,16 +84,16 @@ test("the model and size saved in Settings are what the Generate page starts wit
   page,
 }) => {
   await page.goto("/settings");
-  await pickModel(page, "2.5-sunburst");
+  await pickModel(page, "2.5-flare");
   await page.locator("#default_size").selectOption("1024x1536");
   await page.getByRole("button", { name: /save/i }).first().click();
 
   await page.goto("/generate");
-  await expect(modelRadio(page, "2.5-sunburst")).toBeChecked();
+  await expect(modelRadio(page, "2.5-flare")).toBeChecked();
   await expect(page.locator("#size")).toHaveValue("1024x1536");
 
   await page.goto("/settings");
-  await pickModel(page, "1.5");
+  await pickModel(page, "2.5-sunburst");
   await page.locator("#default_size").selectOption("1024x1024");
   await page.getByRole("button", { name: /save/i }).first().click();
 });

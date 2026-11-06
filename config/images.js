@@ -8,20 +8,22 @@ const { toTrimmedString } = require("../utils/domain/coerce");
 
 // Image models, keyed by the short token shown in the UI.
 const MODELS = {
-  "1.5": "gpt-image-1.5",
   2: "gpt-image-2",
   "2.5-sunburst": "gpt-image-2.5-sunburst",
   "2.5-flare": "gpt-image-2.5-flare",
 };
 
-const MODEL_TOKENS = ["1.5", "2", "2.5-sunburst", "2.5-flare"];
+const MODEL_TOKENS = ["2", "2.5-sunburst", "2.5-flare"];
 
 const MODEL_BY_ID = Object.fromEntries(
   Object.entries(MODELS).map(([token, id]) => [id, token])
 );
-const DEFAULT_MODEL = "1.5";
+const DEFAULT_MODEL = "2.5-sunburst";
 const DEFAULT_OPENAI_MODEL = MODELS[DEFAULT_MODEL];
 const DEFAULT_EDIT_MODEL = "2.5-sunburst";
+
+// One image per model, plus a second from the selected one: the 2x2 grid.
+const COMPARE_IMAGES = MODEL_TOKENS.length + 1;
 
 // Image sizes the API accepts.
 const ALLOWED_SIZES = ["1024x1024", "1024x1536", "1536x1024", "auto"];
@@ -66,6 +68,21 @@ function pickerModel(modelId, fallback) {
   return normalizeModel(MODEL_BY_ID[toTrimmedString(modelId)], fallback);
 }
 
+/**
+ * What a compare asks for: every model once, and the selected one twice.
+ */
+function compareLineup(selected) {
+  const doubled = normalizeModel(selected);
+  return MODEL_TOKENS.flatMap((token) =>
+    token === doubled
+      ? [
+          { token, label: `${MODELS[token]} #1` },
+          { token, label: `${MODELS[token]} #2` },
+        ]
+      : [{ token, label: MODELS[token] }]
+  );
+}
+
 module.exports = {
   MODELS,
   MODEL_TOKENS,
@@ -73,6 +90,7 @@ module.exports = {
   DEFAULT_MODEL,
   DEFAULT_OPENAI_MODEL,
   DEFAULT_EDIT_MODEL,
+  COMPARE_IMAGES,
   ALLOWED_SIZES,
   DEFAULT_SIZE,
   ALLOWED_COUNTS,
@@ -82,4 +100,5 @@ module.exports = {
   normalizeSize,
   normalizeCount,
   pickerModel,
+  compareLineup,
 };

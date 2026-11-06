@@ -53,9 +53,9 @@ test("a size and model round-trip through add and update", () => {
   assert.equal(row.default_size, "1024x1536");
   assert.equal(row.default_model, "2");
 
-  Prompt.update(id, "A", "x", null, { size: "1536x1024", model: "1.5" });
+  Prompt.update(id, "A", "x", null, { size: "1536x1024", model: "2.5-flare" });
   assert.equal(Prompt.get(id).default_size, "1536x1024");
-  assert.equal(Prompt.get(id).default_model, "1.5");
+  assert.equal(Prompt.get(id).default_model, "2.5-flare");
 
   Prompt.update(id, "A", "x", null, { size: "", model: "" });
   assert.equal(Prompt.get(id).default_size, null);

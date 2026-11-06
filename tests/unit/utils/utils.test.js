@@ -54,9 +54,9 @@ test("generatedImageName matches the expected pattern", () => {
 });
 
 test("resolveModel maps tokens to OpenAI names", () => {
-  assert.equal(resolveModel("1.5"), "gpt-image-1.5");
+  assert.equal(resolveModel("2.5-flare"), "gpt-image-2.5-flare");
   assert.equal(resolveModel("2"), "gpt-image-2");
-  assert.equal(resolveModel("bogus"), "gpt-image-1.5");
+  assert.equal(resolveModel("bogus"), "gpt-image-2.5-sunburst");
 });
 
 test("uploadsDirBytes sums file sizes and treats a missing folder as zero", async () => {

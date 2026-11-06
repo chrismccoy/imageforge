@@ -45,6 +45,15 @@ test("the model is named only when the batch is a comparison", () => {
   assert.equal(batchFrom([image(1), image(2)], true)[0].showModel, true);
 });
 
+test("a compared picture keeps the label that tells a doubled model apart", () => {
+  const twin = { ...image(1), model: "gpt-image-2", label: "gpt-image-2 #2" };
+  assert.equal(batchFrom([twin], true)[0].label, "gpt-image-2 #2");
+});
+
+test("a picture with no label is named by its model", () => {
+  assert.equal(batchFrom([image(1)], true)[0].label, image(1).model);
+});
+
 test("an answer with no images is an empty batch, not a crash", () => {
   assert.equal(batchFrom(undefined, false).length, 0);
   assert.equal(batchFrom([], true).length, 0);
@@ -81,6 +90,13 @@ test("a model that did not answer is named", () => {
   assert.match(
     missingNote([{ model: "a" }, { model: "b" }]),
     /a did not answer\. b did not answer\./
+  );
+});
+
+test("a missing half of a doubled model is named by its label", () => {
+  assert.equal(
+    missingNote([{ model: "gpt-image-2", label: "gpt-image-2 #1" }]),
+    "gpt-image-2 #1 did not answer."
   );
 });
 

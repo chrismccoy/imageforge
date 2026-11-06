@@ -87,7 +87,7 @@ test("the posted model is used, and its absence falls back to settings", async (
     await call({ prompt: "a cat", size: "1024x1024" });
 
     assert.equal(seen[0], "2", "the posted model is honoured");
-    assert.equal(seen[1], "1.5", "no model falls back to the setting");
+    assert.equal(seen[1], "2.5-sunburst", "no model falls back to the setting");
   } finally {
     app.stop();
     db.close();

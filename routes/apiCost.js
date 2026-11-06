@@ -4,9 +4,7 @@
 
 "use strict";
 
-const { normalizeCount, MODEL_TOKENS } = require("../config/images");
-
-const COMPARE_IMAGES = MODEL_TOKENS.length;
+const { normalizeCount, COMPARE_IMAGES } = require("../config/images");
 
 /**
  * How many images a request is asking for.

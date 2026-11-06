@@ -141,7 +141,7 @@ test("prompt model: a paged row keeps its generations count", () => {
 test("settings model: page_size, blanks to 0, clamps to max", () => {
   const db = freshDb();
   const Settings = require("../../../../models/settings")(db);
-  const base = { default_size: "1024x1024", model: "1.5" };
+  const base = { default_size: "1024x1024", model: "2.5-sunburst" };
 
   Settings.update({ ...base, page_size: "12" });
   assert.equal(Settings.get().page_size, 12);
@@ -162,7 +162,11 @@ test("prompts controller: index pages and clamps an out of range page", () => {
   const Prompt = require("../../../../models/prompt")(db);
   const Generation = require("../../../../models/generation")(db);
   const Settings = require("../../../../models/settings")(db);
-  Settings.update({ default_size: "1024x1024", model: "1.5", page_size: "2" });
+  Settings.update({
+    default_size: "1024x1024",
+    model: "2.5-sunburst",
+    page_size: "2",
+  });
   ["a", "b", "c", "d", "e"].forEach((name) => Prompt.add(name, `${name} text`));
 
   const ctrl = require("../../../../controllers/promptsController")({
@@ -199,7 +203,11 @@ test("generations controller: index pages and clamps an out of range page", () =
   const db = freshDb();
   const Generation = require("../../../../models/generation")(db);
   const Settings = require("../../../../models/settings")(db);
-  Settings.update({ default_size: "1024x1024", model: "1.5", page_size: "2" });
+  Settings.update({
+    default_size: "1024x1024",
+    model: "2.5-sunburst",
+    page_size: "2",
+  });
   for (let i = 1; i <= 5; i++) Generation.add({ filename: `f${i}.png` });
 
   const ctrl = require("../../../../controllers/generationsController")({

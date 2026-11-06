@@ -6,6 +6,8 @@
 
 const { DEFAULT_SIZE, DEFAULT_MODEL } = require("../config/images");
 
+const RETIRED_MODEL = "1.5";
+
 /**
  * The tables this app owns.
  */
@@ -50,7 +52,7 @@ function tables(db) {
     CREATE TABLE IF NOT EXISTS settings (
       id                INTEGER PRIMARY KEY CHECK (id = 1),
       default_size      TEXT NOT NULL,
-      model             TEXT NOT NULL DEFAULT '1.5',
+      model             TEXT NOT NULL DEFAULT '2.5-sunburst',
       api_key           TEXT NOT NULL DEFAULT '',
       page_size         INTEGER NOT NULL DEFAULT 0,
       public_share      INTEGER,
@@ -188,7 +190,23 @@ function init(db, { seedModel = DEFAULT_MODEL } = {}) {
     "INSERT OR IGNORE INTO settings (id, default_size, model, api_key) VALUES (1, ?, ?, '')"
   ).run(DEFAULT_SIZE, seedModel);
 
+  moveOffRetiredModel(db);
   seedSpendFromGenerations(db);
+}
+
+/**
+ * Point saved choices at the default once their model is gone. Generations are
+ * left alone: they record what made them, and their spend and prices still apply.
+ */
+function moveOffRetiredModel(db) {
+  db.prepare("UPDATE settings SET model = ? WHERE model = ?").run(
+    DEFAULT_MODEL,
+    RETIRED_MODEL
+  );
+  db.prepare("UPDATE prompts SET default_model = ? WHERE default_model = ?").run(
+    DEFAULT_MODEL,
+    RETIRED_MODEL
+  );
 }
 
 /**

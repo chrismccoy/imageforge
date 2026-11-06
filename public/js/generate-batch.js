@@ -13,6 +13,7 @@ window.ImageForgeGenerateBatch = (function () {
         token: image.token,
         url: image.url,
         model: image.model,
+        label: image.label || image.model,
         showModel: Boolean(comparing),
         selected: images.length === 1,
         note: "",
@@ -51,7 +52,7 @@ window.ImageForgeGenerateBatch = (function () {
   function missingNote(failed) {
     return (failed || [])
       .map(function (one) {
-        return one.model + " did not answer.";
+        return (one.label || one.model) + " did not answer.";
       })
       .join(" ");
   }
