@@ -23,7 +23,10 @@ test.beforeEach(async ({ page, request }) => {
   await page.locator("#prompt").fill(PROMPT);
 });
 
-test("asking for two images returns two, in one request", async ({ page, request }) => {
+test("asking for two images returns two, in one request", async ({
+  page,
+  request,
+}) => {
   await page.locator("#count").selectOption("2");
   await page.locator("#generate-btn").click();
 
@@ -34,7 +37,9 @@ test("asking for two images returns two, in one request", async ({ page, request
   expect(log[0].n).toBe(2);
 });
 
-test("asking for four returns four, and one of them can be kept", async ({ page }) => {
+test("asking for four returns four, and one of them can be kept", async ({
+  page,
+}) => {
   await page.locator("#count").selectOption("4");
   await page.locator("#generate-btn").click();
 
@@ -127,7 +132,9 @@ test("every model button is wide enough for its name", async ({ page }) => {
   expect(clipped).toEqual([]);
 });
 
-test("while comparing, the page says how many images it is waiting for", async ({ page }) => {
+test("while comparing, the page says how many images it is waiting for", async ({
+  page,
+}) => {
   let release;
   const held = new Promise((resolve) => {
     release = resolve;
@@ -140,13 +147,17 @@ test("while comparing, the page says how many images it is waiting for", async (
   await page.locator("#compare").check();
   await page.locator("#generate-btn").click();
 
-  await expect(page.locator("#spinner-text")).toHaveText("Generating your 4 images");
+  await expect(page.locator("#spinner-text")).toHaveText(
+    "Generating your 4 images"
+  );
 
   release();
   await expect(page.locator("#tiles > *")).toHaveCount(4, { timeout: 30_000 });
 });
 
-test("the compare toggle says what it will cost before it is used", async ({ page }) => {
+test("the compare toggle says what it will cost before it is used", async ({
+  page,
+}) => {
   await expect(page.getByText("always costs 4")).toBeVisible();
 });
 
@@ -162,7 +173,9 @@ test("when one model fails the other still arrives, and the page says which", as
   await expect(page.locator("#tiles > *")).toHaveCount(3, { timeout: 30_000 });
   const labels = await page.locator("#tiles [data-model]").allTextContents();
   expect(labels).not.toContain("gpt-image-2");
-  await expect(page.locator("#status")).toContainText("gpt-image-2 did not answer.");
+  await expect(page.locator("#status")).toContainText(
+    "gpt-image-2 did not answer."
+  );
 });
 
 test("a failed generation says so rather than showing an empty frame", async ({

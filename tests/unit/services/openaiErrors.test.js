@@ -56,12 +56,20 @@ test("running out of credits becomes one short sentence", () => {
 });
 
 test("an out of credits reply is recognised by its wording when it has no code", () => {
-  const err = apiError(429, undefined, "429 You exceeded your current quota, please check your plan and billing details.");
+  const err = apiError(
+    429,
+    undefined,
+    "429 You exceeded your current quota, please check your plan and billing details."
+  );
   assert.equal(describeUpstreamError(err), NO_CREDITS);
 });
 
 test("a rate limit is not mistaken for running out of credits", () => {
-  const err = apiError(429, "rate_limit_exceeded", "429 Rate limit reached for images per minute.");
+  const err = apiError(
+    429,
+    "rate_limit_exceeded",
+    "429 Rate limit reached for images per minute."
+  );
   const message = describeUpstreamError(err);
   assert.notEqual(message, NO_CREDITS);
   assert.match(message, /wait a moment/i);

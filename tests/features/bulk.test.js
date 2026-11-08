@@ -80,8 +80,7 @@ test.after(() => {
   for (const full of written) {
     try {
       fs.unlinkSync(full);
-    } catch (_err) {
-    }
+    } catch (_err) {}
   }
 });
 

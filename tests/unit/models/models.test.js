@@ -53,7 +53,7 @@ test("prompt model: all() reports use counts from generations", () => {
 test("generation model: add defaults and purge", () => {
   const Generation = require("../../../models/generation")(freshDb());
 
-  Generation.add({ filename: "x.png" }); 
+  Generation.add({ filename: "x.png" });
   const rows = Generation.all();
   assert.equal(rows.length, 1);
   assert.equal(rows[0].prompt, "");
@@ -133,8 +133,8 @@ test("settings model: seed present and invalid values fall back", () => {
 
   Settings.update({ default_size: "bogus", model: "99", api_key: "sk-test" });
   const after = Settings.get();
-  assert.equal(after.default_size, "1024x1024"); 
-  assert.equal(after.model, "2.6-sunburst"); 
+  assert.equal(after.default_size, "1024x1024");
+  assert.equal(after.model, "2.6-sunburst");
   assert.equal(after.api_key, "sk-test");
 
   Settings.update({ default_size: "auto", model: "2", api_key: undefined });

@@ -20,7 +20,10 @@ async function createCollection(page) {
   const name = uniqueName("Collection");
   await page.goto("/collections");
   await page.getByRole("textbox", { name: "New collection" }).fill(name);
-  await page.getByRole("button", { name: /add|create|save/i }).first().click();
+  await page
+    .getByRole("button", { name: /add|create|save/i })
+    .first()
+    .click();
   await expect(rowFor(page, name)).toBeVisible();
   return name;
 }
@@ -37,7 +40,9 @@ test.beforeEach(async ({ page }) => {
   await signIn(page);
 });
 
-test("the seeded collection holds one image, reachable from its count", async ({ page }) => {
+test("the seeded collection holds one image, reachable from its count", async ({
+  page,
+}) => {
   await page.goto("/collections");
   const row = rowFor(page, COLLECTION.name);
   await expect(row).toBeVisible();
@@ -48,18 +53,24 @@ test("the seeded collection holds one image, reachable from its count", async ({
   await expect(cardFor(page, IMAGES.collected.prompt)).toBeVisible();
 });
 
-test("an image is added to a collection from its card, and taken out again", async ({ page }) => {
+test("an image is added to a collection from its card, and taken out again", async ({
+  page,
+}) => {
   const name = await createCollection(page);
 
   await page.goto("/generations");
   const card = cardFor(page, IMAGES.favourite.prompt);
   await card.locator("[data-collection-add]").selectOption({ label: name });
 
-  await expect(card.locator("[data-collection-chip]", { hasText: name })).toBeVisible();
+  await expect(
+    card.locator("[data-collection-chip]", { hasText: name })
+  ).toBeVisible();
 
   await page.goto(`/generations`);
   await expect(
-    cardFor(page, IMAGES.favourite.prompt).locator("[data-collection-chip]", { hasText: name })
+    cardFor(page, IMAGES.favourite.prompt).locator("[data-collection-chip]", {
+      hasText: name,
+    })
   ).toBeVisible();
 
   await cardFor(page, IMAGES.favourite.prompt)
@@ -67,13 +78,17 @@ test("an image is added to a collection from its card, and taken out again", asy
     .locator("[data-collection-remove]")
     .click();
   await expect(
-    cardFor(page, IMAGES.favourite.prompt).locator("[data-collection-chip]", { hasText: name })
+    cardFor(page, IMAGES.favourite.prompt).locator("[data-collection-chip]", {
+      hasText: name,
+    })
   ).toHaveCount(0);
 
   await deleteCollection(page, name);
 });
 
-test("several images are added at once, and the filter finds them", async ({ page }) => {
+test("several images are added at once, and the filter finds them", async ({
+  page,
+}) => {
   const name = await createCollection(page);
 
   await page.goto("/generations");
@@ -113,7 +128,10 @@ test("a shared collection is public under its public title, never its own name",
   await row.locator('input[name="title"]').fill(publicTitle);
   await row.getByRole("button", { name: "Share" }).click();
 
-  const link = await rowFor(page, name).locator('a[href^="/c/"]').first().getAttribute("href");
+  const link = await rowFor(page, name)
+    .locator('a[href^="/c/"]')
+    .first()
+    .getAttribute("href");
 
   const stranger = await browser.newContext();
   const theirPage = await stranger.newPage();
@@ -128,7 +146,10 @@ test("a shared collection is public under its public title, never its own name",
 
   await theirPage.goto(`${baseURL}${link}`);
   const zip = await downloadTo(theirPage, () =>
-    theirPage.getByRole("link", { name: /download/i }).first().click()
+    theirPage
+      .getByRole("link", { name: /download/i })
+      .first()
+      .click()
   );
   expect(fs.readFileSync(zip.path).subarray(0, 2).toString("latin1")).toBe("PK");
 
@@ -155,5 +176,7 @@ test("a collection that was never shared is named nowhere public", async ({
 
   await stranger.close();
   await page.goto("/collections");
-  await expect(rowFor(page, COLLECTION.name).getByRole("button", { name: "Share" })).toBeVisible();
+  await expect(
+    rowFor(page, COLLECTION.name).getByRole("button", { name: "Share" })
+  ).toBeVisible();
 });

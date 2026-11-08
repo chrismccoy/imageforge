@@ -62,17 +62,17 @@ test("resolveModel maps tokens to OpenAI names", () => {
 test("uploadsDirBytes sums file sizes and treats a missing folder as zero", async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "uploads-"));
   try {
-    assert.equal(await uploadsDirBytes(dir), 0); 
+    assert.equal(await uploadsDirBytes(dir), 0);
 
     fs.writeFileSync(path.join(dir, "a.png"), Buffer.alloc(100));
     fs.writeFileSync(path.join(dir, "b.png"), Buffer.alloc(50));
-    fs.mkdirSync(path.join(dir, "sub")); 
+    fs.mkdirSync(path.join(dir, "sub"));
     assert.equal(await uploadsDirBytes(dir), 150);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 
-  assert.equal(await uploadsDirBytes(path.join(dir, "gone")), 0); 
+  assert.equal(await uploadsDirBytes(path.join(dir, "gone")), 0);
 });
 
 const { idList } = require("../../../utils/http/request");

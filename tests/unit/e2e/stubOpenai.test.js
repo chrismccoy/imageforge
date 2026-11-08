@@ -122,7 +122,10 @@ test("an edit reads the multipart body and refuses one without an image", async 
 
   const bare = new FormData();
   bare.set("prompt", "a white circle");
-  const bad = await fetch(`${base}/v1/images/edits`, { method: "POST", body: bare });
+  const bad = await fetch(`${base}/v1/images/edits`, {
+    method: "POST",
+    body: bare,
+  });
   assert.equal(bad.status, 400);
 });
 

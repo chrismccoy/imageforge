@@ -116,8 +116,7 @@ test("restoring puts back exactly what was archived", async () => {
   } finally {
     try {
       install.db.close();
-    } catch (err) {
-    }
+    } catch (err) {}
     fs.rmSync(install.root, { recursive: true, force: true });
   }
 });
@@ -150,8 +149,7 @@ test("a share token survives a restore, so links already sent still work", async
   } finally {
     try {
       install.db.close();
-    } catch (err) {
-    }
+    } catch (err) {}
     fs.rmSync(install.root, { recursive: true, force: true });
   }
 });
@@ -195,8 +193,7 @@ test("restore saves the current state before replacing it", async () => {
   } finally {
     try {
       install.db.close();
-    } catch (err) {
-    }
+    } catch (err) {}
     fs.rmSync(install.root, { recursive: true, force: true });
   }
 });
@@ -218,8 +215,7 @@ test("something that is not an archive is refused, and nothing is touched", asyn
   } finally {
     try {
       install.db.close();
-    } catch (err) {
-    }
+    } catch (err) {}
     fs.rmSync(install.root, { recursive: true, force: true });
   }
 });
@@ -251,8 +247,7 @@ test("an archive missing a column this code needs is refused", async () => {
   } finally {
     try {
       install.db.close();
-    } catch (err) {
-    }
+    } catch (err) {}
     fs.rmSync(install.root, { recursive: true, force: true });
   }
 });
@@ -283,8 +278,7 @@ test("an archive from a newer version is refused", async () => {
   } finally {
     try {
       install.db.close();
-    } catch (err) {
-    }
+    } catch (err) {}
     fs.rmSync(install.root, { recursive: true, force: true });
   }
 });

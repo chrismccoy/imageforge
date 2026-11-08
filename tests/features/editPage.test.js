@@ -313,7 +313,9 @@ test("the model is picked with the same buttons as Generate, starting on 2.6-sun
   const app = await startApp(db);
   try {
     const cookie = await signIn(app.base);
-    const html = await (await fetch(`${app.base}/edit/${id}`, { headers: { cookie } })).text();
+    const html = await (
+      await fetch(`${app.base}/edit/${id}`, { headers: { cookie } })
+    ).text();
 
     assert.match(html, /data-model-strip/, "the button strip");
     assert.doesNotMatch(html, /<select id="model"/, "and no drop down");
@@ -322,7 +324,11 @@ test("the model is picked with the same buttons as Generate, starting on 2.6-sun
       /name="model" value="2.6-sunburst"\s+class="sr-only"\s+checked/,
       "sunburst, not the gpt-image-2 that made the image"
     );
-    assert.equal((html.match(/name="model"[^>]*checked/g) || []).length, 1, "only one is picked");
+    assert.equal(
+      (html.match(/name="model"[^>]*checked/g) || []).length,
+      1,
+      "only one is picked"
+    );
   } finally {
     app.stop();
     db.close();

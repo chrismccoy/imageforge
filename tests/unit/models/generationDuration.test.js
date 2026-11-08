@@ -19,7 +19,11 @@ function freshGenerations() {
 
 test("a saved image keeps how long it took", () => {
   const Generation = freshGenerations();
-  const id = Generation.add({ filename: "a.png", prompt: "a cat", duration_ms: 8421 });
+  const id = Generation.add({
+    filename: "a.png",
+    prompt: "a cat",
+    duration_ms: 8421,
+  });
 
   assert.equal(Generation.get(id).duration_ms, 8421);
 });
@@ -27,7 +31,11 @@ test("a saved image keeps how long it took", () => {
 test("an image with no time stores null", () => {
   const Generation = freshGenerations();
   const none = Generation.add({ filename: "a.png", prompt: "a cat" });
-  const junk = Generation.add({ filename: "b.png", prompt: "a dog", duration_ms: -3 });
+  const junk = Generation.add({
+    filename: "b.png",
+    prompt: "a dog",
+    duration_ms: -3,
+  });
 
   assert.equal(Generation.get(none).duration_ms, null);
   assert.equal(Generation.get(junk).duration_ms, null);

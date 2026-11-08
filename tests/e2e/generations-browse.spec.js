@@ -45,7 +45,9 @@ test.afterEach(async ({ page }) => {
   await useGridView(page);
 });
 
-test("the list view shows each prompt beside its image, and is remembered", async ({ page }) => {
+test("the list view shows each prompt beside its image, and is remembered", async ({
+  page,
+}) => {
   await page.goto("/generations");
   await expect(page.locator("[data-row-prompt]")).toHaveCount(0);
 
@@ -92,7 +94,9 @@ test("a search survives paging", async ({ page }) => {
   await page.getByRole("button", { name: /save/i }).first().click();
 });
 
-test("a card's pop-up shows the prompt, copies it, and edits it in place", async ({ page }) => {
+test("a card's pop-up shows the prompt, copies it, and edits it in place", async ({
+  page,
+}) => {
   await page.goto("/generations");
 
   const card = cardFor(page, IMAGES.collected.prompt);
@@ -100,7 +104,9 @@ test("a card's pop-up shows the prompt, copies it, and edits it in place", async
 
   const modal = page.locator("#prompt-modal");
   await expect(modal).toBeVisible();
-  await expect(page.locator("#prompt-modal-text")).toHaveText(IMAGES.collected.prompt);
+  await expect(page.locator("#prompt-modal-text")).toHaveText(
+    IMAGES.collected.prompt
+  );
 
   await page.locator("#prompt-modal-copy").click();
   const copied = await page.evaluate(() => navigator.clipboard.readText());
@@ -111,19 +117,25 @@ test("a card's pop-up shows the prompt, copies it, and edits it in place", async
   await page.locator("#prompt-modal-edit").fill(edited);
   await page.locator("#prompt-modal-save").click();
   await expect(page.locator("#prompt-modal-text")).toHaveText(edited);
-  await expect(page.locator(`[data-prompt-show][data-prompt="${edited}"]`)).toHaveCount(1);
+  await expect(
+    page.locator(`[data-prompt-show][data-prompt="${edited}"]`)
+  ).toHaveCount(1);
   await page.locator("[data-prompt-close]").first().click();
   await expect(modal).toBeHidden();
 
   await page.goto("/generations?q=at+night");
-  await expect(page.locator(`[data-prompt-show][data-prompt="${edited}"]`)).toHaveCount(1);
+  await expect(
+    page.locator(`[data-prompt-show][data-prompt="${edited}"]`)
+  ).toHaveCount(1);
 
   await page.goto("/generations");
   await cardFor(page, edited).getByRole("button", { name: "Show Prompt" }).click();
   await page.locator("#prompt-modal-edit-start").click();
   await page.locator("#prompt-modal-edit").fill(IMAGES.collected.prompt);
   await page.locator("#prompt-modal-save").click();
-  await expect(page.locator("#prompt-modal-text")).toHaveText(IMAGES.collected.prompt);
+  await expect(page.locator("#prompt-modal-text")).toHaveText(
+    IMAGES.collected.prompt
+  );
 });
 
 test("Select reveals the checkboxes, and a bulk delete names what it will remove", async ({
@@ -148,16 +160,25 @@ test("Select reveals the checkboxes, and a bulk delete names what it will remove
 
   await page.locator('[formaction$="/bulk-delete"]').click();
   await expect(page.getByText(prompt)).toBeVisible();
-  await page.getByRole("button", { name: /delete/i }).last().click();
+  await page
+    .getByRole("button", { name: /delete/i })
+    .last()
+    .click();
 
-  await expect(page.locator(`[data-prompt-show][data-prompt="${prompt}"]`)).toHaveCount(0);
+  await expect(
+    page.locator(`[data-prompt-show][data-prompt="${prompt}"]`)
+  ).toHaveCount(0);
 });
 
-test("one image downloads on its own, and the whole library as a zip", async ({ page }) => {
+test("one image downloads on its own, and the whole library as a zip", async ({
+  page,
+}) => {
   await page.goto("/generations");
 
   const single = await downloadTo(page, () =>
-    cardFor(page, IMAGES.favourite.prompt).getByRole("link", { name: "Download" }).click()
+    cardFor(page, IMAGES.favourite.prompt)
+      .getByRole("link", { name: "Download" })
+      .click()
   );
   expect(single.suggestedFilename).toMatch(/\.png$/);
 

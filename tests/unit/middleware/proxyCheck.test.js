@@ -57,7 +57,7 @@ test("checks only the first request", () => {
     mw({ headers: {} }, {}, () => {});
     mw({ headers: {} }, {}, () => {});
     mw({ headers: {} }, {}, () => {});
-    assert.equal(warnings.length, 1); 
+    assert.equal(warnings.length, 1);
   } finally {
     env.TRUST_PROXY = original;
   }

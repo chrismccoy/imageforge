@@ -44,8 +44,13 @@ test("deleting a category leaves its prompts uncategorised", async ({ page }) =>
 
   await page.goto("/categories");
   await page.getByRole("textbox", { name: "New category" }).fill(category);
-  await page.getByRole("button", { name: /add|create|save/i }).first().click();
-  await expect(page.locator(`input[name="name"][value="${category}"]`)).toBeVisible();
+  await page
+    .getByRole("button", { name: /add|create|save/i })
+    .first()
+    .click();
+  await expect(
+    page.locator(`input[name="name"][value="${category}"]`)
+  ).toBeVisible();
 
   await page.goto("/prompts/new");
   await field(page, "name").fill(promptName);
@@ -76,7 +81,10 @@ test("a rating is given from the list and sorts the list", async ({ page }) => {
 
   const row = rowFor(page, PROMPTS.variables.name);
   await row.getByRole("button", { name: "Rate 4" }).click();
-  await expect(row.locator("[data-rating-group]")).toHaveAttribute("data-rating", "4");
+  await expect(row.locator("[data-rating-group]")).toHaveAttribute(
+    "data-rating",
+    "4"
+  );
 
   await page.getByRole("link", { name: "Rating" }).click();
   const sorted = await order(page);
@@ -85,10 +93,15 @@ test("a rating is given from the list and sorts the list", async ({ page }) => {
   await page.goto("/prompts");
   const again = rowFor(page, PROMPTS.variables.name);
   await again.getByRole("button", { name: "Rate 4" }).click();
-  await expect(again.locator("[data-rating-group]")).toHaveAttribute("data-rating", "");
+  await expect(again.locator("[data-rating-group]")).toHaveAttribute(
+    "data-rating",
+    ""
+  );
 });
 
-test("a pin moves a prompt to the top without reloading the page", async ({ page }) => {
+test("a pin moves a prompt to the top without reloading the page", async ({
+  page,
+}) => {
   await page.goto("/prompts");
 
   const before = await order(page);
@@ -131,9 +144,9 @@ test("a pin taken during a search keeps the search", async ({ page }) => {
 
   await expect(page).toHaveURL(/q=orchard/);
   await expect(page.locator("[data-prompt-row]")).toHaveCount(1);
-  await expect(page.getByRole("searchbox", { name: "Search prompts…" })).toHaveValue(
-    "orchard"
-  );
+  await expect(
+    page.getByRole("searchbox", { name: "Search prompts…" })
+  ).toHaveValue("orchard");
 
   await rowFor(page, PROMPTS.noted.name)
     .getByRole("button", { name: `Pin ${PROMPTS.noted.name} to the top` })
@@ -147,7 +160,9 @@ test("the generate page's picker puts pinned prompts first", async ({ page }) =>
   expect(options[1]).toBe(PROMPTS.pinned.name);
 });
 
-test("deleting several prompts together keeps the images made from them", async ({ page }) => {
+test("deleting several prompts together keeps the images made from them", async ({
+  page,
+}) => {
   const first = uniqueName("Bulk");
   const second = uniqueName("Bulk");
 
@@ -169,7 +184,10 @@ test("deleting several prompts together keeps the images made from them", async 
   await page.locator("[data-bulk-action]").click();
 
   await expect(page.getByText(first)).toBeVisible();
-  await page.getByRole("button", { name: /delete/i }).last().click();
+  await page
+    .getByRole("button", { name: /delete/i })
+    .last()
+    .click();
 
   await expect(rowFor(page, first)).toHaveCount(0);
   await expect(rowFor(page, second)).toHaveCount(0);

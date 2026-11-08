@@ -82,7 +82,9 @@
    * The model token picked in the strip of model buttons.
    */
   function pickedModel() {
-    const on = document.querySelector('[data-model-strip] input[name="model"]:checked');
+    const on = document.querySelector(
+      '[data-model-strip] input[name="model"]:checked'
+    );
     return on ? on.value : "";
   }
 

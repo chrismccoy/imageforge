@@ -35,7 +35,9 @@ async function openEditor(page) {
   await page
     .locator("[data-generation-card]")
     .filter({
-      has: page.locator(`[data-prompt-show][data-prompt="${IMAGES.favourite.prompt}"]`),
+      has: page.locator(
+        `[data-prompt-show][data-prompt="${IMAGES.favourite.prompt}"]`
+      ),
     })
     .first()
     .getByRole("link", { name: "Edit" })
@@ -51,7 +53,9 @@ test.beforeEach(async ({ page }) => {
   await signIn(page);
 });
 
-test("a brush stroke paints, and undo takes back only the last one", async ({ page }) => {
+test("a brush stroke paints, and undo takes back only the last one", async ({
+  page,
+}) => {
   const canvas = await openEditor(page);
   expect(await holes(canvas)).toBe(0);
 
@@ -85,7 +89,9 @@ test("wipe clears the whole painted area", async ({ page }) => {
   expect(await holes(canvas)).toBe(0);
 });
 
-test("the eraser takes back part of a stroke without undoing it", async ({ page }) => {
+test("the eraser takes back part of a stroke without undoing it", async ({
+  page,
+}) => {
   const canvas = await openEditor(page);
 
   await paint(page, canvas, [
@@ -125,7 +131,9 @@ test("a wider brush paints more than a narrow one", async ({ page }) => {
   expect(await holes(canvas)).toBeGreaterThan(narrow);
 });
 
-test("the box tool paints a rectangle, and the oval an ellipse", async ({ page }) => {
+test("the box tool paints a rectangle, and the oval an ellipse", async ({
+  page,
+}) => {
   const canvas = await openEditor(page);
 
   await page.locator("[data-tool='rect']").click();
@@ -159,7 +167,9 @@ test("each tool says what it does", async ({ page }) => {
   await expect(hint).toContainText("takes back part of what you painted");
 });
 
-test("invert is a way of reading the painting, not a change to it", async ({ page }) => {
+test("invert is a way of reading the painting, not a change to it", async ({
+  page,
+}) => {
   const canvas = await openEditor(page);
 
   await paint(page, canvas, [
@@ -173,11 +183,16 @@ test("invert is a way of reading the painting, not a change to it", async ({ pag
   expect(await holes(canvas)).toBeGreaterThan(painted);
 
   await page.locator("#invert-btn").click();
-  await expect(page.locator("#invert-btn")).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("#invert-btn")).toHaveAttribute(
+    "aria-pressed",
+    "false"
+  );
   expect(await holes(canvas)).toBe(painted);
 });
 
-test("zooming in makes the same stroke finer on the picture itself", async ({ page }) => {
+test("zooming in makes the same stroke finer on the picture itself", async ({
+  page,
+}) => {
   const canvas = await openEditor(page);
 
   await paint(page, canvas, [

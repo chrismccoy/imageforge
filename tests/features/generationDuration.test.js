@@ -61,10 +61,14 @@ function post(base, cookie, csrf, path, body) {
 }
 
 async function generateAndSave(base, cookie, csrf, body) {
-  const { images } = await (await post(base, cookie, csrf, "/api/generate", body)).json();
+  const { images } = await (
+    await post(base, cookie, csrf, "/api/generate", body)
+  ).json();
   const ids = [];
   for (const image of images) {
-    const saved = await (await post(base, cookie, csrf, "/api/save", { token: image.token })).json();
+    const saved = await (
+      await post(base, cookie, csrf, "/api/save", { token: image.token })
+    ).json();
     const filename = saved.url.replace("/uploads/", "");
     savedFiles.push(uploadPath(filename, UPLOAD_DIR).full);
     ids.push(filename);
@@ -264,7 +268,9 @@ test("a database migrated with what schema-gaps prints stores and shows the time
   const printed = gapsBetween(want, live)
     .filter((gap) => gap.kind === "column" && gap.table === "generations")
     .map((gap) => gap.sql);
-  assert.deepEqual(printed, ["ALTER TABLE generations ADD COLUMN duration_ms INTEGER;"]);
+  assert.deepEqual(printed, [
+    "ALTER TABLE generations ADD COLUMN duration_ms INTEGER;",
+  ]);
   printed.forEach((sql) => live.exec(sql));
 
   const { Generation, Settings } = buildModels(live);

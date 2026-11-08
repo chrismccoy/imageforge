@@ -285,7 +285,7 @@ test("the rating stars work on a page with no [data-prompt-rows] (the prompt for
   const page = loadRatingOnPromptForm(group);
   page.setReply({ rating: 3 });
 
-  await group.stars[2].click(); 
+  await group.stars[2].click();
 
   assert.equal(page.asked.length, 1, "the click sent a request");
   assert.equal(page.asked[0].url, "/prompts/9/rating/3");

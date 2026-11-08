@@ -75,8 +75,7 @@ test.after(() => {
   for (const full of savedFiles) {
     try {
       fs.unlinkSync(full);
-    } catch (_err) {
-    }
+    } catch (_err) {}
   }
 });
 

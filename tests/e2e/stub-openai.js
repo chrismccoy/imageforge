@@ -134,7 +134,8 @@ function createStub({ fixturesDir }) {
       });
 
       const failure = failureFor(asked.model);
-      if (failure) return sendError(res, failure.status, "The image request failed.");
+      if (failure)
+        return sendError(res, failure.status, "The image request failed.");
 
       const recorded = n > 1 && batch.data.length > 1 ? batch : generation;
       return sendJson(res, 200, reply(recorded, { n, size }));
@@ -163,7 +164,8 @@ function createStub({ fixturesDir }) {
       }
 
       const failure = failureFor(model);
-      if (failure) return sendError(res, failure.status, "The edit request failed.");
+      if (failure)
+        return sendError(res, failure.status, "The edit request failed.");
 
       return sendJson(res, 200, reply(edit, { n, size }));
     }

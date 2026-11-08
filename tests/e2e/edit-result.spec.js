@@ -18,7 +18,9 @@ const { IMAGES } = require("./support/seed");
 
 async function openEditor(page) {
   await page.goto("/generations");
-  await cardFor(page, IMAGES.favourite.prompt).getByRole("link", { name: "Edit" }).click();
+  await cardFor(page, IMAGES.favourite.prompt)
+    .getByRole("link", { name: "Edit" })
+    .click();
   await expect(page).toHaveURL(/\/edit\/\d+/);
 
   const canvas = page.locator("#mask");
@@ -41,7 +43,10 @@ test.beforeEach(async ({ page, request }) => {
   await signIn(page);
 });
 
-test("an edit sends the picture and the painted mask, once", async ({ page, request }) => {
+test("an edit sends the picture and the painted mask, once", async ({
+  page,
+  request,
+}) => {
   const canvas = await openEditor(page);
   await makeEdit(page, canvas, "a white circle in the middle");
 
@@ -54,7 +59,10 @@ test("an edit sends the picture and the painted mask, once", async ({ page, requ
   });
 });
 
-test("an edit is sent to the model picked on the buttons", async ({ page, request }) => {
+test("an edit is sent to the model picked on the buttons", async ({
+  page,
+  request,
+}) => {
   const canvas = await openEditor(page);
   await pickModel(page, "2.6-flare");
   await makeEdit(page, canvas, "a white circle in the middle");
@@ -64,7 +72,9 @@ test("an edit is sent to the model picked on the buttons", async ({ page, reques
   expect(log[0].model).toBe("gpt-image-2.6-flare");
 });
 
-test("the result appears over the original, with a slider between them", async ({ page }) => {
+test("the result appears over the original, with a slider between them", async ({
+  page,
+}) => {
   const canvas = await openEditor(page);
   await makeEdit(page, canvas, "a white circle in the middle");
 
@@ -119,7 +129,9 @@ test("saving an edit keeps the original and records where the edit came from", a
   await expect(page.locator("#view-link")).toBeVisible();
 
   await page.goto("/generations");
-  await expect(page.locator(`[data-prompt-show][data-prompt="${prompt}"]`)).toHaveCount(1);
+  await expect(
+    page.locator(`[data-prompt-show][data-prompt="${prompt}"]`)
+  ).toHaveCount(1);
   await expect(cardFor(page, IMAGES.favourite.prompt)).toBeVisible();
 
   await cardFor(page, prompt)
@@ -131,7 +143,10 @@ test("saving an edit keeps the original and records where the edit came from", a
   await expect(page.locator("#slider")).toBeVisible();
 });
 
-test("an edit the service refuses is reported, and saves nothing", async ({ page, request }) => {
+test("an edit the service refuses is reported, and saves nothing", async ({
+  page,
+  request,
+}) => {
   const canvas = await openEditor(page);
   await armStubFailure(request, { status: 400 });
 

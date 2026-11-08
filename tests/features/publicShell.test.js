@@ -120,7 +120,6 @@ test("a public page never renders the app's own sidebar", () => {
   assert.doesNotMatch(renderShell({ canManage: false }), /<aside/);
 });
 
-
 test("denied.ejs shows its icon and names the allow list, with no branded header and no way onward", () => {
   const html = renderView("denied", { title: "Access denied" });
   assert.match(html, /fa-shield-halved/, "no shield icon");
@@ -142,11 +141,7 @@ test("error.ejs shows its icon and its sentence inside the branded header", () =
   const h1 = /<h1[^>]*>[\s\S]*?<\/h1>/.exec(html);
   assert.ok(h1, "no heading");
   assert.match(h1[0], /Something went wrong/);
-  assert.match(
-    html,
-    BRANDED_HEADER,
-    "error should carry the branded header"
-  );
+  assert.match(html, BRANDED_HEADER, "error should carry the branded header");
   assert.doesNotMatch(html, EMOJI);
 });
 
@@ -217,7 +212,6 @@ test("login.ejs draws no emoji either", () => {
   });
   assert.doesNotMatch(html, EMOJI);
 });
-
 
 function seededDb() {
   const db = freshDb();

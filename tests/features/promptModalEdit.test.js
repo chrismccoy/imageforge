@@ -21,7 +21,9 @@ async function pageHtml(db, path) {
   const app = await startApp({ db });
   try {
     const cookie = await signIn(app.base);
-    return await (await fetch(`${app.base}${path}`, { headers: { cookie } })).text();
+    return await (
+      await fetch(`${app.base}${path}`, { headers: { cookie } })
+    ).text();
   } finally {
     app.stop();
   }
@@ -36,10 +38,7 @@ test("a card names the URL its prompt saves to", async () => {
 
   try {
     const html = await pageHtml(db, "/generations");
-    assert.match(
-      html,
-      new RegExp(`data-prompt-save="/generations/${id}/prompt"`)
-    );
+    assert.match(html, new RegExp(`data-prompt-save="/generations/${id}/prompt"`));
     assert.match(html, /src="\/js\/prompt-modal\.js"/);
   } finally {
     db.close();

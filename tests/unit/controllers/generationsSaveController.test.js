@@ -118,7 +118,7 @@ test("save refuses to write once the uploads quota would be exceeded", async () 
 
   assert.equal(res.statusCode, 507);
   assert.match(res.body.message, /Storage is full/);
-  assert.equal(Generation.rows.length, 0); 
+  assert.equal(Generation.rows.length, 0);
 
   pending.close();
 });
@@ -227,8 +227,7 @@ test("two saves racing on one token record the image once", async () => {
   written.forEach((full) => {
     try {
       fs.unlinkSync(full);
-    } catch (_err) {
-    }
+    } catch (_err) {}
   });
 
   assert.equal(Generation.rows.length, 1, "one row, not two");

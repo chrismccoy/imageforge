@@ -5,8 +5,20 @@
 "use strict";
 
 const { expect, test } = require("@playwright/test");
-const { signIn, cardFor, uniqueSlug, modelRadio, pickModel } = require("./support/app");
-const { IMAGES, TRASHED, PAGE_SIZE, PRICES, COLLECTION } = require("./support/seed");
+const {
+  signIn,
+  cardFor,
+  uniqueSlug,
+  modelRadio,
+  pickModel,
+} = require("./support/app");
+const {
+  IMAGES,
+  TRASHED,
+  PAGE_SIZE,
+  PRICES,
+  COLLECTION,
+} = require("./support/seed");
 
 async function saveOneImage(page) {
   const prompt = `a picture for the trash ${uniqueSlug()}`;
@@ -24,7 +36,9 @@ async function deleteImage(page, prompt) {
   const card = cardFor(page, prompt);
   await card.getByRole("button", { name: "Delete" }).click();
   await card.getByRole("button", { name: /^(Delete|Yes)/ }).click();
-  await expect(page.locator(`[data-prompt-show][data-prompt="${prompt}"]`)).toHaveCount(0);
+  await expect(
+    page.locator(`[data-prompt-show][data-prompt="${prompt}"]`)
+  ).toHaveCount(0);
 }
 
 test.describe.configure({ mode: "serial" });
@@ -33,14 +47,18 @@ test.beforeEach(async ({ page }) => {
   await signIn(page);
 });
 
-test("the trash holds what was thrown away, with what it is costing", async ({ page }) => {
+test("the trash holds what was thrown away, with what it is costing", async ({
+  page,
+}) => {
   await page.goto("/trash");
 
   await expect(page.getByText(TRASHED.prompt)).toBeVisible();
   await expect(page.getByText(/image(s)? waiting/)).toBeVisible();
 });
 
-test("deleting moves an image to the trash, and restoring brings it back", async ({ page }) => {
+test("deleting moves an image to the trash, and restoring brings it back", async ({
+  page,
+}) => {
   const prompt = await saveOneImage(page);
 
   await page.goto("/generations");
@@ -55,7 +73,9 @@ test("deleting moves an image to the trash, and restoring brings it back", async
   await page.goto("/trash");
   await expect(page.getByText(prompt)).toBeVisible();
 
-  const gone = await page.request.get(new URL(link, "http://127.0.0.1:3200").pathname);
+  const gone = await page.request.get(
+    new URL(link, "http://127.0.0.1:3200").pathname
+  );
   expect(gone.status()).toBeGreaterThanOrEqual(400);
 
   const row = page.locator("tr").filter({ hasText: prompt }).first();
@@ -64,11 +84,15 @@ test("deleting moves an image to the trash, and restoring brings it back", async
   await page.goto("/generations");
   await expect(cardFor(page, prompt)).toBeVisible();
   await expect(cardFor(page, prompt).locator("[data-share-badge]")).toBeVisible();
-  const back = await page.request.get(new URL(link, "http://127.0.0.1:3200").pathname);
+  const back = await page.request.get(
+    new URL(link, "http://127.0.0.1:3200").pathname
+  );
   expect(back.status()).toBe(200);
 });
 
-test("the API key is saved and shown only by its last few characters", async ({ page }) => {
+test("the API key is saved and shown only by its last few characters", async ({
+  page,
+}) => {
   await page.goto("/settings");
   await page.locator("#api_key").fill("sk-test-abcdefghijklmnop");
   await page.getByRole("button", { name: /save/i }).first().click();
@@ -98,7 +122,9 @@ test("the model and size saved in Settings are what the Generate page starts wit
   await page.getByRole("button", { name: /save/i }).first().click();
 });
 
-test("the per-page setting decides how many images a page shows", async ({ page }) => {
+test("the per-page setting decides how many images a page shows", async ({
+  page,
+}) => {
   await page.goto("/settings");
   await page.locator("#page_size").fill("2");
   await page.getByRole("button", { name: /save/i }).first().click();
@@ -146,7 +172,14 @@ test("the dashboard shows the library, the spend, the collections and the chart"
 }) => {
   await page.goto("/");
 
-  for (const widget of ["recent", "library", "images", "spend", "storage", "favourites"]) {
+  for (const widget of [
+    "recent",
+    "library",
+    "images",
+    "spend",
+    "storage",
+    "favourites",
+  ]) {
     await expect(page.locator(`[data-widget="${widget}"]`)).toBeVisible();
   }
 

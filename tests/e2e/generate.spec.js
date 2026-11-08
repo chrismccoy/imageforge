@@ -33,7 +33,9 @@ test("the picker offers the saved prompts, pinned first", async ({ page }) => {
   expect(options).toContain(PROMPTS.noted.name);
 });
 
-test("choosing a saved prompt fills in its text, size and model", async ({ page }) => {
+test("choosing a saved prompt fills in its text, size and model", async ({
+  page,
+}) => {
   await page.locator("#prompt-select").selectOption({ label: PROMPTS.plain.name });
 
   await expect(page.locator("#prompt")).toHaveValue(PROMPTS.plain.prompt);
@@ -41,8 +43,12 @@ test("choosing a saved prompt fills in its text, size and model", async ({ page 
   await expect(modelRadio(page, PROMPTS.plain.model)).toBeChecked();
 });
 
-test("a prompt with variables offers a box for each, in both syntaxes", async ({ page }) => {
-  await page.locator("#prompt-select").selectOption({ label: PROMPTS.variables.name });
+test("a prompt with variables offers a box for each, in both syntaxes", async ({
+  page,
+}) => {
+  await page
+    .locator("#prompt-select")
+    .selectOption({ label: PROMPTS.variables.name });
 
   const variables = page.locator("#variables label");
   await expect(variables).toHaveCount(2);
@@ -62,8 +68,12 @@ test("a prompt with variables offers a box for each, in both syntaxes", async ({
   );
 });
 
-test("the character count follows the filled prompt, not only what was typed", async ({ page }) => {
-  await page.locator("#prompt-select").selectOption({ label: PROMPTS.variables.name });
+test("the character count follows the filled prompt, not only what was typed", async ({
+  page,
+}) => {
+  await page
+    .locator("#prompt-select")
+    .selectOption({ label: PROMPTS.variables.name });
   await page.locator("#variables label").nth(0).getByRole("textbox").fill("Lisbon");
 
   const filled = CITY_PROMPT.replace("{city}", "Lisbon");
@@ -111,7 +121,10 @@ test("saving the preview puts it at the top of the library", async ({ page }) =>
   ).toHaveAttribute("data-prompt", prompt);
 });
 
-test("generate again sends a second request for the same prompt", async ({ page, request }) => {
+test("generate again sends a second request for the same prompt", async ({
+  page,
+  request,
+}) => {
   await page.locator("#prompt").fill("a plain grey square");
   await page.locator("#generate-btn").click();
   await expect(page.locator("#image")).toBeVisible({ timeout: 30_000 });
@@ -124,7 +137,9 @@ test("generate again sends a second request for the same prompt", async ({ page,
   expect(log[1].prompt).toBe("a plain grey square");
 });
 
-test("regenerating from a saved image arrives with its settings filled in", async ({ page }) => {
+test("regenerating from a saved image arrives with its settings filled in", async ({
+  page,
+}) => {
   await page.goto("/generations");
   await cardFor(page, IMAGES.collected.prompt)
     .getByRole("link", { name: "Regenerate" })

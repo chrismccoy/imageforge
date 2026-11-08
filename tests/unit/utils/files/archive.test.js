@@ -401,20 +401,20 @@ function handMadeZip(outPath, entries) {
     const crc = zlib.crc32(data);
 
     const local = Buffer.alloc(30);
-    local.writeUInt32LE(0x04034b50, 0); 
-    local.writeUInt16LE(20, 4); 
-    local.writeUInt16LE(0, 6); 
-    local.writeUInt16LE(0, 8); 
-    local.writeUInt32LE(0, 10); 
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4);
+    local.writeUInt16LE(0, 6);
+    local.writeUInt16LE(0, 8);
+    local.writeUInt32LE(0, 10);
     local.writeUInt32LE(crc, 14);
     local.writeUInt32LE(data.length, 18);
     local.writeUInt32LE(data.length, 22);
     local.writeUInt16LE(nameBytes.length, 26);
-    local.writeUInt16LE(0, 28); 
+    local.writeUInt16LE(0, 28);
     locals.push(local, nameBytes, data);
 
     const dir = Buffer.alloc(46);
-    dir.writeUInt32LE(0x02014b50, 0); 
+    dir.writeUInt32LE(0x02014b50, 0);
     dir.writeUInt16LE(20, 4);
     dir.writeUInt16LE(20, 6);
     dir.writeUInt16LE(0, 8);
@@ -432,7 +432,7 @@ function handMadeZip(outPath, entries) {
 
   const dirBytes = Buffer.concat(central);
   const end = Buffer.alloc(22);
-  end.writeUInt32LE(0x06054b50, 0); 
+  end.writeUInt32LE(0x06054b50, 0);
   end.writeUInt16LE(entries.length, 8);
   end.writeUInt16LE(entries.length, 10);
   end.writeUInt32LE(dirBytes.length, 12);

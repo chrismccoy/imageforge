@@ -91,8 +91,7 @@ test.after(() => {
   for (const full of savedFiles) {
     try {
       fs.unlinkSync(full);
-    } catch (_err) {
-    }
+    } catch (_err) {}
   }
 });
 
@@ -341,7 +340,9 @@ test("the upload page picks its model with the same buttons as Generate", async 
   const app = await startApp(db);
   try {
     const cookie = await signIn(app.base);
-    const html = await (await fetch(`${app.base}/upload`, { headers: { cookie } })).text();
+    const html = await (
+      await fetch(`${app.base}/upload`, { headers: { cookie } })
+    ).text();
 
     assert.match(html, /data-model-strip/, "the button strip");
     assert.doesNotMatch(html, /<select id="model"/, "and no drop down");

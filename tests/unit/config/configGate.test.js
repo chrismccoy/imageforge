@@ -28,7 +28,7 @@ test("production without SETTINGS_ENC_KEY is refused", () => {
 });
 
 test("production with a valid SETTINGS_ENC_KEY passes", () => {
-  process.env.SETTINGS_ENC_KEY = "a".repeat(64); 
+  process.env.SETTINGS_ENC_KEY = "a".repeat(64);
   const problems = freshConfigProblems();
   assert.deepEqual(problems, []);
 });

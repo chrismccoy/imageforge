@@ -38,7 +38,9 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/prompts/backup");
 });
 
-test("the export holds every saved prompt, with its category and rating", async ({ page }) => {
+test("the export holds every saved prompt, with its category and rating", async ({
+  page,
+}) => {
   const { suggestedFilename, path: file } = await downloadTo(page, () =>
     page.getByRole("link", { name: "Export all prompts" }).click()
   );
@@ -57,7 +59,9 @@ test("the export holds every saved prompt, with its category and rating", async 
   expect(pinned.prompt).toBe(PROMPTS.pinned.prompt);
 });
 
-test("importing the same file again skips every prompt and names them", async ({ page }) => {
+test("importing the same file again skips every prompt and names them", async ({
+  page,
+}) => {
   const { path: file } = await downloadTo(page, () =>
     page.getByRole("link", { name: "Export all prompts" }).click()
   );
@@ -66,7 +70,9 @@ test("importing the same file again skips every prompt and names them", async ({
   await page.locator("#import-file").setInputFiles(file);
   await page.getByRole("button", { name: "Import" }).click();
 
-  await expect(page.getByText(`Skipped ${Object.keys(PROMPTS).length}`)).toBeVisible();
+  await expect(
+    page.getByText(`Skipped ${Object.keys(PROMPTS).length}`)
+  ).toBeVisible();
   await page.getByText("Which were skipped").click();
   await expect(page.getByText(PROMPTS.pinned.name)).toBeVisible();
   await page.goto("/prompts");
@@ -77,7 +83,10 @@ test("importing the same file again skips every prompt and names them", async ({
 
 test("a file with one new prompt imports exactly that one", async ({ page }) => {
   const name = uniqueName("Imported");
-  const file = fileWith([{ name, prompt: "A lighthouse in fog", rating: 4 }], "one");
+  const file = fileWith(
+    [{ name, prompt: "A lighthouse in fog", rating: 4 }],
+    "one"
+  );
 
   await page.locator("#import-file").setInputFiles(file);
   await page.getByRole("button", { name: "Import" }).click();
@@ -91,7 +100,9 @@ test("a file with one new prompt imports exactly that one", async ({ page }) => 
   await deletePrompt(page, name);
 });
 
-test("a broken entry is counted and the good ones still arrive", async ({ page }) => {
+test("a broken entry is counted and the good ones still arrive", async ({
+  page,
+}) => {
   const first = uniqueName("Imported");
   const second = uniqueName("Imported");
   const file = fileWith(
@@ -130,7 +141,9 @@ test("a file holding more than a thousand prompts is refused", async ({ page }) 
   );
 });
 
-test("a file that is not prompts at all is refused without storing anything", async ({ page }) => {
+test("a file that is not prompts at all is refused without storing anything", async ({
+  page,
+}) => {
   const file = fileWith("this is not JSON at all", "broken");
 
   await page.locator("#import-file").setInputFiles(file);

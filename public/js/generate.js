@@ -9,10 +9,14 @@
   const promptSelect = el("prompt-select");
   const promptField = el("prompt");
   const sizeSelect = el("size");
-  const modelRadios = document.querySelectorAll('[data-model-strip] input[name="model"]');
+  const modelRadios = document.querySelectorAll(
+    '[data-model-strip] input[name="model"]'
+  );
 
   function pickedModel() {
-    const on = document.querySelector('[data-model-strip] input[name="model"]:checked');
+    const on = document.querySelector(
+      '[data-model-strip] input[name="model"]:checked'
+    );
     return on ? on.value : "";
   }
 

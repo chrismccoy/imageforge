@@ -28,7 +28,9 @@ async function openCrop(page) {
   await page
     .locator("[data-generation-card]")
     .filter({
-      has: page.locator(`[data-prompt-show][data-prompt="${IMAGES.shared.prompt}"]`),
+      has: page.locator(
+        `[data-prompt-show][data-prompt="${IMAGES.shared.prompt}"]`
+      ),
     })
     .filter({ hasText: IMAGES.shared.size })
     .first()
@@ -52,7 +54,9 @@ test.beforeEach(async ({ page, request }) => {
   await signIn(page);
 });
 
-test("dragging a box shows its size in the picture's own pixels", async ({ page }) => {
+test("dragging a box shows its size in the picture's own pixels", async ({
+  page,
+}) => {
   const stage = await openCrop(page);
 
   await dragHandle(page, stage, "se", [0.5, 0.5]);

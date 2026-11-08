@@ -34,13 +34,17 @@ test.beforeEach(async ({ page }) => {
   await signIn(page);
 });
 
-test("the list holds every saved prompt with its title and text", async ({ page }) => {
+test("the list holds every saved prompt with its title and text", async ({
+  page,
+}) => {
   await page.goto("/prompts");
 
   for (const prompt of Object.values(PROMPTS)) {
     await expect(rowFor(page, prompt.name)).toBeVisible();
   }
-  await expect(rowFor(page, PROMPTS.plain.name)).toContainText(PROMPTS.plain.prompt);
+  await expect(rowFor(page, PROMPTS.plain.name)).toContainText(
+    PROMPTS.plain.prompt
+  );
 });
 
 test("a prompt can be written, edited and deleted again", async ({ page }) => {
@@ -66,14 +70,18 @@ test("the form counts the characters as they are typed", async ({ page }) => {
   await page.goto("/prompts/new");
   await field(page, "prompt").fill("Twelve chars");
 
-  await expect(page.locator("[data-char-count='prompt']")).toHaveText("12 characters");
+  await expect(page.locator("[data-char-count='prompt']")).toHaveText(
+    "12 characters"
+  );
 });
 
 test("duplicating a prompt names the copy after it and saves nothing until told", async ({
   page,
 }) => {
   await page.goto("/prompts");
-  await rowFor(page, PROMPTS.pinned.name).getByRole("link", { name: "Duplicate" }).click();
+  await rowFor(page, PROMPTS.pinned.name)
+    .getByRole("link", { name: "Duplicate" })
+    .click();
 
   const copyName = await field(page, "name").inputValue();
   expect(copyName).toContain(PROMPTS.pinned.name);
@@ -83,29 +91,40 @@ test("duplicating a prompt names the copy after it and saves nothing until told"
   await expect(rowFor(page, copyName)).toHaveCount(0);
 
   await page.goto("/prompts");
-  await rowFor(page, PROMPTS.pinned.name).getByRole("link", { name: "Duplicate" }).click();
+  await rowFor(page, PROMPTS.pinned.name)
+    .getByRole("link", { name: "Duplicate" })
+    .click();
   await page.getByRole("button", { name: "Save prompt" }).click();
 
   const copy = rowFor(page, copyName);
   await expect(copy).toBeVisible();
-  await expect(copy.locator("[data-rating-group]")).toHaveAttribute("data-rating", "");
+  await expect(copy.locator("[data-rating-group]")).toHaveAttribute(
+    "data-rating",
+    ""
+  );
 
   await deletePrompt(page, copyName);
 });
 
 test("a prompt's own page shows what it has made", async ({ page }) => {
   await page.goto("/prompts");
-  await rowFor(page, PROMPTS.plain.name).getByRole("link", { name: "Edit" }).click();
+  await rowFor(page, PROMPTS.plain.name)
+    .getByRole("link", { name: "Edit" })
+    .click();
 
   const made = page.locator("[data-widget='prompt-images']");
   await expect(made).toBeVisible();
-  await expect(made.locator(`img[src$="${IMAGES.favourite.filename}"]`)).toBeVisible();
+  await expect(
+    made.locator(`img[src$="${IMAGES.favourite.filename}"]`)
+  ).toBeVisible();
 
   await expect(page.locator("[data-widget='prompt-rating']")).toBeVisible();
   await expect(page.locator("[data-widget='prompt-pin']")).toBeVisible();
 });
 
-test("searching finds a prompt by its title, its text or its note", async ({ page }) => {
+test("searching finds a prompt by its title, its text or its note", async ({
+  page,
+}) => {
   await page.goto("/prompts?q=Coastal");
   await expect(rowFor(page, PROMPTS.plain.name)).toBeVisible();
   await expect(page.locator("[data-prompt-row]")).toHaveCount(1);
@@ -119,9 +138,13 @@ test("searching finds a prompt by its title, its text or its note", async ({ pag
   await expect(page.locator("[data-prompt-row]")).toHaveCount(1);
 });
 
-test("a prompt's image count leads to the images made from it", async ({ page }) => {
+test("a prompt's image count leads to the images made from it", async ({
+  page,
+}) => {
   await page.goto("/prompts");
-  await rowFor(page, PROMPTS.plain.name).getByRole("link", { name: /^\d+$/ }).click();
+  await rowFor(page, PROMPTS.plain.name)
+    .getByRole("link", { name: /^\d+$/ })
+    .click();
 
   await expect(page).toHaveURL(/\/generations\?prompt=\d+/);
   await expect(

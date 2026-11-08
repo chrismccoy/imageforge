@@ -80,10 +80,12 @@ test("comparing asks every model the same prompt, and the selected one twice", a
   const out = await ask({ compare: "1", model: "2" });
 
   assert.equal(out.status, 200);
-  assert.deepEqual(
-    calls.map((call) => call.model).sort(),
-    ["2", "2", "2.6-flare", "2.6-sunburst"]
-  );
+  assert.deepEqual(calls.map((call) => call.model).sort(), [
+    "2",
+    "2",
+    "2.6-flare",
+    "2.6-sunburst",
+  ]);
   assert.equal(
     new Set(calls.map((call) => call.prompt)).size,
     1,
@@ -132,7 +134,9 @@ test("comparing is one picture per call however many the picker asked for", asyn
 });
 
 test("the calls run alongside each other, not one after the other", async () => {
-  behaviour = Object.fromEntries(MODEL_TOKENS.map((token) => [token, { delay: 120 }]));
+  behaviour = Object.fromEntries(
+    MODEL_TOKENS.map((token) => [token, { delay: 120 }])
+  );
 
   const started = Date.now();
   await ask({ compare: "1" });
@@ -186,14 +190,17 @@ test("one half of a doubled model failing keeps the other half", async () => {
 });
 
 test("every model failing is a failure, not an empty page", async () => {
-  behaviour = Object.fromEntries(MODEL_TOKENS.map((token) => [token, { fail: true }]));
+  behaviour = Object.fromEntries(
+    MODEL_TOKENS.map((token) => [token, { fail: true }])
+  );
 
   const out = await ask({ compare: "1" });
   assert.equal(out.status, 400);
 });
 
 test("every model failing for the same reason says that reason once", async () => {
-  const message = "You are out of credits, please add funds to continue generating images";
+  const message =
+    "You are out of credits, please add funds to continue generating images";
   behaviour = Object.fromEntries(
     MODEL_TOKENS.map((token) => [token, { fail: true, message }])
   );
@@ -204,7 +211,9 @@ test("every model failing for the same reason says that reason once", async () =
 });
 
 test("every model failing for different reasons names each picture", async () => {
-  behaviour = Object.fromEntries(MODEL_TOKENS.map((token) => [token, { fail: true }]));
+  behaviour = Object.fromEntries(
+    MODEL_TOKENS.map((token) => [token, { fail: true }])
+  );
 
   const out = await ask({ compare: "1", model: "2" });
 
@@ -277,7 +286,9 @@ test("the page offers three models, the third filling its own row", async () => 
   assert.doesNotMatch(html, /value="1\.5"/);
   assert.match(html, /data-model-strip\s+class="grid grid-cols-2/);
 
-  const labels = html.split("<label ").filter((part) => part.includes('name="model"'));
+  const labels = html
+    .split("<label ")
+    .filter((part) => part.includes('name="model"'));
   assert.equal(labels.length, 3);
   assert.deepEqual(
     labels.map((label) => label.includes("col-span-2")),

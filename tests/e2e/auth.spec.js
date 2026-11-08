@@ -20,7 +20,9 @@ test.describe("signing in", () => {
     await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
   });
 
-  test("a wrong password is refused without saying whether the user exists", async ({ page }) => {
+  test("a wrong password is refused without saying whether the user exists", async ({
+    page,
+  }) => {
     await page.goto("/login");
     await page.getByLabel("Username").fill(ADMIN.username);
     await page.getByLabel("Password").fill("not-the-right-password");

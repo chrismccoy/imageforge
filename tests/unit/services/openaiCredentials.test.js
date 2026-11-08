@@ -25,7 +25,7 @@ test("apiKey falls back to the environment key when none is saved", () => {
   process.env.OPENAI_API_KEY = "env-key";
   try {
     const c = createOpenaiCredentials(fakeSettings({ api_key: "", model: "" }));
-    assert.equal(c.model(), "2.6-sunburst"); 
+    assert.equal(c.model(), "2.6-sunburst");
   } finally {
     if (prev === undefined) delete process.env.OPENAI_API_KEY;
     else process.env.OPENAI_API_KEY = prev;

@@ -20,14 +20,14 @@ test("parseKey accepts 64-char hex and 32-byte base64, rejects the rest", () => 
   assert.equal(secretBox.parseKey(b64).length, 32);
 
   assert.equal(secretBox.parseKey(""), null);
-  assert.equal(secretBox.parseKey("abc"), null); 
+  assert.equal(secretBox.parseKey("abc"), null);
   assert.equal(secretBox.parseKey(crypto.randomBytes(16).toString("base64")), null);
 });
 
 test("encrypt then decrypt round-trips and marks the value encrypted", () => {
   const blob = secretBox.encrypt("sk-secret-123", KEY);
   assert.ok(secretBox.isEncrypted(blob));
-  assert.ok(!blob.includes("sk-secret-123")); 
+  assert.ok(!blob.includes("sk-secret-123"));
   assert.equal(secretBox.decrypt(blob, KEY), "sk-secret-123");
 });
 

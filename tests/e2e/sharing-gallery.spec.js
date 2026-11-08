@@ -31,7 +31,11 @@ test("a shared image opens for a stranger, with everything about it", async ({
   browser,
   baseURL,
 }) => {
-  const { context, page } = await asStranger(browser, baseURL, `/s/${SHARED_TOKEN}`);
+  const { context, page } = await asStranger(
+    browser,
+    baseURL,
+    `/s/${SHARED_TOKEN}`
+  );
 
   await expect(page.getByText(IMAGES.shared.prompt)).toBeVisible();
   await expect(page.getByText(IMAGES.shared.model)).toBeVisible();
@@ -48,7 +52,9 @@ test("a shared image opens for a stranger, with everything about it", async ({
   await context.close();
 });
 
-test("the image link serves the picture, with or without its extension", async ({ request }) => {
+test("the image link serves the picture, with or without its extension", async ({
+  request,
+}) => {
   const withExtension = await request.get(`/i/${SHARED_TOKEN}.png`);
   expect(withExtension.status()).toBe(200);
   expect(withExtension.headers()["content-type"]).toContain("image/png");
@@ -61,7 +67,9 @@ test("the image link serves the picture, with or without its extension", async (
   expect(without.headers()["content-type"]).toContain("image/png");
 });
 
-test("a shared page is not for crawlers, and carries a preview card", async ({ request }) => {
+test("a shared page is not for crawlers, and carries a preview card", async ({
+  request,
+}) => {
   const html = await (await request.get(`/s/${SHARED_TOKEN}`)).text();
 
   expect(html).toContain("noindex");
@@ -69,9 +77,13 @@ test("a shared page is not for crawlers, and carries a preview card", async ({ r
   expect(html).toMatch(/property="og:title"|property="og:description"/);
 });
 
-test("the same page shows a way back to the dashboard when signed in", async ({ page }) => {
+test("the same page shows a way back to the dashboard when signed in", async ({
+  page,
+}) => {
   await page.goto(`/s/${SHARED_TOKEN}`);
-  await expect(page.getByRole("link", { name: /dashboard/i }).first()).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /dashboard/i }).first()
+  ).toBeVisible();
 });
 
 test("sharing and unsharing an image turns its link on and off", async ({
@@ -86,10 +98,16 @@ test("sharing and unsharing an image turns its link on and off", async ({
   await card.locator('[data-share="link"]').click();
   await expect(card.locator("[data-share-badge]")).toBeVisible();
 
-  const link = await card.locator('[data-share="link"]').getAttribute("data-share-url");
+  const link = await card
+    .locator('[data-share="link"]')
+    .getAttribute("data-share-url");
   expect(link).toBeTruthy();
 
-  const opened = await asStranger(browser, baseURL, new URL(link, baseURL).pathname);
+  const opened = await asStranger(
+    browser,
+    baseURL,
+    new URL(link, baseURL).pathname
+  );
   await expect(opened.page.getByText(IMAGES.favourite.prompt)).toBeVisible();
 
   await page.goto("/generations");
@@ -98,7 +116,9 @@ test("sharing and unsharing an image turns its link on and off", async ({
   await again.getByRole("button", { name: /^(Unshare|Yes)/ }).click();
   await expect(again.locator("[data-share-none]")).toBeVisible();
 
-  const after = await opened.page.goto(`${baseURL}${new URL(link, baseURL).pathname}`);
+  const after = await opened.page.goto(
+    `${baseURL}${new URL(link, baseURL).pathname}`
+  );
   expect(after.status()).toBeGreaterThanOrEqual(400);
 
   await opened.context.close();
@@ -116,7 +136,9 @@ test("descriptive links carry the start of the prompt, and old links keep workin
   await card.locator('[data-share="link"]').click();
   await expect(card.locator("[data-share-badge]")).toBeVisible();
 
-  const link = await card.locator('[data-share="link"]').getAttribute("data-share-url");
+  const link = await card
+    .locator('[data-share="link"]')
+    .getAttribute("data-share-url");
   expect(link).toMatch(/\/s\/[a-z0-9-]+-[A-Za-z0-9]+$/);
 
   const old = await asStranger(browser, baseURL, `/s/${SHARED_TOKEN}`);
@@ -130,7 +152,10 @@ test("descriptive links carry the start of the prompt, and old links keep workin
   await back.getByRole("button", { name: /^(Unshare|Yes)/ }).click();
 });
 
-test("the gallery lists what is shared and nothing private", async ({ browser, baseURL }) => {
+test("the gallery lists what is shared and nothing private", async ({
+  browser,
+  baseURL,
+}) => {
   const { context, page } = await asStranger(browser, baseURL, "/gallery");
 
   await expect(page.locator(".pub-tile")).toHaveCount(1);
@@ -148,7 +173,11 @@ test("the gallery can be closed to strangers while staying open to the admin", a
 }) => {
   await setToggle(page, "public_gallery", false);
 
-  const { context, page: theirPage } = await asStranger(browser, baseURL, "/gallery");
+  const { context, page: theirPage } = await asStranger(
+    browser,
+    baseURL,
+    "/gallery"
+  );
   await expect(theirPage).toHaveURL(/\/login/);
   await expect(theirPage.locator(".pub-tile")).toHaveCount(0);
   await context.close();
@@ -160,9 +189,13 @@ test("the gallery can be closed to strangers while staying open to the admin", a
   await setToggle(page, "public_gallery", true);
 });
 
-test("Settings refuses to leave the gallery published with sharing off", async ({ page }) => {
+test("Settings refuses to leave the gallery published with sharing off", async ({
+  page,
+}) => {
   await page.goto("/settings");
-  await page.locator('input[name="public_share"]').setChecked(false, { force: true });
+  await page
+    .locator('input[name="public_share"]')
+    .setChecked(false, { force: true });
   await page.getByRole("button", { name: /save/i }).last().click();
 
   await expect(page.getByText(/public sharing/i).first()).toBeVisible();
