@@ -28,6 +28,16 @@
   const bulkBar = document.getElementById("bulk-generations");
 
   /**
+   * The page of the list being shown.
+   */
+  function pageNumber() {
+    const at = window.location || {};
+    const fromPath = /\/page\/(\d+)/.exec(at.pathname || "");
+    const fromQuery = /[?&]page=(\d+)/.exec(at.search || "");
+    return Number((fromPath || fromQuery || [])[1]) || 1;
+  }
+
+  /**
    * Drop a card that no longer belongs here, and show the empty state when it
    * is the last one.
    */
@@ -37,6 +47,9 @@
 
     card.remove();
     if (grid.children.length) return;
+
+    // Other pages still hold favourites; let the server draw this one again.
+    if (pageNumber() > 1) return window.location.reload();
 
     hide(grid);
     hide(bulkBar);

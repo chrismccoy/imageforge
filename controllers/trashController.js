@@ -7,6 +7,7 @@
 const fs = require("fs");
 
 const { parseId } = require("../utils/domain/coerce");
+const { idList } = require("../utils/http/request");
 const { PAGES } = require("../config/urls");
 const { confirmed, renderConfirm } = require("../utils/http/confirm");
 const { uploadPath, uploadsDirFor } = require("../utils/files/uploads");
@@ -31,16 +32,28 @@ module.exports = (deps) => {
   /**
    * Destroy one trashed image, file and all.
    */
-  function destroy(row) {
+  async function destroy(row) {
     ops.purgeImage(row.id);
 
     const { safe, full } = uploadPath(row.filename, uploadDir);
-    fs.unlink(full, (err) => {
-      if (err && err.code !== "ENOENT") {
+    try {
+      await fs.promises.unlink(full);
+    } catch (err) {
+      if (err.code !== "ENOENT") {
         log.error(`Could not delete file ${safe}:`, err.message);
       }
-    });
-    room.forget();
+    }
+  }
+
+  /**
+   * Destroy trashed images, then drop the cached size once the files are gone.
+   */
+  async function destroyAll(rows) {
+    try {
+      await Promise.all(rows.map(destroy));
+    } finally {
+      room.forget();
+    }
   }
 
   return {
@@ -71,34 +84,37 @@ module.exports = (deps) => {
     /**
      * Destroy one image for good.
      */
-    purge(req, res) {
+    async purge(req, res) {
       const id = parseId(req.params.id);
       const row = id ? Generation.getAnyState(id) : null;
-      if (row && row.deleted_at) destroy(row);
+      if (row && row.deleted_at) await destroyAll([row]);
       res.redirect(PAGES.trash);
     },
 
     /**
-     * Destroy everything in the trash, asking first.
+     * Destroy everything in the trash, asking first. The confirmation destroys
+     * only the images it listed that are still in the trash.
      */
-    empty(req, res) {
-      const rows = Generation.trashed();
-      if (!rows.length) return res.redirect(PAGES.trash);
+    async empty(req, res) {
+      const trashed = Generation.trashed();
+      if (!trashed.length) return res.redirect(PAGES.trash);
 
       if (!confirmed(req)) {
+        const count = trashed.length;
         return renderConfirm(res, {
           title: "Empty the trash",
           active: "trash",
-          heading: `Destroy ${rows.length} images?`,
+          heading: `Destroy ${count} ${count === 1 ? "image" : "images"}?`,
           detail: "This cannot be undone. The files are removed from disk as well.",
           action: `${PAGES.trash}/empty`,
           backUrl: PAGES.trash,
-          rows,
+          rows: trashed,
           label: (row) => row.prompt || row.filename,
         });
       }
 
-      rows.forEach(destroy);
+      const listed = new Set(idList(req.body, "ids", Infinity));
+      await destroyAll(trashed.filter((row) => listed.has(row.id)));
       res.redirect(PAGES.trash);
     },
   };

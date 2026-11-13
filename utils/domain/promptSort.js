@@ -7,10 +7,12 @@
 const RANK_WIDTH = 2;
 
 /**
- * A prompt's name as the database compares it.
+ * A prompt's name as the database compares it: NOCASE folds A-Z only.
  */
 function nameKey(row) {
-  return String(row.name == null ? "" : row.name).toLowerCase();
+  return String(row.name == null ? "" : row.name).replace(/[A-Z]/g, (c) =>
+    c.toLowerCase()
+  );
 }
 
 /**

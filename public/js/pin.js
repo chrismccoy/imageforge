@@ -28,11 +28,12 @@
     const rows = Array.prototype.map.call(
       body.querySelectorAll("[data-prompt-row]"),
       function (row) {
+        const pin = row.querySelector("[data-pin]");
         return {
           row: row,
           key: row.getAttribute("data-sort-key") || "",
-          pinned:
-            row.querySelector("[data-pin]").getAttribute("aria-pressed") === "true",
+          id: Number(pin.getAttribute("data-prompt-id")) || 0,
+          pinned: pin.getAttribute("aria-pressed") === "true",
         };
       }
     );
@@ -55,13 +56,18 @@
 
     const next = button.getAttribute("aria-pressed") !== "true";
     const id = button.getAttribute("data-prompt-id");
+    const body = document.querySelector("[data-prompt-rows]");
+    const row = button.closest("[data-prompt-row]");
 
     try {
       const reply = await api.post("/prompts/" + id + "/pin", {
         pinned: next ? "1" : "",
+        sort: body ? body.getAttribute("data-sort") || "" : "",
       });
       paint(button, Boolean(reply.pinned));
-      const body = document.querySelector("[data-prompt-rows]");
+      if (row && typeof reply.sortKey === "string") {
+        row.setAttribute("data-sort-key", reply.sortKey);
+      }
       if (body) reorder(body);
       keepFocus(button);
     } catch (err) {

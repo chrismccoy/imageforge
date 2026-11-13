@@ -6,10 +6,19 @@
 
 const express = require("express");
 const { requireAuth } = require("../middleware/auth");
-const { csrf } = require("../middleware/csrf");
+const { createCsrf } = require("../middleware/csrf");
 const { notFoundHandler } = require("../middleware/errorHandler");
 const { noIndex } = require("../middleware/noIndex");
 const { CSS_DIR, JS_DIR, VENDOR_DIR, SCREENSHOTS_DIR } = require("../config/paths");
+
+// Multipart routes whose parser checks the CSRF token after reading the body.
+const MULTIPART_ROUTES = [
+  "/upload",
+  "/prompts/import",
+  "/api/edit",
+  "/api/crop",
+  "/api/flatten",
+];
 
 module.exports = (deps) => {
   const router = express.Router();
@@ -29,7 +38,7 @@ module.exports = (deps) => {
 
   router.use(deps.ipAllow);
 
-  router.use(csrf);
+  router.use(createCsrf({ multipartPaths: MULTIPART_ROUTES }));
 
   router.use(require("./auth")(deps));
 

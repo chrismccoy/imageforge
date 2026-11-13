@@ -13,6 +13,17 @@ const E2E_DIR = path.join(ROOT, "var", "e2e");
 const appPort = process.env.E2E_PORT ?? "3200";
 const stubPort = process.env.E2E_STUB_PORT ?? "3199";
 
+// System Chrome runs only when asked for with --project=chrome, so the default
+// run needs no installed Chrome and seeds e2e.db for one project only. The env
+// var carries the choice to workers, which load this file again.
+const wantsChrome =
+  process.env.E2E_CHROME === "1" ||
+  process.argv.some(
+    (arg, i, all) =>
+      arg === "--project=chrome" || (arg === "--project" && all[i + 1] === "chrome")
+  );
+if (wantsChrome) process.env.E2E_CHROME = "1";
+
 const baseURL = `http://127.0.0.1:${appPort}`;
 const stubURL = `http://127.0.0.1:${stubPort}`;
 
@@ -82,7 +93,14 @@ module.exports = defineConfig({
 
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "chrome", use: { ...devices["Desktop Chrome"], channel: "chrome" } },
+    ...(wantsChrome
+      ? [
+          {
+            name: "chrome",
+            use: { ...devices["Desktop Chrome"], channel: "chrome" },
+          },
+        ]
+      : []),
   ],
 
   webServer: [

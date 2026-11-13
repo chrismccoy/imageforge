@@ -19,10 +19,6 @@ module.exports = (deps) => {
      * Put flattened bytes in place of the ones being held.
      */
     flatten(req, res) {
-      if (req.uploadError) {
-        return problem(res, 400, req.uploadError);
-      }
-
       const token = field(req.body, "token");
       const file = req.files && req.files.image && req.files.image[0];
 

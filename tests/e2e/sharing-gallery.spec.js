@@ -199,6 +199,9 @@ test("Settings refuses to leave the gallery published with sharing off", async (
   await page.getByRole("button", { name: /save/i }).last().click();
 
   await expect(page.getByText(/public sharing/i).first()).toBeVisible();
+  // The refused form keeps what was typed; nothing is stored.
+  await expect(page.locator('input[name="public_share"]')).not.toBeChecked();
+  await page.goto("/settings");
   await expect(page.locator('input[name="public_share"]')).toBeChecked();
   await expect(page.locator('input[name="public_gallery"]')).toBeChecked();
 });

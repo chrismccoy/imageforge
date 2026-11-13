@@ -99,8 +99,8 @@
   /**
    * Put a box on screen, held inside the picture and in the chosen shape.
    */
-  function setBox(next) {
-    box = applyRatio(clampBox(next, bounds()), ratio, bounds());
+  function setBox(next, handle) {
+    box = applyRatio(clampBox(next, bounds(), handle), ratio, bounds(), handle);
     paint();
   }
 
@@ -120,6 +120,7 @@
    * Follow a drag on the box or one of its handles.
    */
   stage.addEventListener("pointerdown", function (event) {
+    if (event.button !== 0) return;
     const handleEl = event.target.closest("[data-handle]");
     const inside = event.target.closest("#crop-box");
     if (!handleEl && !inside) return;
@@ -142,7 +143,8 @@
         drag.handle,
         event.clientX - drag.fromX,
         event.clientY - drag.fromY
-      )
+      ),
+      drag.handle
     );
   });
 

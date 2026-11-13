@@ -79,7 +79,7 @@
             <th class="text-right">Actions</th>
           </tr>
         </thead>
-        <tbody data-prompt-rows>
+        <tbody data-prompt-rows data-sort="<%= sort === 'rating' ? 'rating' : 'name' %>">
           <% prompts.forEach(function (prompt) { %>
             <tr data-prompt-row data-sort-key="<%= prompt.sortKey %>">
               <td data-bulk-cell hidden>

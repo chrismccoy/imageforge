@@ -6,7 +6,7 @@
 
 const path = require("path");
 
-require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+require("dotenv").config({ path: path.join(__dirname, "..", ".env"), quiet: true });
 
 const { toTrimmedString } = require("../utils/domain/coerce");
 const { parseKey } = require("../utils/security/encKey");
@@ -30,6 +30,21 @@ function isTrue(raw) {
   return String(raw || "").toLowerCase() === "true";
 }
 
+/**
+ * The Express "trust proxy" value for TRUST_PROXY: false, a hop count, or an
+ * address list such as "loopback". "true" trusts exactly one hop.
+ */
+function proxyTrust(raw) {
+  const value = toTrimmedString(raw);
+  const lower = value.toLowerCase();
+  if (!value || lower === "false" || lower === "0") return false;
+  if (lower === "true") return 1;
+  if (/^\d+$/.test(value)) return Number(value);
+  return value;
+}
+
+const PROXY_TRUST = proxyTrust(process.env.TRUST_PROXY);
+
 const env = {
   PORT: Number(process.env.PORT) || 3000,
   SESSION_SECRET: process.env.SESSION_SECRET || DEFAULT_SESSION_SECRET,
@@ -39,7 +54,7 @@ const env = {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean),
-  TRUST_PROXY: isTrue(process.env.TRUST_PROXY),
+  TRUST_PROXY: Boolean(PROXY_TRUST),
   IS_PRODUCTION: process.env.NODE_ENV === "production",
   OPENAI_API_KEY: toTrimmedString(process.env.OPENAI_API_KEY),
   OPENAI_MODEL: toTrimmedString(process.env.OPENAI_MODEL),
@@ -84,12 +99,6 @@ function configProblems() {
     }
   }
 
-  if (env.PUBLIC_GALLERY && !env.PUBLIC_SHARE) {
-    problems.push(
-      "PUBLIC_GALLERY requires PUBLIC_SHARE=true, otherwise the gallery's links and images are refused by the IP allow list."
-    );
-  }
-
   if (!env.IS_PRODUCTION) return problems;
 
   if (
@@ -112,9 +121,25 @@ function configProblems() {
 }
 
 /**
- * Throw if the production configuration is unsafe.
+ * Config that may be wrong but is not refused. The Settings page can still
+ * change these toggles, so only the environment's values are seen here.
  */
-function assertConfig() {
+function configWarnings() {
+  const warnings = [];
+  if (env.PUBLIC_GALLERY && !env.PUBLIC_SHARE) {
+    warnings.push(
+      "PUBLIC_GALLERY requires PUBLIC_SHARE=true, otherwise the gallery's links and images are refused by the IP allow list."
+    );
+  }
+  return warnings;
+}
+
+/**
+ * Throw if the production configuration is unsafe, and warn about the rest.
+ */
+function assertConfig(warn = console.warn) {
+  for (const warning of configWarnings()) warn(`[config] ${warning}`);
+
   const problems = configProblems();
   if (problems.length) {
     throw new Error(`Invalid configuration:\n- ${problems.join("\n- ")}`);
@@ -123,7 +148,10 @@ function assertConfig() {
 
 module.exports = {
   env,
+  PROXY_TRUST,
   DEFAULT_SESSION_SECRET,
+  proxyTrust,
   configProblems,
+  configWarnings,
   assertConfig,
 };

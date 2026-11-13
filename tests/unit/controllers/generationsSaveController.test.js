@@ -47,7 +47,7 @@ test("save writes the held bytes and records the generation", async () => {
   const pending = createPendingImages();
   const Generation = fakeGeneration();
   const ctrl = buildController({
-    models: { Generation, Prompt: {}, Settings: {} },
+    models: { Generation, Prompt: { get: (id) => ({ id }) }, Settings: {} },
     openaiCredentials: credentials,
     pending,
     usage: createUploadsUsage(),

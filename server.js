@@ -24,7 +24,7 @@ const { createSecurityHeaders } = require("./middleware/securityHeaders");
 const { proxyCheck } = require("./middleware/proxyCheck");
 const { createErrorHandler } = require("./middleware/errorHandler");
 const buildRouter = require("./routes");
-const { env, assertConfig } = require("./config/env");
+const { env, PROXY_TRUST, assertConfig } = require("./config/env");
 const { JSON_BODY_LIMIT, resolveLimits } = require("./config/limits");
 const { NAV_LINKS, NAV_GROUPS } = require("./config/navigation");
 const { PAGES, UPLOAD_PREFIX } = require("./config/urls");
@@ -41,6 +41,7 @@ function createApp({
   allowedIps,
   limits = {},
   log = console,
+  trustProxy = PROXY_TRUST,
 } = {}) {
   const models = buildModels(initSchema(db));
   const openaiCredentials = createOpenaiCredentials(models.Settings);
@@ -68,12 +69,12 @@ function createApp({
 
   const app = express();
 
-  // Behind a reverse proxy, trust it so req.ip is the real client address the IP allow checks.
-  if (env.TRUST_PROXY) {
-    app.set("trust proxy", true);
+  // Behind a reverse proxy, trust only its hops so req.ip is the real client address the IP allow checks.
+  if (trustProxy) {
+    app.set("trust proxy", trustProxy);
   }
 
-  // Warn once if the TRUST_PROXY setting is wrong for the actual deployment.
+  // Warn once per problem if the TRUST_PROXY setting is wrong for the actual deployment.
   app.use(proxyCheck(log.warn));
 
   app.set("view engine", "ejs");
@@ -100,7 +101,8 @@ function createApp({
   app.use(createBrand());
 
   app.use(createSecurityHeaders());
-  app.use(express.urlencoded({ extended: false }));
+  // The empty-trash confirmation posts one id per image.
+  app.use(express.urlencoded({ extended: false, parameterLimit: 10000 }));
   app.use(express.json({ limit: JSON_BODY_LIMIT }));
   app.use(session);
   app.use(viewContext);
@@ -118,6 +120,32 @@ function createApp({
   return app;
 }
 
+const SHUTDOWN_GRACE_MS = 10 * 1000;
+
+/**
+ * Build the signal handler: stop taking requests, then exit, forced after a grace period.
+ */
+function createShutDown({
+  server,
+  close,
+  exit = process.exit,
+  graceMs = SHUTDOWN_GRACE_MS,
+}) {
+  let stopping = false;
+
+  return function shutDown() {
+    if (stopping) return;
+    stopping = true;
+
+    setTimeout(() => exit(1), graceMs).unref();
+    server.close(() => {
+      close();
+      exit(0);
+    });
+    server.closeIdleConnections();
+  };
+}
+
 // When run directly, refuse an unsafe production config
 if (require.main === module) {
   assertConfig();
@@ -127,15 +155,15 @@ if (require.main === module) {
     console.log(`Image Forge running on http://localhost:${env.PORT}`);
   });
 
-  const shutDown = () => {
-    server.close(() => {
+  const shutDown = createShutDown({
+    server,
+    close: () => {
       app.get("deps").close();
       db.close();
-      process.exit(0);
-    });
-  };
+    },
+  });
   process.on("SIGINT", shutDown);
   process.on("SIGTERM", shutDown);
 }
 
-module.exports = { createApp };
+module.exports = { createApp, createShutDown };

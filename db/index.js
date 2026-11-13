@@ -5,14 +5,15 @@
 "use strict";
 
 const fs = require("fs");
+const path = require("path");
 const Database = require("better-sqlite3");
-const { DATA_DIR, DB_PATH } = require("../config/paths");
+const { DB_PATH } = require("../config/paths");
 
 /**
  * Open the SQLite database
  */
 function openDatabase(dbPath = DB_PATH) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   const db = new Database(dbPath);
   db.pragma("journal_mode = WAL");
   return db;

@@ -46,8 +46,11 @@ async function sendZip(res, files, filename, { log = console } = {}) {
   const archive = await createArchive();
   archive.on("error", (err) => {
     log.error("Zip error:", err.message);
-    if (!res.headersSent) res.status(500).end();
-    else res.destroy();
+    if (!res.headersSent) {
+      res.removeHeader("Content-Type");
+      res.removeHeader("Content-Disposition");
+      res.status(500).end();
+    } else res.destroy();
   });
   archive.pipe(res);
   files.forEach((file) => archive.file(file.full, { name: file.name }));

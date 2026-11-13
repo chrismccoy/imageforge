@@ -18,6 +18,9 @@ function createUploadsUsage({
 } = {}) {
   let total = null;
   let readAt = 0;
+  // Bumped whenever the folder changes, so a scan begun before it is not kept.
+  let generation = 0;
+  let scan = null;
 
   let queue = Promise.resolve();
 
@@ -30,16 +33,34 @@ function createUploadsUsage({
     return run;
   }
 
+  /**
+   * The folder's size, scanning again when the cached one is old or forgotten.
+   * Callers at the same moment share one scan.
+   */
   async function bytes() {
     const stale = total === null || Date.now() - readAt > maxAgeMs;
-    if (stale) {
-      total = await uploadsDirBytes(dir);
-      readAt = Date.now();
+    if (!stale) return total;
+
+    if (!scan || scan.generation !== generation) {
+      const started = { generation };
+      started.done = uploadsDirBytes(dir)
+        .then((found) => {
+          if (started.generation === generation) {
+            total = found;
+            readAt = Date.now();
+          }
+          return found;
+        })
+        .finally(() => {
+          if (scan === started) scan = null;
+        });
+      scan = started;
     }
-    return total;
+    return scan.done;
   }
 
   function forget() {
+    generation += 1;
     total = null;
   }
 
@@ -48,12 +69,15 @@ function createUploadsUsage({
    */
   function write(byteCount, save) {
     return alone(async () => {
+      const before = generation;
       const used = await bytes();
       if (used + byteCount > quotaBytes) return false;
 
       await save();
 
-      total = used + byteCount;
+      const moved = generation !== before;
+      generation += 1;
+      total = moved ? null : used + byteCount;
       return true;
     });
   }

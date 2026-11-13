@@ -20,7 +20,7 @@ const {
   compareLineup,
 } = require("../config/images");
 const { sizeFrom, field } = require("../utils/http/request");
-const { parseId } = require("../utils/domain/coerce");
+const { parseId, parseFlag } = require("../utils/domain/coerce");
 const { splitUsage } = require("../utils/domain/usage");
 const { requireDeps } = require("./support/helpers/requireDeps");
 
@@ -39,6 +39,15 @@ module.exports = (deps) => {
     "generateController"
   );
   const { Prompt, Generation, Spend } = models;
+
+  /**
+   * What a failed request may tell the caller about why.
+   */
+  function shown(err) {
+    return err && err.expose
+      ? { status: err.status || 400, message: err.message }
+      : { status: 500, message: "It failed." };
+  }
 
   /**
    * One image from a model, held for saving.
@@ -86,25 +95,29 @@ module.exports = (deps) => {
     const images = [];
     const failed = [];
 
+    const statuses = new Set();
+
     answers.forEach((answer, at) => {
       const { token, label } = lineup[at];
       if (answer.status === "fulfilled") {
         images.push({ ...answer.value, label });
         return;
       }
-      failed.push({
-        model: MODELS[token],
-        label,
-        message: (answer.reason && answer.reason.message) || "It failed.",
-      });
+      if (!(answer.reason && answer.reason.expose)) {
+        log.error(`Compare failed for ${label}:`, answer.reason);
+      }
+      const { status, message } = shown(answer.reason);
+      statuses.add(status);
+      failed.push({ model: MODELS[token], label, message });
     });
 
     if (!images.length) {
+      const status = statuses.size === 1 ? [...statuses][0] : 502;
       const reasons = new Set(failed.map((one) => one.message));
-      if (reasons.size === 1) return problem(res, 400, failed[0].message);
+      if (reasons.size === 1) return problem(res, status, failed[0].message);
       return problem(
         res,
-        400,
+        status,
         failed.map((one) => `${one.label}: ${one.message}`).join(" ")
       );
     }
@@ -147,7 +160,7 @@ module.exports = (deps) => {
      * Make images from the posted prompt and size. The bytes are kept server
      * side under a token each; the data URLs are returned only for preview.
      */
-    async generate(req, res) {
+    async generate(req, res, next) {
       const prompt = field(req.body, "prompt");
       if (!prompt) {
         return problem(res, 400, "The prompt is empty.");
@@ -162,7 +175,7 @@ module.exports = (deps) => {
 
       const count = normalizeCount(field(req.body, "count"));
 
-      const comparing = Boolean(field(req.body, "compare"));
+      const comparing = parseFlag(req.body && req.body.compare);
 
       try {
         if (comparing) {
@@ -200,7 +213,8 @@ module.exports = (deps) => {
 
         res.json({ images });
       } catch (err) {
-        problem(res, 400, err.message || "Something went wrong.");
+        if (!(err && err.expose)) return next(err);
+        problem(res, err.status || 400, err.message);
       }
     },
   };

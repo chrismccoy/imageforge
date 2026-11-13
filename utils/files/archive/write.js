@@ -36,14 +36,18 @@ function schemaOf(db) {
 }
 
 /**
- * Take a consistent copy of the database, with the API key blank.
+ * Take a consistent copy of the database, with the API key blank and no
+ * sessions. Secure delete and a vacuum leave no trace of either in free pages.
  */
-async function copyDatabaseWithoutKey(source, dbCopy) {
+async function copyDatabaseWithoutSecrets(source, dbCopy) {
   await source.backup(dbCopy);
 
   const copy = new Database(dbCopy);
   try {
+    copy.pragma("secure_delete = ON");
     copy.prepare("UPDATE settings SET api_key = ''").run();
+    copy.prepare("DELETE FROM sessions").run();
+    copy.exec("VACUUM");
   } finally {
     copy.close();
   }
@@ -110,32 +114,41 @@ async function writeZip(tmpZip, entries) {
 }
 
 /**
- * Move the finished zip to where it was asked for.
+ * Move the finished zip to where it was asked for. Without overwrite, a file
+ * already there is an error rather than replaced.
  */
-async function moveIntoPlace(tmpZip, outPath) {
+async function moveIntoPlace(tmpZip, outPath, overwrite) {
   await fsp.mkdir(path.dirname(outPath), { recursive: true });
   try {
-    await fsp.rename(tmpZip, outPath);
+    if (overwrite) await fsp.rename(tmpZip, outPath);
+    else await fsp.link(tmpZip, outPath);
   } catch (err) {
-    if (err.code !== "EXDEV") throw err;
-    await fsp.copyFile(tmpZip, outPath);
+    if (
+      err.code === "EEXIST" ||
+      !["EXDEV", "EPERM", "ENOTSUP"].includes(err.code)
+    ) {
+      throw err;
+    }
+    await fsp.copyFile(tmpZip, outPath, overwrite ? 0 : fs.constants.COPYFILE_EXCL);
   }
 }
 
 /**
  * Write an archive, returning the manifest it recorded.
  */
-async function writeArchive({ dbPath, db, uploadDir, outPath }) {
+async function writeArchive({ dbPath, db, uploadDir, outPath, overwrite = true }) {
   const staging = await fsp.mkdtemp(path.join(os.tmpdir(), "forge-backup-"));
   const dbCopy = path.join(staging, "database.sqlite");
   const tmpZip = path.join(staging, "archive.zip");
 
   const source = db || new Database(dbPath, { readonly: true });
+  let copy;
 
   try {
-    await copyDatabaseWithoutKey(source, dbCopy);
+    await copyDatabaseWithoutSecrets(source, dbCopy);
+    copy = new Database(dbCopy, { readonly: true });
 
-    const prompts = source
+    const prompts = copy
       .prepare(
         `SELECT p.name, p.prompt, p.rating, p.default_size, p.default_model,
                 c.name AS category_name
@@ -144,7 +157,8 @@ async function writeArchive({ dbPath, db, uploadDir, outPath }) {
       .all();
 
     const present = await uploadedFiles(uploadDir);
-    const manifest = buildManifest(source, present);
+    const manifest = buildManifest(copy, present);
+    copy.close();
 
     await writeZip(tmpZip, {
       files: [
@@ -163,9 +177,10 @@ async function writeArchive({ dbPath, db, uploadDir, outPath }) {
       ],
     });
 
-    await moveIntoPlace(tmpZip, outPath);
+    await moveIntoPlace(tmpZip, outPath, overwrite);
     return manifest;
   } finally {
+    if (copy && copy.open) copy.close();
     if (!db) source.close();
     await fsp.rm(staging, { recursive: true, force: true });
   }

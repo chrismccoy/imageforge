@@ -188,7 +188,8 @@ module.exports = (db) => {
     },
 
     /**
-     * Share a collection, returning its new token, or null with no title.
+     * Share a collection, returning its new token, or null with no title or
+     * no such collection.
      */
     share(id, title, makeToken, attempts) {
       const clean = toTrimmedString(title);

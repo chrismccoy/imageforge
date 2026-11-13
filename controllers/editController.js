@@ -73,7 +73,7 @@ module.exports = (deps) => {
     /**
      * Make the edit and hold the result for saving.
      */
-    async edit(req, res) {
+    async edit(req, res, next) {
       const id = parseId(field(req.body, "source_id"));
       const row = id ? Generation.get(id) : null;
       if (!row) {
@@ -149,7 +149,8 @@ module.exports = (deps) => {
 
         res.json({ token, url: result.dataUrl });
       } catch (err) {
-        problem(res, 400, err.message || "Something went wrong.");
+        if (!(err && err.expose)) return next(err);
+        problem(res, err.status || 400, err.message);
       }
     },
   };

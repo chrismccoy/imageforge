@@ -22,7 +22,7 @@ module.exports = (db) => {
          (SELECT COUNT(*) FROM live_generations g WHERE g.prompt_id = p.id) AS uses
        FROM prompts p
        LEFT JOIN categories c ON c.id = p.category_id
-       ORDER BY p.pinned DESC, p.name COLLATE NOCASE ASC`
+       ORDER BY p.pinned DESC, p.name COLLATE NOCASE ASC, p.id ASC`
     ),
     get: db.prepare(
       `SELECT id, name, prompt, created_at, category_id, rating,
@@ -42,6 +42,7 @@ module.exports = (db) => {
     setRating: db.prepare("UPDATE prompts SET rating = ? WHERE id = ?"),
     setPinned: db.prepare("UPDATE prompts SET pinned = ? WHERE id = ?"),
     getRating: db.prepare("SELECT rating FROM prompts WHERE id = ?"),
+    hasCategory: db.prepare("SELECT 1 FROM categories WHERE id = ?"),
   };
 
   const stmt = statementCache(db);
@@ -60,6 +61,14 @@ module.exports = (db) => {
   function note(value) {
     const clean = String(value == null ? "" : value).trim();
     return clean || null;
+  }
+
+  /**
+   * The category id to store, or null when there is no such category.
+   */
+  function categoryFor(value) {
+    const id = parseId(value);
+    return id && stmts.hasCategory.get(id) ? id : null;
   }
 
   /**
@@ -92,8 +101,8 @@ module.exports = (db) => {
   }
 
   const ORDERS = {
-    name: "p.name COLLATE NOCASE ASC",
-    rating: "p.rating IS NULL, p.rating DESC, p.name COLLATE NOCASE ASC",
+    name: "p.name COLLATE NOCASE ASC, p.id ASC",
+    rating: "p.rating IS NULL, p.rating DESC, p.name COLLATE NOCASE ASC, p.id ASC",
   };
 
   const PINNED_FIRST = "p.pinned DESC, ";
@@ -107,7 +116,8 @@ module.exports = (db) => {
 
   return {
     /**
-     * List every prompt in name order, each with how many images used it.
+     * List every prompt, pinned first then in name order, each with how many
+     * images used it.
      */
     all() {
       return stmts.all.all();
@@ -125,7 +135,8 @@ module.exports = (db) => {
     },
 
     /**
-     * List one page of prompts in name order, each with how many images used it.
+     * List one page of prompts, pinned first then in the asked order, each with
+     * how many images used it.
      */
     page({ search = null, categoryId = null, sort = null, limit, offset } = {}) {
       const { clause, params } = where({ search, categoryId });
@@ -157,7 +168,7 @@ module.exports = (db) => {
           name,
           prompt,
           created_at: new Date().toISOString(),
-          category_id: parseId(categoryId),
+          category_id: categoryFor(categoryId),
           default_size: oneOf(fields.size, ALLOWED_SIZES),
           default_model: oneOf(fields.model, MODEL_TOKENS),
           notes: note(fields.notes),
@@ -174,7 +185,7 @@ module.exports = (db) => {
           id,
           name,
           prompt,
-          category_id: parseId(categoryId),
+          category_id: categoryFor(categoryId),
           default_size: oneOf(fields.size, ALLOWED_SIZES),
           default_model: oneOf(fields.model, MODEL_TOKENS),
           notes: note(fields.notes),

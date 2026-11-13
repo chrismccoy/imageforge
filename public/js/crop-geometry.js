@@ -7,9 +7,47 @@ window.ImageForgeCropGeometry = (function () {
   const MIN_SIDE = 16;
 
   /**
-   * Hold a box inside the picture, keeping its size where that is possible.
+   * One side of a resized box held inside the picture: the edge the handle
+   * moved is clamped, the other stays put.
    */
-  function clampBox(box, bounds) {
+  function clampSide(from, to, size, movesStart) {
+    from = Math.max(from, 0);
+    to = Math.min(to, size);
+    const length = Math.min(Math.max(to - from, MIN_SIDE), size);
+
+    if (movesStart) {
+      from = Math.max(to - length, 0);
+      return { at: from, length: length };
+    }
+    return { at: Math.min(from, size - length), length: length };
+  }
+
+  /**
+   * Hold a box inside the picture. A move keeps its size where that is
+   * possible; a resize by a handle stops the edge it moved.
+   */
+  function clampBox(box, bounds, handle) {
+    if (handle) {
+      const across = clampSide(
+        box.x,
+        box.x + box.width,
+        bounds.width,
+        handle.indexOf("w") !== -1
+      );
+      const down = clampSide(
+        box.y,
+        box.y + box.height,
+        bounds.height,
+        handle.indexOf("n") !== -1
+      );
+      return {
+        x: across.at,
+        y: down.at,
+        width: across.length,
+        height: down.length,
+      };
+    }
+
     const width = Math.min(Math.max(box.width, MIN_SIDE), bounds.width);
     const height = Math.min(Math.max(box.height, MIN_SIDE), bounds.height);
 
@@ -22,24 +60,47 @@ window.ImageForgeCropGeometry = (function () {
   }
 
   /**
-   * Give a box a shape, or leave it alone when it is free.
+   * Give a box a shape, or leave it alone when it is free. The n and s
+   * handles set the height, the rest the width; the edges opposite the
+   * handle stay put.
    */
-  function applyRatio(box, ratio, bounds) {
-    if (!ratio) return clampBox(box, bounds);
+  function applyRatio(box, ratio, bounds, handle) {
+    if (!ratio) return clampBox(box, bounds, handle);
+
+    const h = handle || "";
+    const fromLeft = h.indexOf("w") !== -1;
+    const fromTop = h.indexOf("n") !== -1;
+    const right = box.x + box.width;
+    const bottom = box.y + box.height;
+    const roomX = !h ? bounds.width : fromLeft ? right : bounds.width - box.x;
+    const roomY = !h ? bounds.height : fromTop ? bottom : bounds.height - box.y;
 
     let width = box.width;
     let height = width / ratio;
-
-    if (height > bounds.height) {
-      height = bounds.height;
+    if (h === "n" || h === "s") {
+      height = box.height;
       width = height * ratio;
     }
-    if (width > bounds.width) {
-      width = bounds.width;
+
+    if (height > roomY) {
+      height = roomY;
+      width = height * ratio;
+    }
+    if (width > roomX) {
+      width = roomX;
       height = width / ratio;
     }
 
-    return clampBox({ x: box.x, y: box.y, width: width, height: height }, bounds);
+    return clampBox(
+      {
+        x: fromLeft ? right - width : box.x,
+        y: fromTop ? bottom - height : box.y,
+        width: width,
+        height: height,
+      },
+      bounds,
+      handle
+    );
   }
 
   /**

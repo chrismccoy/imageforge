@@ -80,11 +80,11 @@
   /**
    * Type the new prompt to save over the old one
    */
-  function repaint(text) {
-    if (!source) return;
-    source.setAttribute("data-prompt", text);
+  function repaint(button, text) {
+    if (!button) return;
+    button.setAttribute("data-prompt", text);
 
-    const card = source.closest && source.closest("[data-generation-card]");
+    const card = button.closest && button.closest("[data-generation-card]");
     if (!card) return;
 
     const line = card.querySelector("[data-row-prompt]");
@@ -100,12 +100,17 @@
   async function save() {
     if (!saveUrl || !api || saveBtn.disabled) return;
     saveBtn.disabled = true;
+    const from = source;
+    const url = saveUrl;
 
     try {
-      const body = await api.post(saveUrl, { prompt: editEl.value });
-      currentText = body.prompt || "";
-      repaint(currentText);
-      reading();
+      const body = await api.post(url, { prompt: editEl.value });
+      const text = body.prompt || "";
+      repaint(from, text);
+      if (source === from) {
+        currentText = text;
+        reading();
+      }
     } catch (err) {
       api.notice(err.message || "Could not save the prompt.");
     } finally {

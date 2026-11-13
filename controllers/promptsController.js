@@ -6,7 +6,7 @@
 
 const { PAGES } = require("../config/urls");
 const { field, idRows } = require("../utils/http/request");
-const { parseId } = require("../utils/domain/coerce");
+const { parseId, parseFlag } = require("../utils/domain/coerce");
 const { readPaging } = require("../utils/http/pageRequest");
 const { confirmed, renderConfirm } = require("../utils/http/confirm");
 const { problem } = require("../utils/http/http");
@@ -119,7 +119,11 @@ module.exports = (deps) => {
         return problem(res, 404, "That prompt is not saved.");
       }
 
-      res.json({ rating: Prompt.setRating(id, Number(req.params.value)) });
+      const rating = Prompt.setRating(id, Number(req.params.value));
+      res.json({
+        rating,
+        sortKey: sortKeyFor(Prompt.get(id), field(req.body, "sort")),
+      });
     },
 
     /**
@@ -131,8 +135,10 @@ module.exports = (deps) => {
         return problem(res, 404, "That prompt is not saved.");
       }
 
+      const pinned = Prompt.setPinned(id, parseFlag(req.body && req.body.pinned));
       res.json({
-        pinned: Prompt.setPinned(id, Boolean(field(req.body, "pinned"))),
+        pinned,
+        sortKey: sortKeyFor(Prompt.get(id), field(req.body, "sort")),
       });
     },
 

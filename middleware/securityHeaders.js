@@ -24,7 +24,7 @@ const CSP = [
  * Build the middleware that adds the security headers.
  */
 function createSecurityHeaders({ settings = env } = {}) {
-  const overTls = settings.IS_PRODUCTION || settings.TRUST_PROXY;
+  const overTls = settings.IS_PRODUCTION;
 
   return function securityHeaders(req, res, next) {
     res.setHeader("Content-Security-Policy", CSP);

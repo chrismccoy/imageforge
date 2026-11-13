@@ -25,6 +25,17 @@ function backupName(now) {
 }
 
 /**
+ * A path in dir for name that no file has yet, adding -2, -3 and so on.
+ */
+function unusedPath(dir, name) {
+  const { name: stem, ext } = path.parse(name);
+  for (let n = 1; ; n++) {
+    const full = path.join(dir, n === 1 ? name : `${stem}-${n}${ext}`);
+    if (!fs.existsSync(full)) return full;
+  }
+}
+
+/**
  * The full path of a named backup, or null.
  */
 function backupPath(dir, name) {
@@ -53,7 +64,14 @@ function listBackups(dir) {
   return names
     .filter((name) => name.endsWith(".zip"))
     .map((name) => {
-      const stat = fs.statSync(path.join(dir, name));
+      let stat;
+      try {
+        stat = fs.statSync(path.join(dir, name));
+      } catch (err) {
+        if (err.code === "ENOENT") return null;
+        throw err;
+      }
+      if (!stat.isFile()) return null;
       return {
         name,
         bytes: stat.size,
@@ -61,7 +79,14 @@ function listBackups(dir) {
         createdAt: stat.mtime.toISOString(),
       };
     })
+    .filter(Boolean)
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
-module.exports = { BACKUP_DIR, backupName, backupPath, listBackups };
+module.exports = {
+  BACKUP_DIR,
+  backupName,
+  unusedPath,
+  backupPath,
+  listBackups,
+};

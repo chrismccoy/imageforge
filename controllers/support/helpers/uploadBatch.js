@@ -14,6 +14,28 @@ const STORAGE_FULL = "Storage is full.";
 const NOT_AN_IMAGE = "Not a PNG, JPEG, or WebP image.";
 const COULD_NOT_SAVE = "It could not be saved.";
 
+// How many fresh names to try when one is already taken.
+const NAME_TRIES = 5;
+
+/**
+ * Write bytes under a new name that is not taken yet. Returns that name.
+ */
+async function writeNew(ext, bytes, uploadDir, wrote) {
+  for (let tried = 1; ; tried += 1) {
+    const filename = generatedImageName(ext);
+    const { full } = uploadPath(filename, uploadDir);
+    try {
+      wrote(full);
+      await fsp.writeFile(full, bytes, { flag: "wx" });
+      return filename;
+    } catch (err) {
+      if (err.code !== "EEXIST") throw err;
+      wrote(null);
+      if (tried >= NAME_TRIES) throw err;
+    }
+  }
+}
+
 /**
  * Save one file
  */
@@ -23,13 +45,16 @@ async function saveOne(file, { room, uploadDir, record, details, log = console }
   const kind = sniffImageType(file.buffer);
   if (!kind) return { name: named, error: NOT_AN_IMAGE };
 
-  const filename = generatedImageName(kind.ext);
-  const { full } = uploadPath(filename, uploadDir);
+  let filename = null;
+  let full = null;
+  let saved = false;
 
   try {
-    const saved = await room.write(file.buffer.length, () =>
-      fsp.writeFile(full, file.buffer)
-    );
+    saved = await room.write(file.buffer.length, async () => {
+      filename = await writeNew(kind.ext, file.buffer, uploadDir, (at) => {
+        full = at;
+      });
+    });
 
     if (!saved) return { name: named, error: STORAGE_FULL };
 
@@ -37,6 +62,8 @@ async function saveOne(file, { room, uploadDir, record, details, log = console }
     return { name: named, ok: true };
   } catch (err) {
     log.error("Could not save upload:", err.message);
+    if (full) await fsp.rm(full, { force: true }).catch(() => {});
+    if (saved && room.forget) room.forget();
     return { name: named, error: COULD_NOT_SAVE };
   }
 }

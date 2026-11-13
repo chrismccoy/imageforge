@@ -7,11 +7,21 @@
 const JSON_PREFIXES = ["/api/"];
 
 /**
- * Whether the caller wants a JSON reply instead of an HTML page.
+ * Whether the caller wants a JSON reply instead of an HTML page: an /api/ URL,
+ * a fetch carrying the CSRF header, or an Accept that prefers JSON.
  */
 function wantsJson(req) {
   const url = String((req && (req.originalUrl || req.url)) || "");
-  return JSON_PREFIXES.some((prefix) => url.startsWith(prefix));
+  if (JSON_PREFIXES.some((prefix) => url.startsWith(prefix))) return true;
+
+  if (req && typeof req.get === "function" && req.get("x-csrf-token")) {
+    return true;
+  }
+  return Boolean(
+    req &&
+    typeof req.accepts === "function" &&
+    req.accepts(["html", "json"]) === "json"
+  );
 }
 
 /**

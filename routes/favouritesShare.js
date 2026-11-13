@@ -18,10 +18,10 @@ module.exports = (deps) => {
   const router = express.Router();
 
   const guard = publicGate(deps, "favourites");
-  const { limiter, zipLimiter } = shareLimiters(deps.limits.rate);
+  const { limiter, imageLimiter, zipLimiter } = shareLimiters(deps.limits.rate);
 
-  const on = (path, handler) =>
-    router.get(`${FAVOURITES_PREFIX}${path}`, guard, noIndex, limiter, handler);
+  const on = (path, handler, gate = limiter) =>
+    router.get(`${FAVOURITES_PREFIX}${path}`, guard, noIndex, gate, handler);
 
   on("/:token", ctrl.view);
   on("/:token/page/:page", ctrl.view);
@@ -36,12 +36,12 @@ module.exports = (deps) => {
     `${FAVOURITES_PREFIX}/:token/i/:id`,
     guard,
     noIndex,
-    limiter,
+    imageLimiter,
     imageExtension("id"),
     ctrl.image
   );
-  on("/:token/i/:id/file", ctrl.file);
-  on("/:token/i/:id/download", ctrl.download);
+  on("/:token/i/:id/file", ctrl.file, imageLimiter);
+  on("/:token/i/:id/download", ctrl.download, imageLimiter);
 
   return router;
 };

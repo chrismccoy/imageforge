@@ -169,7 +169,9 @@ test("a mistyped icon leaves the mark as it was", async () => {
 
 test("the error page a bad request lands on still carries the brand", async () => {
   const db = freshDb();
-  const app = await startApp({ db });
+  const warned = [];
+  const log = { ...console, warn: (...args) => warned.push(args.join(" ")) };
+  const app = await startApp({ db, log });
 
   try {
     const cookie = await signIn(app.base);
@@ -189,6 +191,7 @@ test("the error page a bad request lands on still carries the brand", async () =
 
     assert.equal(res.status, 400);
     assert.match(html, /Pixel Barn/, "the error page wears the brand too");
+    assert.ok(warned.some((line) => line.startsWith("Request error 400:")));
   } finally {
     app.stop();
     db.close();

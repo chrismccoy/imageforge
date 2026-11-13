@@ -11,6 +11,7 @@ const { problem, INSUFFICIENT_STORAGE } = require("../utils/http/http");
 const { field } = require("../utils/http/request");
 const { parseId } = require("../utils/domain/coerce");
 const { generatedImageName } = require("../utils/domain/filename");
+const { sniffImageType } = require("../utils/files/imageType");
 const { uploadPath, uploadsDirFor } = require("../utils/files/uploads");
 const { requireUsage } = require("../services/uploadsUsage");
 const { requireDeps } = require("./support/helpers/requireDeps");
@@ -26,9 +27,20 @@ module.exports = (deps) => {
     log = console,
     usage,
   } = requireDeps(deps, ["models", "pending"], "generationsSaveController");
-  const { Generation } = models;
+  const { Generation, Prompt } = models;
   const uploadDir = uploadsDirFor(folders);
   const room = requireUsage(usage, "generationsSaveController");
+
+  /**
+   * Remove a file this save wrote, if it is there.
+   */
+  async function removeFile(full) {
+    try {
+      await fsp.rm(full, { force: true });
+    } catch (err) {
+      log.error("Could not remove the unsaved image:", err.message);
+    }
+  }
 
   return {
     /**
@@ -41,14 +53,20 @@ module.exports = (deps) => {
         return problem(res, 400, "Nothing to save. Generate an image first.");
       }
 
-      const prompt_id = parseId(req.body.prompt_id);
-      const filename = generatedImageName();
+      const asked = parseId(req.body.prompt_id);
+      const chosen = asked && Prompt ? Prompt.get(asked) : null;
+      const prompt_id = chosen ? chosen.id : (claimed.meta.prompt_id ?? null);
+
+      const kind = sniffImageType(claimed.bytes);
+      const filename = generatedImageName(kind ? kind.ext : "png");
       const { full } = uploadPath(filename, uploadDir);
+      let started = false;
 
       try {
-        const saved = await room.write(claimed.bytes.length, () =>
-          fsp.writeFile(full, claimed.bytes)
-        );
+        const saved = await room.write(claimed.bytes.length, () => {
+          started = true;
+          return fsp.writeFile(full, claimed.bytes, { flag: "wx" });
+        });
 
         if (!saved) {
           pending.restore(token, claimed);
@@ -65,6 +83,7 @@ module.exports = (deps) => {
           );
         }
       } catch (err) {
+        if (started && err.code !== "EEXIST") await removeFile(full);
         pending.restore(token, claimed);
         log.error("Could not save image:", err.message);
         return problem(res, 500, "The image could not be saved.");
@@ -74,7 +93,7 @@ module.exports = (deps) => {
         Generation.add({
           filename,
           prompt: claimed.meta.prompt,
-          prompt_id: prompt_id ?? claimed.meta.prompt_id ?? null,
+          prompt_id,
           model: claimed.meta.model,
           size: claimed.meta.size,
           usage: claimed.meta.usage,
@@ -82,12 +101,15 @@ module.exports = (deps) => {
           edited_from: claimed.meta.edited_from ?? null,
           spend_counted: 1,
         });
-
-        res.json({ url: `${UPLOAD_PREFIX}/${filename}` });
       } catch (err) {
+        await removeFile(full);
+        room.forget();
+        pending.restore(token, claimed);
         log.error("Could not record the saved image:", err.message);
         return problem(res, 500, "The image could not be saved.");
       }
+
+      res.json({ url: `${UPLOAD_PREFIX}/${filename}` });
     },
   };
 };

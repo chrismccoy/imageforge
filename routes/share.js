@@ -6,7 +6,11 @@
 
 const express = require("express");
 const buildController = require("../controllers/shareController");
-const { publicGate, publicLimiter } = require("../middleware/publicRoute");
+const {
+  publicGate,
+  publicLimiter,
+  imageLimiter,
+} = require("../middleware/publicRoute");
 const { noIndex } = require("../middleware/noIndex");
 const { imageExtension } = require("../middleware/imageExt");
 const { SHARE_PREFIX, IMAGE_PREFIX } = require("../config/urls");
@@ -17,13 +21,14 @@ module.exports = (deps) => {
 
   const guard = publicGate(deps, "sharing");
   const limiter = publicLimiter(deps.limits.rate.share);
+  const imagesLimiter = imageLimiter(deps.limits.rate);
 
   router.get(`${SHARE_PREFIX}/:token`, guard, noIndex, limiter, ctrl.view);
   router.get(
     `${IMAGE_PREFIX}/:token`,
     guard,
     noIndex,
-    limiter,
+    imagesLimiter,
     imageExtension("token"),
     ctrl.image
   );

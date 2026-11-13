@@ -5,6 +5,7 @@ window.ImageForgeUi = (function () {
   "use strict";
 
   const FLASH_MS = 2000;
+  const STATUS_COLOURS = ["text-red-600", "text-green-600", "text-slate-500"];
 
   const timers = new WeakMap();
   const labels = new WeakMap();
@@ -25,13 +26,14 @@ window.ImageForgeUi = (function () {
   function setStatus(el, message, kind) {
     if (!el) return;
     el.textContent = message || "";
-    el.className =
-      "mt-3 min-h-5 text-sm " +
-      (kind === "error"
+    el.classList.remove(...STATUS_COLOURS);
+    el.classList.add(
+      kind === "error"
         ? "text-red-600"
         : kind === "success"
           ? "text-green-600"
-          : "text-slate-500");
+          : "text-slate-500"
+    );
   }
 
   /**

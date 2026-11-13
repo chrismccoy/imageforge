@@ -142,7 +142,7 @@ test("what the error handler writes goes where the app was told to write", async
 
     assert.equal(res.status, 400, "the caller still gets an answer");
     assert.ok(
-      app.log.said(/Unhandled error/),
+      app.log.said(/Request error 400/),
       "and the detail goes where it was told"
     );
   } finally {

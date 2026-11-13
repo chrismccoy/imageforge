@@ -21,9 +21,8 @@ openai.generateImage = async (opts) => {
   seen.push(opts.model);
   return {
     model: "gpt-image-x",
-    bytes: Buffer.from("PNG"),
-    dataUrl: "data:image/png;base64,UE5H",
     usage: null,
+    images: [{ bytes: Buffer.from("PNG"), dataUrl: "data:image/png;base64,UE5H" }],
   };
 };
 
@@ -83,8 +82,11 @@ test("the posted model is used, and its absence falls back to settings", async (
         body: JSON.stringify(body),
       });
 
-    await call({ prompt: "a cat", size: "1024x1024", model: "2" });
-    await call({ prompt: "a cat", size: "1024x1024" });
+    const posted = await call({ prompt: "a cat", size: "1024x1024", model: "2" });
+    const fallback = await call({ prompt: "a cat", size: "1024x1024" });
+
+    assert.equal(posted.status, 200);
+    assert.equal(fallback.status, 200);
 
     assert.equal(seen[0], "2", "the posted model is honoured");
     assert.equal(seen[1], "2.6-sunburst", "no model falls back to the setting");

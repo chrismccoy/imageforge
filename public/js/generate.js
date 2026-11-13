@@ -61,6 +61,7 @@
     return opt ? opt.getAttribute("data-id") || "" : "";
   })();
   let currentPromptId = ""; // id kept for the image that was made
+  let saving = false;
 
   const show = (node) => ui.show(node, true);
   const hide = (node) => ui.show(node, false);
@@ -76,6 +77,7 @@
    * Put the Save button in step with the selection.
    */
   function syncSave() {
+    if (saving) return;
     const n = picked(batch).length;
     ui.show(saveBtn, batch.length > 0);
     saveBtn.disabled = n === 0;
@@ -135,7 +137,7 @@
     button.appendChild(img);
 
     button.addEventListener("click", function () {
-      if (!item.token) return;
+      if (!item.token || saving) return;
       item.selected = !item.selected;
       paintTile(button, item, index);
       syncSave();
@@ -232,6 +234,7 @@
    * Generate from whatever the form currently holds.
    */
   async function runGenerate() {
+    if (saving) return;
     const prompt = (promptField.value || "").trim();
     if (!prompt) {
       setStatus("Enter a prompt first.", "error");
@@ -251,6 +254,7 @@
 
     try {
       const comparing = Boolean(compareBox && compareBox.checked);
+      const promptId = selectedPromptId;
 
       const body = await api.post("/api/generate", {
         prompt: prompt,
@@ -261,7 +265,7 @@
       });
 
       batch = batchFrom(body.images, comparing);
-      currentPromptId = selectedPromptId;
+      currentPromptId = promptId;
       hide(spinner);
       render();
       show(againBtn);
@@ -285,8 +289,11 @@
    */
   async function runSave() {
     const chosen = picked(batch);
-    if (!chosen.length) return;
+    if (saving || !chosen.length) return;
 
+    saving = true;
+    generateBtn.disabled = true;
+    if (againBtn) againBtn.disabled = true;
     saveBtn.disabled = true;
     saveBtn.textContent = "Saving…";
     setStatus("Saving…");
@@ -311,6 +318,9 @@
       }
     }
 
+    saving = false;
+    generateBtn.disabled = false;
+    if (againBtn) againBtn.disabled = false;
     render();
 
     const said = saveSummary(saved, failed);

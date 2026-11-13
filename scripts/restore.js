@@ -1,7 +1,7 @@
 /**
  * Restore
  *
- * Puts an archive back: the database and the uploads
+ * Puts an archive back: the database and the uploads. Stop the app first.
  *
  *   node scripts/restore.js data/backups/imageforge-20260810-1402.zip
  *   node scripts/restore.js backup.zip --yes
@@ -19,7 +19,7 @@ const Database = require("better-sqlite3");
 
 const { DB_PATH, UPLOAD_DIR } = require("../config/paths");
 const schema = require("../db/schema");
-const { BACKUP_DIR } = require("../utils/files/backups");
+const { BACKUP_DIR, unusedPath } = require("../utils/files/backups");
 const { writeArchive, ARCHIVE_VERSION } = require("../utils/files/archive/write");
 const { readManifest, extractTo } = require("../utils/files/archive/read");
 const { gapsBetween } = require("../db/schemaDiff");
@@ -36,15 +36,24 @@ function wantedSchema() {
 }
 
 /**
- * Stop, saying why, without having touched anything.
+ * A refusal, carrying the lines that say why.
  */
-function refuse(lines) {
-  console.error(lines.join("\n"));
-  process.exit(1);
+class Refusal extends Error {
+  constructor(lines) {
+    super(lines.join("\n"));
+    this.lines = lines;
+  }
 }
 
 /**
- * Ask before replacing, unless --yes was given.
+ * Stop, saying why, without having touched anything.
+ */
+function refuse(lines) {
+  throw new Refusal(lines);
+}
+
+/**
+ * Ask before replacing, unless --yes was given. No answer means no.
  */
 function confirm(question) {
   return new Promise((resolve) => {
@@ -52,11 +61,62 @@ function confirm(question) {
       input: process.stdin,
       output: process.stdout,
     });
+    let answered = false;
+    rl.on("close", () => {
+      if (!answered) resolve(false);
+    });
     rl.question(`${question} [y/N] `, (answer) => {
+      answered = true;
       rl.close();
       resolve(/^y(es)?$/i.test(answer.trim()));
     });
   });
+}
+
+/**
+ * Whether a manifest has the fields restore reads.
+ */
+function wellFormed(manifest) {
+  const counts = manifest && manifest.counts;
+  return Boolean(
+    counts &&
+    typeof counts === "object" &&
+    Number.isInteger(counts.prompts) &&
+    Number.isInteger(counts.generations)
+  );
+}
+
+/**
+ * The entries of the unpacked uploads folder that are not plain files.
+ */
+async function nestedUploads(dir) {
+  try {
+    return (await fsp.readdir(dir, { withFileTypes: true }))
+      .filter((e) => !e.isFile())
+      .map((e) => e.name);
+  } catch (err) {
+    if (err.code !== "ENOENT") throw err;
+    return [];
+  }
+}
+
+/**
+ * Whether another connection, such as the running app, has the database open.
+ */
+function inUse(dbPath) {
+  if (!fs.existsSync(dbPath)) return false;
+  const probe = new Database(dbPath, { timeout: 200 });
+  try {
+    probe.pragma("locking_mode = EXCLUSIVE");
+    probe.exec("BEGIN EXCLUSIVE");
+    probe.exec("ROLLBACK");
+    return false;
+  } catch (err) {
+    if (err.code === "SQLITE_BUSY" || err.code === "SQLITE_LOCKED") return true;
+    throw err;
+  } finally {
+    probe.close();
+  }
 }
 
 /**
@@ -106,12 +166,22 @@ async function main() {
     refuse([`Refused: ${err.message}`]);
   }
 
+  if (!manifest || typeof manifest !== "object") {
+    refuse([`Refused: the manifest in ${path.basename(archive)} is not readable.`]);
+  }
+
   if (manifest.version !== ARCHIVE_VERSION) {
     refuse([
       `Refused: that archive is version ${manifest.version} and this code reads version ${ARCHIVE_VERSION}.`,
       manifest.version > ARCHIVE_VERSION
         ? "  It was written by a newer version of Image Forge. Upgrade before restoring it."
         : "  It was written by an older version, whose format this code no longer reads.",
+    ]);
+  }
+
+  if (!wellFormed(manifest)) {
+    refuse([
+      `Refused: the manifest in ${path.basename(archive)} has no counts, so Image Forge did not write it.`,
     ]);
   }
 
@@ -126,6 +196,14 @@ async function main() {
 
     if (!fs.existsSync(extracted.dbPath)) {
       refuse(["Refused: that archive holds no database.sqlite."]);
+    }
+
+    const nested = await nestedUploads(extracted.uploadDir);
+    if (nested.length) {
+      refuse([
+        "Refused: that archive's uploads folder holds folders, which an archive never has:",
+        ...nested.map((name) => `    uploads/${name}`),
+      ]);
     }
 
     const want = wantedSchema();
@@ -156,9 +234,20 @@ async function main() {
       ]);
     }
 
+    if (inUse(dbPath)) {
+      refuse([
+        `Refused: ${dbPath} is in use. Stop the app, then run the restore again.`,
+      ]);
+    }
+
     if (!assumeYes) {
+      if (!process.stdin.isTTY) {
+        refuse([
+          "Refused: there is no terminal to confirm on. Run it again with --yes to replace this install.",
+        ]);
+      }
       const ok = await confirm(
-        `Replace this install with ${path.basename(archive)} ` +
+        `With the app stopped, replace this install with ${path.basename(archive)} ` +
           `(${manifest.counts.generations} images, ${manifest.counts.prompts} prompts)?`
       );
       if (!ok) {
@@ -172,10 +261,13 @@ async function main() {
       .slice(0, TO_THE_MINUTE)
       .replace(/[-:]/g, "")
       .replace("T", "-");
-    const safety = path.join(backupDir, `pre-restore-${stamp}.zip`);
-    await writeArchive({ dbPath, uploadDir, outPath: safety });
-    console.log(`The state being replaced was saved to ${safety}`);
+    if (fs.existsSync(dbPath)) {
+      const safety = unusedPath(backupDir, `pre-restore-${stamp}.zip`);
+      await writeArchive({ dbPath, uploadDir, outPath: safety, overwrite: false });
+      console.log(`The state being replaced was saved to ${safety}`);
+    }
 
+    await fsp.mkdir(path.dirname(dbPath), { recursive: true });
     const incomingDb = new Database(extracted.dbPath, { readonly: true });
     try {
       await incomingDb.backup(dbPath);
@@ -202,6 +294,7 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(`Restore failed: ${err.message}`);
-  process.exit(1);
+  if (err instanceof Refusal) console.error(err.lines.join("\n"));
+  else console.error(`Restore failed: ${err.message}`);
+  process.exitCode = 1;
 });

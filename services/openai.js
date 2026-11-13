@@ -18,6 +18,7 @@ const {
 const { env } = require("../config/env");
 const { toTrimmedString } = require("../utils/domain/coerce");
 const { readUsage } = require("../utils/domain/usage");
+const { sniffImageType } = require("../utils/files/imageType");
 
 /**
  * Turn a UI token ("2" or "2.6-flare") into the full OpenAI model name.
@@ -28,6 +29,24 @@ function resolveModel(token) {
 
 // How much of an unexpected reply to keep in the log.
 const BODY_LOG_CHARS = 300;
+
+// Limits on fetching an image the API returned by URL.
+const IMAGE_FETCH_TIMEOUT_MS = 60 * 1000;
+const IMAGE_FETCH_MAX_BYTES = 64 * 1024 * 1024;
+
+/**
+ * An error whose message is safe to show, with the status to show it under.
+ */
+function shownError(message, status) {
+  return Object.assign(new Error(message), { status, expose: true });
+}
+
+/**
+ * The status to answer with when the image API itself failed.
+ */
+function upstreamStatus(err) {
+  return err && err.status === 429 ? 503 : 502;
+}
 
 /**
  * Wrap fetch so a reply that is not JSON is recorded before the SDK breaks
@@ -108,11 +127,7 @@ async function extractImageBytes(imageData) {
   }
 
   if (imageData.url) {
-    const remote = await fetch(imageData.url);
-    if (!remote.ok) {
-      throw new Error("Could not download the returned image.");
-    }
-    const bytes = Buffer.from(await remote.arrayBuffer());
+    const bytes = await downloadImage(imageData.url);
     if (!bytes.length) {
       throw new Error("Could not download the returned image.");
     }
@@ -120,6 +135,39 @@ async function extractImageBytes(imageData) {
   }
 
   throw new Error("OpenAI returned no usable image data.");
+}
+
+/**
+ * Fetch an image by URL, giving up when it is too slow or too large.
+ */
+async function downloadImage(url) {
+  const failed = new Error("Could not download the returned image.");
+  const tooLarge = new Error("The returned image is too large.");
+  try {
+    const remote = await fetch(url, {
+      signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS),
+    });
+    if (!remote.ok) throw failed;
+    if (Number(remote.headers.get("content-length")) > IMAGE_FETCH_MAX_BYTES) {
+      throw tooLarge;
+    }
+    if (!remote.body) return Buffer.alloc(0);
+
+    const chunks = [];
+    let total = 0;
+    for await (const chunk of remote.body) {
+      total += chunk.length;
+      if (total > IMAGE_FETCH_MAX_BYTES) throw tooLarge;
+      chunks.push(chunk);
+    }
+    return Buffer.concat(chunks);
+  } catch (err) {
+    if (err === tooLarge || err === failed) throw err;
+    if (err && err.name === "TimeoutError") {
+      throw new Error("The returned image took too long to download.");
+    }
+    throw failed;
+  }
 }
 
 /**
@@ -137,12 +185,13 @@ async function imageRequest({
 }) {
   const key = toTrimmedString(apiKey);
   if (!key) {
-    throw new Error(
-      "No OpenAI API key is set. Add one on the Settings page or via OPENAI_API_KEY."
+    throw shownError(
+      "No OpenAI API key is set. Add one on the Settings page or via OPENAI_API_KEY.",
+      400
     );
   }
   if (!prompt || !prompt.trim()) {
-    throw new Error("The prompt is empty.");
+    throw shownError("The prompt is empty.", 400);
   }
 
   const model = resolveModel(modelToken);
@@ -157,21 +206,28 @@ async function imageRequest({
       `Image request failed for model ${model} at ${size}:`,
       (err && err.stack) || err
     );
-    throw new Error(describeUpstreamError(err));
+    throw shownError(describeUpstreamError(err), upstreamStatus(err));
   }
   const durationMs = Math.round(performance.now() - started);
 
   const items = payload && Array.isArray(payload.data) ? payload.data : [];
   if (!items.length) {
-    throw new Error("OpenAI returned no image.");
+    throw shownError("OpenAI returned no image.", 502);
   }
 
   const images = [];
   for (const item of items) {
-    const bytes = await extractImageBytes(item);
+    let bytes;
+    try {
+      bytes = await extractImageBytes(item);
+    } catch (err) {
+      log.error("Could not read the returned image:", (err && err.stack) || err);
+      throw shownError(err.message, 502);
+    }
+    const kind = sniffImageType(bytes);
     images.push({
       bytes,
-      dataUrl: `data:image/png;base64,${bytes.toString("base64")}`,
+      dataUrl: `data:${kind ? kind.mime : "image/png"};base64,${bytes.toString("base64")}`,
     });
   }
 
@@ -222,7 +278,7 @@ async function editImage({
   log,
 }) {
   if (!imageBytes || !imageBytes.length || !maskBytes || !maskBytes.length) {
-    throw new Error("An edit needs both an image and a mask.");
+    throw shownError("An edit needs both an image and a mask.", 400);
   }
 
   const result = await imageRequest({
@@ -260,4 +316,5 @@ module.exports = {
   resolveModel,
   describeUpstreamError,
   makeLoggingFetch,
+  IMAGE_FETCH_MAX_BYTES,
 };

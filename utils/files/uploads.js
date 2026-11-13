@@ -16,10 +16,14 @@ function uploadsDirFor(folders = {}) {
 }
 
 /**
- * Absolute path to a saved upload, kept inside the uploads folder.
+ * Absolute path to a saved upload, kept inside the uploads folder. A name
+ * that is no file at all is refused as not found.
  */
 function uploadPath(filename, dir) {
   const safe = path.basename(String(filename || ""));
+  if (safe === "" || safe === "." || safe === "..") {
+    throw Object.assign(new Error("Not found."), { status: 404, expose: true });
+  }
   return { safe, full: path.join(dir, safe) };
 }
 

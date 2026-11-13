@@ -15,6 +15,7 @@ const { requireDeps } = require("./support/helpers/requireDeps");
 const {
   BACKUP_DIR,
   backupName,
+  unusedPath,
   backupPath,
   listBackups,
 } = require("../utils/files/backups");
@@ -45,7 +46,8 @@ module.exports = (deps) => {
         await writeArchive({
           db,
           uploadDir,
-          outPath: path.join(backupDir, backupName(new Date())),
+          outPath: unusedPath(backupDir, backupName(new Date())),
+          overwrite: false,
         });
         res.redirect(PAGES.promptsBackup);
       } catch (err) {

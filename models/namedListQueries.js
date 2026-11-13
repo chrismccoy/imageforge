@@ -44,8 +44,7 @@ function buildNamedList(db, { insert, rename, remove, detach }) {
       if (!clean) return false;
 
       try {
-        rename.run(clean, id);
-        return true;
+        return rename.run(clean, id).changes > 0;
       } catch (err) {
         if (isDuplicate(err)) return false;
         throw err;

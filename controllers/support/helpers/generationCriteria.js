@@ -5,6 +5,7 @@
 "use strict";
 
 const { field } = require("../../../utils/http/request");
+const { parseFlag } = require("../../../utils/domain/coerce");
 const { likePattern } = require("../../../utils/domain/search");
 const { pageLink } = require("../../../utils/http/pageLink");
 const { PAGES } = require("../../../config/urls");
@@ -33,7 +34,7 @@ function readView(req) {
  */
 function readCriteria(req) {
   const q = field(req.query, "q");
-  const favorite = Boolean(field(req.query, "fav"));
+  const favorite = parseFlag(field(req.query, "fav"));
 
   return {
     q,

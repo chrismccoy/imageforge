@@ -13,9 +13,9 @@ const { DAY_MS } = require("../utils/domain/time");
  */
 module.exports = (db) => {
   const stmts = {
-    total: db.prepare("SELECT COUNT(*) AS n FROM generations"),
+    total: db.prepare("SELECT COUNT(*) AS n FROM live_generations"),
     since: db.prepare(
-      "SELECT COUNT(*) AS n FROM generations WHERE created_at >= ?"
+      "SELECT COUNT(*) AS n FROM live_generations WHERE created_at >= ?"
     ),
     byModel: db.prepare(
       `SELECT model, images, counted_images, input_tokens, output_tokens, total_tokens
@@ -37,7 +37,7 @@ module.exports = (db) => {
 
   return {
     /**
-     * How many saved images there are.
+     * How many saved images there are, leaving out the trash.
      */
     total() {
       return stmts.total.get().n;

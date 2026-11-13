@@ -48,7 +48,7 @@ module.exports = (db) => {
       stmts.record.run({
         model: String(model || ""),
         images: many,
-        counted_images: usage ? many : 0,
+        counted_images: usage && tokenCount(usage.input) !== null ? many : 0,
         input_tokens: tokens(usage, "input"),
         output_tokens: tokens(usage, "output"),
         total_tokens: tokens(usage, "total"),

@@ -8,6 +8,9 @@
  * Build a store.
  */
 function createExpiringStore({ ttlMs, max }) {
+  if (!Number.isInteger(max) || max < 1) {
+    throw new Error("createExpiringStore needs a max of at least 1.");
+  }
   const items = new Map();
 
   /**
@@ -35,19 +38,31 @@ function createExpiringStore({ ttlMs, max }) {
   }
 
   /**
-   * Store a value with a fresh deadline, making room if the store is full.
+   * Drop the oldest entries until one more fits, unless the key is held.
    */
-  function add(key, value) {
+  function makeRoom(key) {
     sweep();
+    if (items.has(key)) return;
     while (items.size >= max) {
       items.delete(items.keys().next().value);
     }
+  }
+
+  /**
+   * Store a value with a fresh deadline, making room if the store is full.
+   */
+  function add(key, value) {
+    makeRoom(key);
     items.set(key, { value, expiresAt: Date.now() + ttlMs });
   }
 
+  /**
+   * Store a value with the deadline it already had, making room the same way.
+   */
   function putBack(key, value, expiresAt) {
     if (!(expiresAt > Date.now())) return false;
 
+    makeRoom(key);
     items.set(key, { value, expiresAt });
     return true;
   }

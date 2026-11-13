@@ -6,13 +6,17 @@
 
 const { SESSION_MAX_AGE_MS, SESSION_SWEEP_MS } = require("../config/limits");
 
+/**
+ * Run work, then tell cb once how it went, outside the try.
+ */
 function reporting(work, cb) {
+  let result;
   try {
-    work();
-    return cb ? cb(null) : undefined;
+    result = [null, work()];
   } catch (err) {
-    return cb ? cb(err) : undefined;
+    result = [err];
   }
+  return cb ? cb(...result) : undefined;
 }
 
 module.exports = (session) => {
@@ -49,17 +53,15 @@ module.exports = (session) => {
     }
 
     get(sid, cb) {
-      try {
+      return reporting(() => {
         const row = this.stmts.get.get(sid);
-        if (!row) return cb(null, null);
+        if (!row) return null;
         if (row.expire <= Date.now()) {
           this.stmts.destroy.run(sid);
-          return cb(null, null);
+          return null;
         }
-        return cb(null, JSON.parse(row.sess));
-      } catch (err) {
-        return cb(err);
-      }
+        return JSON.parse(row.sess);
+      }, cb);
     }
 
     set(sid, sess, cb) {
@@ -87,11 +89,7 @@ module.exports = (session) => {
     }
 
     length(cb) {
-      try {
-        return cb(null, this.stmts.length.get().n);
-      } catch (err) {
-        return cb(err);
-      }
+      return reporting(() => this.stmts.length.get().n, cb);
     }
 
     /**

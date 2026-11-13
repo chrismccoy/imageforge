@@ -84,6 +84,7 @@ test("a revoked or wrong token 404s on the favourites zip, exactly as the page d
 
     const good = await fetch(`${app.base}/f/${token}/download`);
     assert.equal(good.status, 200);
+    await good.arrayBuffer();
 
     Settings.unshareFavourites();
     assert.equal((await fetch(`${app.base}/f/${token}/download`)).status, 404);
@@ -106,6 +107,8 @@ test("the favourites zip is named favourites-<date>.zip", async () => {
       res.headers.get("content-disposition"),
       `attachment; filename="favourites-${isoDate()}.zip"`
     );
+    // Read the zip before its files are removed.
+    await res.arrayBuffer();
   } finally {
     cleanUp();
     app.stop();

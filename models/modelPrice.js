@@ -28,13 +28,31 @@ module.exports = (db) => {
        ON CONFLICT(model) DO UPDATE SET
          input_per_million = @input,
          output_per_million = @output,
-         updated_at = @updated_at`
+         updated_at = @updated_at
+       WHERE input_per_million IS NOT @input
+          OR output_per_million IS NOT @output`
     ),
     remove: db.prepare("DELETE FROM model_prices WHERE model = ?"),
     latest: db.prepare("SELECT MAX(updated_at) AS at FROM model_prices"),
   };
 
+  /**
+   * What a form's rate pair means: { clear: true }, a pair to store, or null
+   * when it cannot be stored, such as one side left blank.
+   */
+  function ratesFrom(inputText, outputText) {
+    const input = String(inputText == null ? "" : inputText).trim();
+    const output = String(outputText == null ? "" : outputText).trim();
+    if (!input && !output) return { clear: true };
+    if (!input || !output) return null;
+
+    const pair = { input: Number(input), output: Number(output) };
+    return validRate(pair.input) && validRate(pair.output) ? pair : null;
+  }
+
   return {
+    ratesFrom,
+
     /**
      * Every price, keyed by the model name a generation stores.
      */
@@ -52,6 +70,7 @@ module.exports = (db) => {
 
     /**
      * Store a rate pair, replacing any existing one. Reports whether it took.
+     * An unchanged pair keeps its updated_at.
      */
     set(model, input, output, nowIso) {
       const name = String(model || "").trim();
@@ -72,11 +91,10 @@ module.exports = (db) => {
      * Apply what a form said about one model's rates.
      */
     applyRates(model, inputText, outputText, nowIso) {
-      const input = String(inputText == null ? "" : inputText).trim();
-      const output = String(outputText == null ? "" : outputText).trim();
-
-      if (!input && !output) return this.clear(model);
-      return this.set(model, Number(input), Number(output), nowIso);
+      const rates = ratesFrom(inputText, outputText);
+      if (!rates) return false;
+      if (rates.clear) return this.clear(model);
+      return this.set(model, rates.input, rates.output, nowIso);
     },
 
     /**

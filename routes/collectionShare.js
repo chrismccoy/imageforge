@@ -16,7 +16,7 @@ module.exports = (deps) => {
   const router = express.Router();
 
   const guard = publicGate(deps, "collections");
-  const { limiter, zipLimiter } = shareLimiters(deps.limits.rate);
+  const { limiter, imageLimiter, zipLimiter } = shareLimiters(deps.limits.rate);
 
   router.get(`${COLLECTION_PREFIX}/:token`, guard, noIndex, limiter, ctrl.view);
   router.get(
@@ -37,14 +37,14 @@ module.exports = (deps) => {
     `${COLLECTION_PREFIX}/:token/i/:id/download`,
     guard,
     noIndex,
-    limiter,
+    imageLimiter,
     ctrl.download
   );
   router.get(
     `${COLLECTION_PREFIX}/:token/i/:id`,
     guard,
     noIndex,
-    limiter,
+    imageLimiter,
     imageExtension("id"),
     ctrl.image
   );
@@ -52,7 +52,7 @@ module.exports = (deps) => {
     `${COLLECTION_PREFIX}/:token/i/:id/file`,
     guard,
     noIndex,
-    limiter,
+    imageLimiter,
     ctrl.file
   );
 

@@ -96,10 +96,7 @@ test("surfaces an SDK error as its message, and keeps the detail in the log", as
 
 test("falls back to downloading the image URL when there is no b64_json", async () => {
   const origFetch = global.fetch;
-  global.fetch = async () => ({
-    ok: true,
-    arrayBuffer: async () => Buffer.from("REMOTE"),
-  });
+  global.fetch = async () => new Response(Buffer.from("REMOTE"));
   try {
     const client = fakeClient({ data: [{ url: "https://example.test/img.png" }] });
     const out = await generateImage({

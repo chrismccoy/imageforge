@@ -34,10 +34,13 @@
       });
     }
 
+    let sent = 0;
+
     async function send(path) {
+      const ticket = ++sent;
       try {
         const body = await api.post(path);
-        paint(body.collections);
+        if (ticket === sent) paint(body.collections);
       } catch (err) {
         api.notice(err.message || "Could not change the collection.");
       }

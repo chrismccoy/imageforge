@@ -13,6 +13,8 @@ const { sniffImageType } = require("../utils/files/imageType");
 const { notFound } = require("../utils/http/pages");
 const { requireDeps } = require("./support/helpers/requireDeps");
 
+const SIZE_PATTERN = /^\d{1,5}x\d{1,5}$/;
+
 /**
  * Build the crop controller
  */
@@ -49,10 +51,6 @@ module.exports = (deps) => {
      * Take the cropped bytes and hold them for saving.
      */
     crop(req, res) {
-      if (req.uploadError) {
-        return problem(res, 400, req.uploadError);
-      }
-
       const source = liveImage(field(req.body, "source_id"));
       if (!source) {
         return problem(res, 404, "That image is not saved.");
@@ -63,22 +61,25 @@ module.exports = (deps) => {
         return problem(res, 400, "There is nothing to crop.");
       }
 
-      if (!sniffImageType(file.buffer)) {
+      const kind = sniffImageType(file.buffer);
+      if (!kind) {
         return problem(res, 400, "That is not an image.");
       }
+
+      const asked = field(req.body, "size");
 
       const token = pending.put(file.buffer, {
         prompt: source.prompt,
         prompt_id: source.prompt_id || null,
         model: source.model,
-        size: field(req.body, "size") || source.size,
+        size: SIZE_PATTERN.test(asked) ? asked : source.size,
         usage: null,
         edited_from: source.id,
       });
 
       res.json({
         token,
-        url: `data:image/png;base64,${file.buffer.toString("base64")}`,
+        url: `data:${kind.mime};base64,${file.buffer.toString("base64")}`,
       });
     },
   };

@@ -153,10 +153,10 @@ test("the rating endpoint sets, clears and reports", async () => {
 
     const set = await rate(4);
     assert.equal(set.status, 200);
-    assert.deepEqual(await set.json(), { rating: 4 });
+    assert.equal((await set.json()).rating, 4);
 
     const cleared = await rate(0);
-    assert.deepEqual(await cleared.json(), { rating: null });
+    assert.equal((await cleared.json()).rating, null);
   } finally {
     app.stop();
     db.close();

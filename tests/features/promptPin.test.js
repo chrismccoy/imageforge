@@ -151,12 +151,12 @@ test("the endpoint pins and unpins, and says what is now true", () => {
 
   const on = fakeRes();
   ctrl.pin({ params: { id: String(zulu) }, body: { pinned: "1" } }, on);
-  assert.deepEqual(on.body, { pinned: 1 });
+  assert.equal(on.body.pinned, 1);
   assert.equal(models.Prompt.get(zulu).pinned, 1);
 
   const off = fakeRes();
   ctrl.pin({ params: { id: String(zulu) }, body: { pinned: "" } }, off);
-  assert.deepEqual(off.body, { pinned: 0 });
+  assert.equal(off.body.pinned, 0);
 });
 
 test("pinning something that is not there is a 404, not a crash", () => {

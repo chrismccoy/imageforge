@@ -23,6 +23,11 @@ const USAGE = { total: 100, input: 40, output: 60 };
 let calls = [];
 let behaviour = {};
 
+// The service marks a failure it means to be shown, with its status.
+function said(message) {
+  return Object.assign(new Error(message), { status: 400, expose: true });
+}
+
 openai.generateImage = async ({ model, n, prompt }) => {
   const started = Date.now();
   calls.push({ model, n, prompt, started });
@@ -30,10 +35,10 @@ openai.generateImage = async ({ model, n, prompt }) => {
   const rule = behaviour[model] || {};
   await new Promise((resolve) => setTimeout(resolve, rule.delay || 20));
 
-  if (rule.fail) throw new Error(rule.message || `${model} said no`);
+  if (rule.fail) throw said(rule.message || `${model} said no`);
   if (rule.failOnce) {
     rule.failOnce = false;
-    throw new Error(`${model} said no`);
+    throw said(`${model} said no`);
   }
 
   return {

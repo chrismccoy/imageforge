@@ -275,7 +275,7 @@ test("usage and cost keep counting a trashed image", () => {
   Generation.trash(id);
 
   assert.deepEqual(Stats.byModel(), before);
-  assert.equal(Stats.total(), 1);
+  assert.equal(Stats.total(), 0, "the image count leaves the trash out");
 });
 
 test("usage and cost survive purging an image, not just trashing it", () => {
@@ -506,7 +506,12 @@ test("emptying the trash asks first, then takes everything in it", async () => {
     assert.match(await asked.text(), /2/, "it says how many first");
     assert.equal(Generation.trashed().length, 2, "and has not done it yet");
 
-    await post(app.base, "/trash/empty", cookie, { _csrf: csrf, confirm: "1" });
+    await post(app.base, "/trash/empty", cookie, [
+      ["_csrf", csrf],
+      ["confirm", "1"],
+      ["ids", String(one)],
+      ["ids", String(two)],
+    ]);
     assert.equal(Generation.trashed().length, 0);
     assert.ok(Generation.get(live), "a live image is untouched");
   } finally {

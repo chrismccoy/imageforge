@@ -72,11 +72,16 @@ function decrypt(stored, key = envKey()) {
   if (!isEncrypted(stored)) throw new Error("Not an encrypted value.");
 
   const raw = Buffer.from(stored.slice(PREFIX.length), "base64");
+  if (raw.length < IV_BYTES + TAG_BYTES) {
+    throw new Error("Not an encrypted value.");
+  }
   const iv = raw.subarray(0, IV_BYTES);
   const tag = raw.subarray(IV_BYTES, IV_BYTES + TAG_BYTES);
   const ct = raw.subarray(IV_BYTES + TAG_BYTES);
 
-  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv, {
+    authTagLength: TAG_BYTES,
+  });
   decipher.setAuthTag(tag);
   return Buffer.concat([decipher.update(ct), decipher.final()]).toString("utf8");
 }

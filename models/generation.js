@@ -41,7 +41,9 @@ module.exports = (db) => {
        )`
     ),
     remove: db.prepare("DELETE FROM generations WHERE id = ?"),
-    trash: db.prepare("UPDATE generations SET deleted_at = ? WHERE id = ?"),
+    trash: db.prepare(
+      "UPDATE generations SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL"
+    ),
     restore: db.prepare("UPDATE generations SET deleted_at = NULL WHERE id = ?"),
     // Whether or not it is in the trash, for restore and purge to work on.
     getAnyState: db.prepare("SELECT * FROM generations WHERE id = ?"),
@@ -228,7 +230,7 @@ module.exports = (db) => {
     },
 
     /**
-     * Move an image to the trash.
+     * Move a live image to the trash. Reports whether it moved.
      */
     trash(id) {
       return stmts.trash.run(new Date().toISOString(), id).changes > 0;
@@ -318,7 +320,7 @@ module.exports = (db) => {
     /**
      * Give a saved image a share token, reseeding when the random value is
      * already taken. The unique index turns a collision into a retry rather
-     * than a silently shared link.
+     * than a silently shared link. Null when there is no such image.
      */
     share(id, makeToken, attempts) {
       return allocateToken(

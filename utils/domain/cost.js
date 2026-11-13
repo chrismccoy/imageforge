@@ -50,7 +50,10 @@ function formatCost(value) {
     return null;
   }
   if (value === 0) return "$0.00";
-  return "$" + value.toFixed(value < 1 ? PLACES_UNDER_A_DOLLAR : PLACES);
+
+  const fine = value.toFixed(PLACES_UNDER_A_DOLLAR);
+  if (Number(fine) === 0) return "<$0.001";
+  return "$" + (Number(fine) < 1 ? fine : value.toFixed(PLACES));
 }
 
 /**

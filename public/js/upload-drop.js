@@ -177,6 +177,21 @@
     if (files && files.length) accept(files);
   });
 
+  // The hidden input cannot show its own "required" prompt, so ask here.
+  const form = input.form || (field.closest && field.closest("form"));
+  if (form && input.required) {
+    input.required = false;
+    form.addEventListener("submit", function (event) {
+      if (input.files && input.files.length) return;
+      event.preventDefault();
+      if (errorOut) {
+        errorOut.textContent = "Choose at least one image to upload.";
+        show(errorOut, true);
+      }
+      zone.focus();
+    });
+  }
+
   show(plain, false);
   show(zone, true);
 })();

@@ -91,7 +91,7 @@ module.exports = (deps) => {
         log.error("Could not import prompts:", err.message);
         return renderBackup(res, {
           importError: "The import failed. Nothing was imported.",
-          status: 400,
+          status: 500,
         });
       }
 

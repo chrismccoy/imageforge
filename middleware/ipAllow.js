@@ -12,11 +12,18 @@ const { denied } = require("../utils/http/pages");
 const { toTrimmedString } = require("../utils/domain/coerce");
 
 /**
- * Strip the IPv4 in IPv6 prefix
+ * Lowercase, strip the IPv4 in IPv6 prefix, and write IPv6 in its short form.
  */
 function normalize(ip) {
-  let out = toTrimmedString(ip);
-  if (out.startsWith("::ffff:")) out = out.slice(7);
+  let out = toTrimmedString(ip).toLowerCase();
+  if (out.startsWith("::ffff:") && out.includes(".")) out = out.slice(7);
+  if (out.includes(":")) {
+    try {
+      out = new URL(`http://[${out}]/`).hostname.slice(1, -1);
+    } catch {
+      // not an IPv6 address, compared as written
+    }
+  }
   return out;
 }
 

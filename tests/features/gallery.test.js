@@ -38,14 +38,21 @@ test("the gallery view is named in the view table", () => {
   assert.equal(VIEWS.GALLERY, "gallery");
 });
 
-test("a gallery without public sharing is a startup error", () => {
+test("a gallery without public sharing is a startup warning", () => {
   process.env.PUBLIC_GALLERY = "true";
   process.env.PUBLIC_SHARE = "";
   try {
-    const problems = freshEnv().configProblems();
+    const fresh = freshEnv();
     assert.ok(
-      problems.some((m) => /PUBLIC_GALLERY requires PUBLIC_SHARE/.test(m)),
+      fresh
+        .configWarnings()
+        .some((m) => /PUBLIC_GALLERY requires PUBLIC_SHARE/.test(m)),
       "the combination should be reported"
+    );
+    assert.equal(
+      fresh.configProblems().some((m) => /PUBLIC_GALLERY/.test(m)),
+      false,
+      "the Settings page may still turn sharing on, so it is not refused"
     );
   } finally {
     process.env.PUBLIC_GALLERY = "";

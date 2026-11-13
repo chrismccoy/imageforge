@@ -19,15 +19,27 @@ function notFoundHandler(req, res) {
 }
 
 /**
+ * The error's own HTTP status when it is a 4xx or 5xx, else 500.
+ */
+function statusOf(err) {
+  const status = err && err.status;
+  return Number.isInteger(status) && status >= 400 && status <= 599 ? status : 500;
+}
+
+/**
  * Build the handler for any error thrown while serving a request.
  */
 function createErrorHandler({ log = console } = {}) {
   return function errorHandler(err, req, res, next) {
-    log.error("Unhandled error:", err && err.stack ? err.stack : err);
+    const status = statusOf(err);
+    if (status < 500) {
+      log.warn(`Request error ${status}:`, err.message);
+    } else {
+      log.error("Unhandled error:", err && err.stack ? err.stack : err);
+    }
     if (res.headersSent) {
       return next(err);
     }
-    const status = err && err.status ? err.status : 500;
     const message = err && err.expose ? err.message : "Server error.";
     return respond(req, res, {
       status,

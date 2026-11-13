@@ -46,7 +46,7 @@ module.exports = (deps) => {
      * File every checked image under one collection.
      */
     bulkCollect(req, res) {
-      const ids = idList(req.body, "ids");
+      const ids = idList(req.body, "ids").filter((id) => Generation.get(id));
       const collectionId = parseId(field(req.body, "collectionId"));
 
       if (ids.length && collectionId && Collection.get(collectionId)) {

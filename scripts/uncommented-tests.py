@@ -1,7 +1,7 @@
 """List tests with no comment immediately above them."""
 import re, sys, pathlib
 
-files = sorted(pathlib.Path("tests").glob("*.test.js"))
+files = sorted(pathlib.Path("tests").rglob("*.test.js"))
 total = missing = 0
 report = {}
 
@@ -20,7 +20,7 @@ for f in files:
         if not (above.startswith("//") or above.startswith("*") or above.startswith("*/")):
             gaps.append((i + 1, line.strip()[:72]))
     if gaps:
-        report[f.name] = gaps
+        report[str(f.relative_to("tests"))] = gaps
         missing += len(gaps)
 
 for name, gaps in sorted(report.items(), key=lambda kv: -len(kv[1])):

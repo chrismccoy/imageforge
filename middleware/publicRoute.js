@@ -31,14 +31,45 @@ function publicLimiter(limits, message = BUSY) {
   });
 }
 
+// A page shows many images, so the image and file routes get more room than the pages.
+const IMAGES_PER_PAGE_VIEW = 10;
+
 /**
- * The pair of limiters
+ * The limits for the images behind the public pages.
+ */
+function imageRate(rate) {
+  return (
+    rate.shareImage || {
+      windowMs: rate.share.windowMs,
+      max: rate.share.max * IMAGES_PER_PAGE_VIEW,
+    }
+  );
+}
+
+/**
+ * The limiter for the images and files behind the public pages.
+ */
+function imageLimiter(rate) {
+  return publicLimiter(imageRate(rate));
+}
+
+/**
+ * The page, image and zip limiters
  */
 function shareLimiters(rate) {
   return {
     limiter: publicLimiter(rate.share),
+    imageLimiter: imageLimiter(rate),
     zipLimiter: publicLimiter(rate.shareZip, BUSY_ZIP),
   };
 }
 
-module.exports = { publicGate, publicLimiter, shareLimiters, BUSY, BUSY_ZIP };
+module.exports = {
+  publicGate,
+  publicLimiter,
+  imageLimiter,
+  imageRate,
+  shareLimiters,
+  BUSY,
+  BUSY_ZIP,
+};

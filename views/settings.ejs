@@ -72,6 +72,12 @@
               Paste a new key here to replace a revoked one — takes effect immediately, no restart.
             </p>
           </div>
+          <% if (hasStoredKey) { %>
+            <label class="flex items-center gap-2 text-sm text-slate-700">
+              <input type="checkbox" name="clear_api_key" value="on" />
+              Remove the stored key<%= envFallback ? ' and use the OPENAI_API_KEY environment variable' : '' %>
+            </label>
+          <% } %>
           <% if (envFallback && !hasStoredKey) { %>
             <div class="notice notice-info mb-0">
               <%- include('partials/icon', { name: 'fa-solid fa-circle-info' }) %>
@@ -107,6 +113,6 @@
   </div>
 </div>
 
-<%- include('partials/page-scripts', { scripts: ['copy-link'] }) %>
+<%- include('partials/page-scripts', { scripts: ['ui', 'copy-link'] }) %>
 
 <%- include('partials/chrome-foot') %>

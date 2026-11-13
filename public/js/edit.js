@@ -30,11 +30,14 @@
     extendStroke,
     maskOps,
     looksTransparent,
+    paints,
+    hasCover,
     drawStrokes,
     MASK_COLOUR,
   } = tools;
 
   const GENERIC_ERR = api.GENERIC_ERR;
+  const ASPECT_SLACK = 0.01;
 
   const el = (id) => document.getElementById(id);
 
@@ -217,6 +220,7 @@
   }
 
   mask.addEventListener("pointerdown", function (event) {
+    if (event.button !== 0) return;
     if (event.pointerType === "touch") {
       if (noteTouch(touches, event)) {
         abandonStroke();
@@ -324,12 +328,16 @@
   }
 
   /**
-   * Whether anything has been brushed at all.
+   * Whether anything is left painted once the eraser has had its say.
    */
   function hasMask() {
-    return strokes.some(function (item) {
-      return item.points.length > 0;
-    });
+    if (!strokes.some(paints)) return false;
+    if (!strokes.some((item) => item.erase)) return true;
+
+    const layer = drawStrokes(strokes, { width: mask.width, height: mask.height });
+    return hasCover(
+      layer.getContext("2d").getImageData(0, 0, layer.width, layer.height)
+    );
   }
 
   /**
@@ -439,7 +447,18 @@
    * The result and the picture it was made from
    */
   function flattenOnto(canvas) {
+    const across = source.naturalWidth || source.width;
+    const down = source.naturalHeight || source.height;
+    if (
+      !across ||
+      !down ||
+      Math.abs(across / down - canvas.width / canvas.height) > ASPECT_SLACK
+    ) {
+      return Promise.resolve(null);
+    }
+
     const into = canvas.getContext("2d");
+    into.clearRect(0, 0, canvas.width, canvas.height);
     into.drawImage(source, 0, 0, canvas.width, canvas.height);
     into.drawImage(edited, 0, 0, canvas.width, canvas.height);
 

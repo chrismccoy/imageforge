@@ -13,8 +13,7 @@ const { SESSION_MAX_AGE_MS } = require("../config/limits");
  * Build the session middleware for the given database connection.
  */
 function createSessionMiddleware(db, { secure } = {}) {
-  const secureCookie =
-    secure === undefined ? env.TRUST_PROXY || env.IS_PRODUCTION : secure;
+  const secureCookie = secure === undefined ? env.IS_PRODUCTION : secure;
   const store = new SqliteSessionStore(db);
   const middleware = session({
     store,

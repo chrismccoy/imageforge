@@ -75,16 +75,16 @@ test("putBack keeps the stated deadline and refuses a passed one", () => {
   held.close();
 });
 
-test("putBack does not make room", () => {
+test("putBack makes room by dropping the oldest", () => {
   const held = store({ max: 2 });
   held.add("a", 1);
   held.add("b", 2);
 
   held.putBack("c", 3, Date.now() + 5_000);
 
-  assert.equal(held.get("a").value, 1, "nothing was dropped for it");
+  assert.equal(held.get("a"), null, "the oldest was dropped for it");
   assert.equal(held.get("c").value, 3);
-  assert.equal(held.size, 3);
+  assert.equal(held.size, 2);
 
   held.close();
 });

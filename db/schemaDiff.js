@@ -23,6 +23,19 @@ function columns(db, table) {
 }
 
 /**
+ * The statement that adds a column as `want` declares it. SQLite adds a
+ * NOT NULL column only with a default, so NOT NULL comes with one.
+ */
+function addColumn(table, column) {
+  const hasDefault = column.dflt_value !== null;
+  const parts = [`ALTER TABLE ${table} ADD COLUMN ${column.name}`];
+  if (column.type) parts.push(column.type);
+  if (column.notnull && hasDefault) parts.push("NOT NULL");
+  if (hasDefault) parts.push(`DEFAULT ${column.dflt_value}`);
+  return `${parts.join(" ")};`;
+}
+
+/**
  * What `live` is missing that `want` has.
  */
 function gapsBetween(want, live) {
@@ -41,7 +54,7 @@ function gapsBetween(want, live) {
       gaps.push({
         kind: "column",
         table,
-        sql: `ALTER TABLE ${table} ADD COLUMN ${column.name} ${column.type};`,
+        sql: addColumn(table, column),
       });
     }
   }

@@ -17,6 +17,7 @@ function buildNamedListController({
   title,
   active,
   taken,
+  blank = "Give it a name.",
   locals = () => ({}),
 }) {
   /**
@@ -43,6 +44,7 @@ function buildNamedListController({
      */
     create(req, res) {
       const name = field(req.body, "name");
+      if (!name) return renderList(res, { error: blank, status: 400 });
       if (!list.add(name, new Date().toISOString())) {
         return renderList(res, { error: taken, status: 400 });
       }
@@ -57,6 +59,7 @@ function buildNamedListController({
       const name = field(req.body, "name");
 
       if (!id || !list.get(id)) return res.redirect(path);
+      if (!name) return renderList(res, { error: blank, status: 400 });
       if (!list.rename(id, name)) {
         return renderList(res, { error: taken, status: 400 });
       }

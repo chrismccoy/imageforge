@@ -127,6 +127,30 @@ window.ImageForgeEditStrokes = (function () {
     return seen > 0 && clear / seen > TRANSPARENT_ENOUGH;
   }
 
+  /**
+   * Whether a stroke adds paint with any area to the layer.
+   */
+  function paints(stroke) {
+    if (stroke.erase || !stroke.points.length) return false;
+    if (stroke.kind === "brush") return stroke.width > 0;
+
+    const first = stroke.points[0];
+    const last = stroke.points[stroke.points.length - 1];
+    const box = rectFrom(first, last);
+    return box.width > 0 && box.height > 0;
+  }
+
+  /**
+   * Whether any pixel of a layer is painted.
+   */
+  function hasCover(pixels) {
+    const data = (pixels && pixels.data) || [];
+    for (let at = 3; at < data.length; at += 4) {
+      if (data[at] > 0) return true;
+    }
+    return false;
+  }
+
   const MASK_COLOUR = "#0f172a";
 
   /**
@@ -208,6 +232,8 @@ window.ImageForgeEditStrokes = (function () {
     strokeOps,
     maskOps,
     looksTransparent,
+    paints,
+    hasCover,
     drawStrokes,
     MASK_COLOUR,
   };

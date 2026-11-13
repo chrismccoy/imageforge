@@ -270,4 +270,4 @@ Generate images from prompts, right from a simple admin dashboard. Type what you
 - On a live setup the app will not start until you have set the password and its two secret keys, so it never runs unprotected
 - If it is set up wrong for the proxy web server, the log will notify you as the blocking of other addresses is required a valid setup
 - Run it over a secure connection and your login is only ever sent over that connection
-- Set it up behind a web server such as nginx and it still knows where a visitor really came from
+- Set it up behind a web server such as nginx and set `TRUST_PROXY` (true trusts one proxy, or give the number of proxies or their addresses), and it still knows where a visitor really came from
