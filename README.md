@@ -1,239 +1,152 @@
 # Image Forge
 
-Generate images from prompts, right from a simple admin dashboard. Type what you want, pick a size, and get an image back from OpenAI. Save the prompts you like and reuse them later.
+This is a private web dashboard for generating images from prompts with OpenAI's image models. It is built for one owner who wants to generate, edit, organise and share images in one place, while keeping track of what each image cost. It needs your own OpenAI account and API key.
 
-## Features
+## Creating Images
 
-### Generating images
+- Type a prompt and get an image back.
+- Choose from three image models: gpt-image-2, 2.6 Sunburst and 2.6 Flare.
+- Pick a square, portrait or landscape size, or let the service choose.
+- Generate one, two or four images at once from the same prompt.
+- Compare the models side by side with one prompt, getting four images labelled by model, including a second one from the model you picked.
+- If one model fails during a comparison you still get the others, with a note saying which one failed.
+- Preview every result before deciding to save it.
+- Keep only the images you like from a batch and discard the rest.
+- Write reusable prompts with variables in curly or square brackets, and type the missing words into their own boxes.
+- Start from a saved prompt and have its preferred size and model chosen for you.
+- See a live character count as you type.
+- Generate an image again from any saved image, with its prompt, size and model already filled in.
+- See a clear notice, and a disabled Generate button, until an API key is set.
+- Get a plain message when your OpenAI account is out of credits or is busy.
+- See how long each image took to generate.
 
-- Type a few words and get an image back
-- Pick the image size you want
-- Let the service pick a size for you with the auto option
-- Choose which image model to use: 2, 2.6 Sunburst or 2.6 Flare
-- Choose the model on the Generate page, not just in Settings
-- See the generated image first, before you save it
-- See how long your prompt is as you type it, under the box
-- The count follows a prompt filled in from a saved one, and its variables, not only what you type
-- Generate one, two or four images at a time from the same prompt
-- Put the same prompt to every model at once and see the results side by side, each labelled with which model it came from
-- Comparing is one picture from each model and a second from the selected model, so it always counts as four generations
-- The four run at the same time rather than one after the other, so comparing takes as long as generating once
-- If one model fails you still get the others, and the page says which one did not generate
-- Compare a batch of four side by side and keep any of them, or none
-- Watch a spinner while your image is being generated
-- Until you have set your OpenAI key the Generate button is switched off, with a notice telling you why
-- An image you have not saved yet is held for ten minutes then it expires
-- Download an image to your device before you save it
-- Regenerate from any saved image, with its prompt, size and model already filled in
-- Generate again in one click once a result comes back
+## Sharing and Public Pages
 
-### Editing images
+- Share a single image with a link to its own page or straight to the image, off by default.
+- Share a whole collection under a public title, so its private name is never shown, off by default.
+- Share all of your favourites through one link, off by default.
+- Show every shared image in a public gallery, off by default.
+- Let visitors page through a shared set, step to the previous or next image, and download one image or a zip of the whole set.
+- Show the prompt, model, size, date, cost and generation time on shared pages, with buttons to copy the prompt or the link.
+- Show an image preview when a shared link is pasted into chat apps and social sites.
+- Turn on custom links that put part of the prompt in the address, off by default.
+- Stop sharing at any time, which breaks every copy of that link.
+- Ask search engines not to list any shared page.
+- Remove trashed images from shared pages and bring them back if they are restored.
+- Show a public page of screenshots of every screen in the app, with no sign in needed.
+- Open any screenshot full size and move through the rest with the arrow keys or a strip of thumbnails.
 
-- Edit a saved image: brush over part of it, say what should be there, and get a new image back
-- Crop any saved image: drag a box over it, freehand or locked to one of the shapes the app generates at
-- A crop costs no credits, because nothing is sent for generation, and it is saved as a new image keeping the one you cropped
-- The crop shows the size it will be in the picture's own pixels while you drag
-- Everywhere you did not brush stays exactly as it was, and the new version appears right where the old one was, not below it
-- Undo your last brush stroke, or wipe the whole painted area and begin again
-- Make the brush wider or narrower, to mark small or large areas
-- Mark an area with a box or an oval instead of the brush, for anything with straight edges or a clean curve
-- Rub out part of what you painted with the eraser, without undoing a whole stroke
-- Each tool says what it does as you pick it, the area you brushed, the box you drew, the oval you drew
-- Invert what you marked, to change everything except the part you painted
-- Inverting is only a way of reading what you painted, so it can be switched on and off and your painting stays
-- Zoom in to 100, 200 or 400 per cent while you brush, to reach small details
-- The brush stays the size you see on screen, so at 400 per cent it paints four times finer on the picture itself
-- Scroll the box to move around a picture you have zoomed into, and zooming keeps whatever you were looking at in the middle
-- On a touch screen one finger paints and two fingers move the picture
-- See how long your description is as you type it
-- Compare a fresh edit against the image you started from, with a slider for before and after, if you decide whether to keep it
-- Come back to the brush after an edit and your painting is still there, ready for a second try
-- If the service hands back an edit with gaps, the missing parts are filled in from the picture you started with before it is saved
-- Every edit is saved as a new image, and it keeps a note of which image it came from
-- Click an edit and it is put on top of the original, and drag a slider between them for before and after
-- The slider is the comparison: the original on its left, the edit on its right
-- The image you started from is kept, so a bad edit doesn't affect the original
+## Prompt Library
 
-### Uploading your own images
+- Save prompts with a name, category, preferred size, preferred model and private notes.
+- Rate prompts from one to five stars, and click the current rating again to clear it.
+- Pin prompts to the top of the list and of the Generate menu.
+- Search prompts by name, text or notes, and filter by category or by uncategorised.
+- Sort prompts by name or by rating, with a Top rated shortcut in the menu.
+- See how many images each prompt has made and jump straight to them.
+- Duplicate a prompt as the starting point for a new one.
+- See up to four images made from a prompt on its edit page.
+- Organise prompts into categories that you can add, rename and delete, and deleting a category keeps its prompts.
+- Delete several prompts at once while keeping the images made from them.
+- Export your prompts to a file and import them elsewhere, with prompts whose names already exist skipped and listed.
 
-- Upload an image from your own device, not only ones you generate here
-- Upload up to ten at once, and give them all the same prompt, model and size at the same time
-- Drag images straight onto the upload page, with a preview of each one before it is saved
-- A dropped file that is not a PNG, JPEG or WebP, or is too big, is refused before it is sent, and named so you know which
-- One bad file in a batch does not fail the whole upload: the page says what saved and what did not
-- Assign an upload to a saved prompt, or type the prompt it came from
-- Say what size an uploaded image is
-- Say which model made it, picked from the same list the Generate page uses
-- A file over 10 MB is refused, with a notice
-- Uploads are checked by what is really inside the file, so only PNG, JPEG and WebP go through
+## Editing and Cropping
 
-### Saved prompts
+- Paint over part of an image and describe what should be there instead.
+- Mark the area with a brush, box, oval or eraser, and change the brush size.
+- Invert the marked area, undo the last stroke, or clear everything.
+- Zoom in up to four times and move around the image while marking.
+- Paint with one finger and move around with two on touch screens.
+- Compare an edit with the original using a sliding before and after view.
+- Go back to the brush to try again without losing your marks.
+- Crop freely or to a fixed shape, with a live readout of the size in pixels and no charge from OpenAI.
+- Save every edit and crop as a new image, keeping the original.
+- See which image an edit came from and open the before and after comparison later.
 
-- Save prompts you like and reuse them later
-- Pick a saved prompt from a drop down list, or type your own when generating images
-- Edit a saved prompt any time on its own page
-- See how long a prompt is while you write it
-- Copy a prompt as the starting point for a new one, and nothing is saved until you say so
-- Editing a prompt shows what it has made: its rating, the newest images generated from it, and whether it is pinned, all changeable from that page
-- A copy of a prompt is named after the one it came from, with its own rating left blank
-- Save a size and a model along with a prompt, and both are filled in for you when you choose it
-- Write a prompt with variables in it, like {city} or [mood], and fill them in when you generate
-- Both kinds of variable types work, so a prompt you copied from somewhere else needs no rewriting
-- A blank you did not fill stays visible in the prompt, so you can see what is missing
-- See your prompts in a table with the title and the full prompt text
-- A long prompt is trimmed to three lines in the table, with a Show Prompt button for the whole thing
-- See how many images you have generated from each prompt
-- Click a prompt's image count to see everything made from it
-- Read your prompts a page at a time, as many per page as you set in Settings
-- Put your prompts into categories, and view them one category at a time
-- Delete a category and its prompts dont get deleted, just assigned uncategorised
-- Rate a prompt one to five stars straight from the list, and sort by rating
-- Pin the prompts you use most, and they sit at the top of the list however it is sorted
-- Pinned prompts come first in the drop down on the Generate page, so the one you always use is the one you see first
-- A pinned prompt jumps to the top the moment you pin it, with no reloading, and keeps your search and your place in the list
-- Unpin one and it drops back to where it belongs in the order, rather than to the end
-- A pin stays with this install: it is not carried with an export
-- Keep a note on a prompt, and find it again by searching what you wrote
-- Select several prompts to delete them together, and the images they made are kept
-- Delete a prompt and the images you generated from that prompt won't be deleted
+## Your Image Library
 
-### Moving prompts between installs
+- Browse saved images in a grid or a list, and the app remembers your choice.
+- Search images by their prompt from any page.
+- Filter by collection, by images in no collection, by favourites, or by the prompt that made them.
+- See the model, size, usage, cost and generation time on each image.
+- Read, copy or correct the prompt of one image in a pop up without changing the saved prompt it came from.
+- Select several images to download as a zip, add to a collection, or delete.
+- Download one image, or every image as a zip.
+- Upload up to ten PNG, JPEG or WebP images at once by dragging them in, and record a prompt, model and size for them.
+- See which uploaded images were saved and why any were refused.
+- Get a helpful message and a next step whenever a page has nothing to show.
 
-- Import and export are on their own page, from the sidebar or the prompts page
-- Export every saved prompt to a single file, with its category and rating
-- Import that file back on another install, or after a reinstall
-- Importing never overwrites a prompt you already have: any with the same name are ignored, and you are notified which are skipped
-- A file holding more than a thousand prompts is refused, and so is one that is simply too big, before anything is stored
-- If one prompt in the file is broken it is skipped and counted, and the rest still get imported
+## Trash, Storage and Backups
 
-### Browsing your images
+- Send deleted images to a trash where you can restore them or delete them for good.
+- Empty the whole trash in one step after confirming.
+- Stop new saves when a storage limit is reached, 500 MB unless changed, with a hint to empty the trash.
+- Confirm on a separate page, listing every item, before deleting several things at once.
+- Create, download and delete full backups of your images and data from the Backup page.
+- Leave your OpenAI key and sign in sessions out of every backup.
+- Restore a backup from the command line, which saves a safety copy of your current data first.
+- Check the database when the app starts and list exactly what to fix if anything is missing.
 
-- Browse all your generated images in one place
-- Switch between a grid of pictures and a list that shows each prompt beside its image
-- The layout(list,grid) you pick is saved into localstorage, and stays as you search and page through
-- See your generated images a page at a time, with Previous and Next
-- Set how many images a page shows in Settings, or leave it to the value you set up at install
-- Search your images by keywords, and your prompts by their title or their text
-- The search stays as you page through the results, and Clear resets the results
-- See the prompt an image was made from, in a pop-up on its card
-- Copy an image's prompt to your clipboard with one click
-- Edit an image's prompt in that same pop-up, without leaving the page you are on
-- An edited prompt is what the list searches next, and the card updates without a reload
-- Download any saved image with one click
-- Download all your generated images at once, as a zip file
-- Press Select to reveal the checkboxes, so a list you are reading is not covered in controls
-- Select several images to delete them together, or download just those as a zip
-- Deleting a batch always asks first and names exactly what it is about to remove
-- Delete a generated image or prompt with a quick confirm, right where you are
+## Settings and Administration
 
-### Favourites
+- Choose the default model, the default size and how many items appear on each page.
+- Save your OpenAI API key, shown masked, or remove it.
+- Turn each public sharing feature on or off.
+- Enter OpenAI's prices for each model so the app can work out what images cost.
+- Rename the app, choose its icon with a live preview, and show or hide the "Made with" credit on public pages.
+- See who is signed in, how many addresses are allowed in, and whether the app is behind a proxy.
+- Point the app at another service that works like OpenAI's.
+- Check that the app is running from an uptime monitor with a simple health address.
 
-- Star any generated image and filter the list down to just your favourites
-- The star saves straight away without reloading the page, and works alongside a search
-- Favourites and Top rated have their own sidebar entries
-- Share every image you have starred on one link, whether or not each one is shared on its own
-- Removing a favourite takes an image off the favourites page at once, and turning the link off kills every share for the favourites page
-- The favourites link is shown on the public gallery, only shown to you when you are signed in
-- Whoever has the favourites link can view all the favourites, and download them as a zip, as favourites-2026-08-23.zip
+## Security and Privacy
 
-### Collections
+- Sign in as the single administrator, and stay signed in for up to seven days, even across restarts.
+- Allow in only your own device and the addresses you list.
+- Slow down repeated sign in attempts and bursts of requests.
+- Protect every form against requests forged by other websites.
+- Store your OpenAI key encrypted.
+- Check uploaded files by their contents, not their names.
+- Refuse to start in production without a password, a session secret and an encryption key.
 
-- Group images into collections and set a title
-- Click a collection's image count to see what is in it
-- Add an image to a collection from its card, or choose several and add them all at once
-- Filter the generations page to one collection, or to the images in none
-- Share a whole collection on one link, under a public title, so the name you use for it stays private
-- A shared collection shows its images, and each opens a page with the prompt and a download
-- Download a whole shared collection as a zip
-- Un-share a collection and every link under it stops working at once
-- Wherever you add images to a collection, the shared ones are marked, so you know when adding one puts it in public view
-- A collection you have not shared stays private, and is never named on the gallery or on a shared link
+## Dashboard and Spending
 
-### Sharing single images
+- See your total images, how many were made this week, your favourites and your storage use at a glance.
+- Track estimated spend for each model, based on the prices you enter.
+- View a bar chart of images made each day over the last 30 days, with daily cost.
+- See your recent images, top rated and most used prompts, and largest collections.
+- Click a recent image to generate it again.
+- See counts for each section and how much storage is left in the sidebar.
 
-- Send any saved image to someone with no account here, by copying a link to it or the address of the picture itself
-- A share link never gives away where the file sits on your machine; it uses an address of random characters instead
-- Share links are short, about a dozen characters
-- There are two kinds of link: /s/k3f9Qa72vX opens a page about the image, and /i/k3f9Qa72vX.png is just the image
-- The image link is the one to paste into a chat or a forum post, and it ends in the picture's own extension, because some chat rooms and forums only show a link that looks like a picture
-- Image links given out without the extension on the end, still work
-- Turn on Descriptive links in Settings and the address picks up the start of the prompt, like /s/a-blue-sky-k3f9Qa72vX and /i/a-blue-sky-k3f9Qa72vX.png
-- Open one image inside a shared collection or the favourites link and you can step through the rest with Previous and Next, without going back to the grid each time
-- Links you have already given out keep working
-- Remove a share with Unshare, and every copy of that link stops working
-- A shared link opens a page with the image, the prompt, the model, the size and the date
-- Paste a page link into a chat room or a forum and it shows a preview card with the picture and the prompt, rather than a bare address
-- Whoever you send it to can copy that prompt or download the image, without an account
-- The shared page also shows what the image cost to make, so the person you sent it to can see what one like it would cost them
-- The cost only appears for a model you have priced
-- Every generated or edited image records how long OpenAI took to generate it, shown on its card and on the shared page
-- Images saved before this, uploads and crops have no duration, so it shows nothing
-- Every image in your list shows whether it is currently shared
+## Collections and Favourites
 
-### The public gallery
+- Group images into named collections that you can rename or delete without losing any images.
+- Add an image to a collection from its card, or remove it with one click.
+- Star images as favourites and view them on their own page.
+- See how many images are in each collection and open them as a filtered list.
+- Spot which collections are shared, marked in every collection picker.
 
-- The gallery is one page holding every image you have shared, so you can give out a link
-- It opens in its own tab, since it is the page your visitors see and not part of the admin
-- It has Previous and Next as well, and shows the same number per page as everywhere else
-- You can look at it yourself from the sidebar at any time, even when it is switched off to everyone else
-- Turn public sharing on and off in Settings, so your links only work while you want them to
-- The gallery has a switch of its own in Settings, on or off whenever you like
-- Shared collections and the favourites link have their own switches too, so you can publish one kind of link and keep the others private
-- The gallery only works with public sharing on as well, and Settings tells you so instead of leaving you with a page of dead links
-- Any switch you never touch keeps the choice you made at install, so a new copy starts out the way you set it up
-- Shared pages and the gallery have noindex to avoid being crawled
-- Preview cards work on shared pages: noindex tells not to crawl them
-- Every public page: a shared image, a shared collection, the favourites link, the gallery, the login page shares the app's own design: the same fonts, colours and icons, just without the sidebar and the rest of the admin's design
-- Whoever has a share link sees no navigation they cannot follow: there is no dashboard link, no sidebar, nothing pointing at a page they dont have access too. Signed in, that same page adds a dashboard link
+## Phones and Accessibility
 
-### The screenshots
+- Use the app on phones and tablets, with a scrolling menu in place of the sidebar.
+- Hear labels for buttons, sliders and switches, and status messages, with a screen reader.
+- Close pop ups with the Escape key or by clicking outside them.
 
-- `/screenshots` shows all items of the app: screenshots of every page of the application, dashboard and public pages
-- Click any image to open it full size, then scroll through the rest with the arrow keys or the strip of thumbnails at the bottom
-- Screenshots URL needs no login
+## Setup
 
-### Dashboard
+1. Install the dependencies with `npm install`.
+2. Copy `.env.example` to `.env`.
+3. In `.env`, set `SESSION_SECRET`, `ADMIN_PASSWORD` and `SETTINGS_ENC_KEY`. Generate each secret with `openssl rand -hex 32`.
+4. Add other machines to `ALLOWED_IPS`. Left blank, only this machine can reach the app.
+5. Start the app with `npm start` and open `http://localhost:3000` (or the `PORT` you set).
+6. Sign in and save your OpenAI API key on the Settings page, or set `OPENAI_API_KEY` in `.env`.
 
-- The sidebar groups its links: Main, Library, Public, System, etc and each one that has a count is shown in the sidebar
-- The dashboard has recent images, spend, storage, favourites and your most used prompts
-- It also lists your largest collections, marking the ones that are shared publicly
-- A chart on the dashboard shows the last thirty days of output, a bar per day including the low activity days, showing the day and its count on hover
-- The old /stats url still works and takes you to the dashboard
-- Every icon on the page is using Font Awesome
+For a live setup, set `NODE_ENV=production` and serve the app over HTTPS. Behind a web server such as nginx, also set `TRUST_PROXY`. The stylesheet is already built; run `npm run build` only if you change the styles.
 
-### What it costs
+When upgrading an older library, the app checks the database on startup. If columns are missing, it refuses to start and prints the SQL to run. `node scripts/schema-gaps.js` lists the same thing without starting the app.
 
-- Every image records what OpenAI charged for it, counted in tokens, shown on its card and on the shared page
-- Images you uploaded have no token count
-- Enter what you pay per million tokens in Settings, and every image will show what it cost you
-- The dashboard keeps the running totals: images made this week, the cost of each model, and the space you are using
-- Lifetime spend is everything you have paid since the day you started.
-- A cost is only shown when you have entered a price for that model and the image has a token count.
+## Configuration
 
-### Storage
-
-- You can see how much of your 500 MB has gone at any time, and saving stops once you reach it instead of using up space
-- When there is no room left the app says so, and asks you to clear some space
-- If the trash is filled it up, a message tells you how many images are waiting in there
-- Everything stays on your own machine in one small file; the only thing that leaves it is the call to OpenAI
-
-### Trash
-
-- Deleting moves an image to the trash instead of deleting it
-- Restore from the trash and it comes back exactly as it was, including its share link
-- A trashed image stops being reachable at once: its link stops working and it leaves any shared collection
-- Nothing is gone for good until you empty the trash yourself
-- The trash page shows how much space its images are taking up, so you know what emptying it would give you back
-
-### Backup and restore
-
-- Back up the whole install to one zip with `node scripts/backup.js`: every image, all your prompts in a form you can read, and the record that ties them together
-- Make a backup from the Backup page: create it, download it, and delete old ones you no longer need
-- A backup holds no settings file and no OpenAI key, so it is safe to keep on any device
-- Restore a backup with `node scripts/restore.js <file>.zip`, make sure to run with the app stopped
-- Restoring is done with the CLI tool. It clears deletes everything you have and restores the backup that was created
-- Restore checks the file first and doesnt allow anything it cannot use, whether it is the wrong sort of file, one from a newer version, or one with something missing, before it changes a thing
-- Before starting the app on an older library, run `node scripts/schema-gaps.js` to see if anything is missing from it
+Every option is described in `.env.example`.
 
 ### Settings and your OpenAI key
 
@@ -246,17 +159,6 @@ Generate images from prompts, right from a simple admin dashboard. Type what you
 - Settings shows how full your storage is
 - It also shows who you are signed in as, how many addresses are on your IP allow list, and whether the app is trusting a proxy
 
-### Authenticating
-
-- Log in with a username and password you set
-- Locked behind a login, only you can get in
-- Log out any time from the sidebar
-- Your login lasts a week, then asks again
-- A wrong username and a wrong password give dont reveal any information
-- Other machines on your network are blocked unless you have white listed them
-- Blocked visitors get an access denied page and never see the login
-- After too many wrong passwords, login is blocked for a few minutes
-
 ### Limits you set
 
 - Every limit is yours to change at install: how much disk it may use, how big an upload, how big an edit, how big an import
@@ -265,9 +167,30 @@ Generate images from prompts, right from a simple admin dashboard. Type what you
 - A public link can only be opened so many times a minute
 - Anyone stopped by a limit gets an error message
 
-### Security
+## Backup and restore
+
+- Back up the whole install to one zip with `node scripts/backup.js`: every image, all your prompts in a form you can read, and the record that ties them together
+- Generate a backup from the Backup page: create it, download it, and delete old ones you no longer need
+- A backup holds no settings file and no OpenAI key, so it is safe to keep on any device
+- Restore a backup with `node scripts/restore.js <file>.zip`, making sure the app is stopped
+- Restoring is done with the CLI tool. It deletes everything you have and restores the backup that was created
+- Restore checks the file first and refuses anything it cannot use, whether it is the wrong sort of file, one from a newer version, or one with something missing, before it changes a thing
+- Before starting the app on an older library, run `node scripts/schema-gaps.js` to see if anything is missing from it
+
+## Authenticating
+
+- Log in with a username and password you set
+- Locked behind a login, only you can get in
+- Log out any time from the sidebar
+- Your login lasts a week, then asks again
+- A wrong username and a wrong password don't reveal which one was wrong
+- Other machines on your network are blocked unless you have allow listed them
+- Blocked visitors get an access denied page and never see the login
+- After too many wrong passwords, login is blocked for a few minutes
+
+## Security
 
 - On a live setup the app will not start until you have set the password and its two secret keys, so it never runs unprotected
-- If it is set up wrong for the proxy web server, the log will notify you as the blocking of other addresses is required a valid setup
+- If it is set up wrong for the proxy web server, the log warns you, because blocking other addresses depends on a valid setup
 - Run it over a secure connection and your login is only ever sent over that connection
 - Set it up behind a web server such as nginx and set `TRUST_PROXY` (true trusts one proxy, or give the number of proxies or their addresses), and it still knows where a visitor really came from
